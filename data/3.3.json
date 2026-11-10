@@ -1,0 +1,1054 @@
+[
+ {
+  "id": "3.3.1-01",
+  "obj": "3.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs Azure Kubernetes Service (AKS) clusters and uses Microsoft Defender for Containers. The security team must discover the clusters and get cluster configuration findings and inventory through the Kubernetes API, without deploying any software inside the clusters.\n\nWhich capability should you rely on?",
+  "choices": [
+   "Agentless discovery for Kubernetes",
+   "The Defender sensor DaemonSet",
+   "The Azure Policy for Kubernetes add-on",
+   "Registry access with security findings"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: agentless discovery uses the Kubernetes API for zero-footprint discovery of clusters, configurations and deployments. It feeds inventory, security explorer and posture recommendations, and nothing runs inside the cluster.",
+   "Incorrect: the Defender sensor is a DaemonSet on the nodes that collects eBPF runtime telemetry for threat detection. It runs inside the cluster, which the stem rules out. Use it when you need runtime alerts for processes and network activity.",
+   "Incorrect: the Azure Policy for Kubernetes add-on is a Gatekeeper-based pod that assesses and enforces workload hardening rules inside the cluster. The stem forbids in-cluster software. Use it for workload hardening recommendations or deny rules.",
+   "Incorrect: registry access with security findings enables agentless vulnerability assessment of images in container registries. It does not discover clusters or their configuration. Use it to scan images that are pushed to Azure Container Registry."
+  ],
+  "explanation": "Defender for Containers separates agentless capabilities (API-based discovery, inventory, control plane hardening, agentless vulnerability assessment) from sensor-based runtime protection and from Azure Policy-based workload hardening. When nothing may run inside the cluster, agentless discovery for Kubernetes is the capability that supplies inventory and misconfiguration data.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction"
+ },
+ {
+  "id": "3.3.1-02",
+  "obj": "3.3.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. runs an AKS cluster on Kubernetes 1.32 with images stored in Azure Container Registry. Microsoft Defender for Containers is enabled. The security team must block the deployment of images that have critical vulnerabilities, based on registry scan results, before the workload starts in the cluster.\n\nWhich feature should you configure?",
+  "choices": [
+   "Security gating (gated deployment) rules",
+   "Agentless vulnerability assessment of running containers",
+   "An Azure Policy initiative that restricts allowed container images",
+   "Defender sensor runtime anti-malware"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: gated deployment adds an admission control layer that evaluates deployments against rules built on registry vulnerability findings. It can audit or block images that do not meet the policy before pods start.",
+   "Incorrect: agentless assessment of running containers reports vulnerabilities after the workload is already deployed, so it cannot stop a deployment. Use it to find and prioritize vulnerable workloads that already run.",
+   "Incorrect: an allowed-images Azure Policy compares image names with a pattern you define, such as approved registries. It does not use scan findings. Use it to restrict where images come from, not to gate on vulnerabilities.",
+   "Incorrect: runtime anti-malware detects and can block malicious file execution in running hosts and containers. It does not evaluate registry vulnerability findings at deploy time. Use it to catch malware inside running containers."
+  ],
+  "explanation": "Gated deployment is the supply chain protection capability that plugs into the Kubernetes admission controller. Rules are evaluated against vulnerability findings that Defender for Containers attaches to registry images, and the rule action can audit or block the deployment.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/troubleshooting-runtime-gated"
+ },
+ {
+  "id": "3.3.1-03",
+  "obj": "3.3.1",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Litware, Inc. must deploy the Defender sensor and the Azure Policy for Kubernetes add-on to an existing AKS cluster named AKS1 in the resource group RG1 by using Azure CLI.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```\naz aks [[1]] --resource-group RG1 --name AKS1 --enable-defender\naz aks [[2]] --addons azure-policy --name AKS1 --resource-group RG1\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "update",
+     "create",
+     "upgrade"
+    ],
+    "why": [
+     "Correct: az aks update changes an existing cluster, and --enable-defender deploys the Defender sensor to it as an AKS security profile.",
+     "Incorrect: az aks create provisions a new cluster and fails for a name that already exists. Use it when you build a new cluster and want Defender enabled from the start.",
+     "Incorrect: az aks upgrade changes the Kubernetes version of the cluster and has no --enable-defender parameter. Use it for version upgrades."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "enable-addons",
+     "update",
+     "scale"
+    ],
+    "why": [
+     "Correct: az aks enable-addons --addons azure-policy installs the Azure Policy for Kubernetes add-on, the Gatekeeper-based pod used for workload hardening.",
+     "Incorrect: az aks update changes cluster settings through dedicated flags and does not take an --addons list. Use it for settings such as --enable-defender.",
+     "Incorrect: az aks scale changes the node count of a node pool. Use it for capacity, not for installing add-ons."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "On AKS the Defender sensor is deployed as a security profile by updating the existing cluster with --enable-defender, and Azure Policy for Kubernetes is an AKS add-on that you turn on with enable-addons. Both components are also toggled on the Defender for Containers plan settings page.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-deploy-azure-cli"
+ },
+ {
+  "id": "3.3.1-04",
+  "obj": "3.3.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank enabled Microsoft Defender for Containers on a subscription. In the plan settings, the Defender sensor, Security Gating, Registry access, Kubernetes API access and Azure Policy are turned on. A gated deployment rule does not trigger for images in Azure Container Registry. The investigation shows that the cluster AKS1 runs Kubernetes 1.30 and that the Security findings component is turned off.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Upgrade AKS1 to Kubernetes 1.31 or later.",
+   "Turn on the Security findings component of Registry access in the plan settings.",
+   "Turn on Agentless scanning for machines in the plan settings.",
+   "Enable the Defender Cloud Security Posture Management (CSPM) plan.",
+   "Deploy the Defender sensor to AKS1 as an Azure Arc extension."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "rationale": [
+   "Correct: gated deployment requires a cluster that runs Kubernetes 1.31 or later, so a cluster on 1.30 must be upgraded before the admission control layer can enforce rules.",
+   "Correct: Security findings generates and links the vulnerability findings to images. Without it there is nothing for a gating rule to evaluate, and this component cannot be enabled through Azure Policy.",
+   "Incorrect: agentless scanning for machines scans the disks of Kubernetes nodes for vulnerabilities and secrets. It does not supply image findings for gating. Use it to assess node operating systems.",
+   "Incorrect: Defender CSPM adds attack path analysis and other posture features, but gated deployment does not depend on it. Enable it when you need attack paths and cloud security graph insights.",
+   "Incorrect: for AKS the Defender sensor is already deployed as a security profile, and the stem says it is on. Arc extensions are the deployment method for Arc-enabled clusters such as EKS or GKE."
+  ],
+  "explanation": "Gated deployment needs the Defender sensor, Security Gating, Registry access and Security findings, and a cluster that runs Kubernetes 1.31 or later. The scan findings artifact must also be available for the image, which the Security findings component produces.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/troubleshooting-runtime-gated"
+ },
+ {
+  "id": "3.3.2-01",
+  "obj": "3.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys requires that all access to the Kubernetes API of an AKS cluster goes through Microsoft Entra ID, so that Conditional Access policies apply. Microsoft Entra integration is already enabled. The built-in cluster administrator certificate must stop working.\n\nWhat should you do?",
+  "choices": [
+   "Disable local accounts on the cluster.",
+   "Enable authorized IP address ranges on the API server.",
+   "Convert the cluster to a private cluster.",
+   "Enable Microsoft Entra Workload ID on the cluster."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: local accounts provide the static admin certificate that bypasses Microsoft Entra ID. Disabling them means the certificate no longer works and all API access is subject to Entra authentication and Conditional Access.",
+   "Incorrect: authorized IP ranges limit which source addresses reach the API server, but a valid admin certificate presented from an allowed range still works. Use ranges to reduce network exposure of a public endpoint.",
+   "Incorrect: a private cluster removes the public API endpoint, yet the static credential still works for anyone who has network access to the private endpoint. Use it to keep the API server off the internet.",
+   "Incorrect: Workload ID federates pod service accounts with Entra identities so pods reach Azure resources without secrets. It does not change how users authenticate to the API server."
+  ],
+  "explanation": "AKS local accounts include a static cluster administrator certificate that bypasses Microsoft Entra ID and therefore Conditional Access. Disabling local accounts, for example with az aks update --disable-local-accounts, forces every Kubernetes API request through Entra authentication.",
+  "ref": "https://learn.microsoft.com/azure/aks/secure-aks"
+ },
+ {
+  "id": "3.3.2-02",
+  "obj": "3.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs App1 in the namespace app1 of an AKS cluster. App1 must read secrets from Azure Key Vault without any stored credentials, and other workloads that run on the same nodes must not obtain the same access.\n\nWhich identity approach should you use?",
+  "choices": [
+   "Microsoft Entra Workload ID with a federated service account for App1",
+   "The kubelet managed identity with a Key Vault role assignment",
+   "A service principal secret stored as a Kubernetes secret",
+   "A managed identity attached to the node pool scale set"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Workload ID federates the service account that App1 uses with a Microsoft Entra identity. Only pods that run under that service account get tokens, no secret is stored, and access is scoped per workload.",
+   "Incorrect: the kubelet identity belongs to the node, so any pod on the node could use it to reach Key Vault. Use it for infrastructure tasks such as pulling images from Azure Container Registry.",
+   "Incorrect: a client secret in a Kubernetes secret is a stored credential that must be rotated and is readable by anyone with access to the namespace. Use federation when the stem forbids stored credentials.",
+   "Incorrect: an identity attached to the scale set is reachable from every pod on those nodes, so it cannot isolate App1. Use node-level identities only for access that all workloads on the node may share."
+  ],
+  "explanation": "Microsoft Entra Workload ID uses OIDC federation between a Kubernetes service account and a Microsoft Entra identity, so pods get tokens without secrets. Because the federation is bound to one service account, access is scoped per workload instead of per node.",
+  "ref": "https://learn.microsoft.com/azure/aks/secure-aks"
+ },
+ {
+  "id": "3.3.2-03",
+  "obj": "3.3.2",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Litware, Inc. runs an AKS cluster that has a public Kubernetes API server endpoint. The security team plans to use API server authorized IP address ranges and Kubernetes network policies.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "You can use authorized IP address ranges on the cluster after you convert it to a private cluster.",
+   "If the cluster needs more than 200 authorized ranges, API server virtual network integration supports a higher limit.",
+   "Without network policies, a pod can accept traffic from pods in other namespaces.",
+   "Authorized IP address ranges restrict which pods can communicate with each other."
+  ],
+  "answer": [
+   1,
+   2
+  ],
+  "rationale": [
+   "No: authorized IP ranges cannot be used with private clusters, because a private cluster has no public endpoint to filter. Use ranges to protect a public endpoint, or a private cluster to remove it.",
+   "Yes: a cluster supports up to 200 authorized ranges, and API server virtual network integration supports up to 2,000 ranges, so it is the option when the limit is exceeded.",
+   "Yes: by default a pod can accept traffic from any other pod in the cluster. Kubernetes network policies restrict that east-west traffic with pod selectors and ingress or egress rules.",
+   "No: authorized ranges filter requests to the API server from outside the cluster. Pod-to-pod traffic is controlled by Kubernetes network policies, not by API server ranges."
+  ],
+  "explanation": "Authorized IP ranges filter which source addresses reach the API server of a cluster with a public endpoint, up to 200 ranges, or up to 2,000 with API server virtual network integration. They do not apply to private clusters and do not control pod traffic, which is the job of network policies.",
+  "ref": "https://learn.microsoft.com/azure/aks/api-server-authorized-ip-ranges"
+ },
+ {
+  "id": "3.3.2-04",
+  "obj": "3.3.2",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. must create a new AKS cluster that uses Microsoft Entra integration and Azure RBAC for Kubernetes authorization, and then give User1 read-only access to the namespace dev. The variable $AKS_ID must contain the resource ID of the cluster.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az aks create --resource-group RG1 --name AKS1 --enable-aad --enable-azure-rbac --generate-ssh-keys`",
+   "`AKS_ID=$(az aks show --resource-group RG1 --name AKS1 --query id --output tsv)`",
+   "`az role assignment create --role \"Azure Kubernetes Service RBAC Reader\" --assignee <User1-object-id> --scope $AKS_ID/namespaces/dev`",
+   "`az aks update --resource-group RG1 --name AKS1 --enable-local-accounts`",
+   "`az aks get-credentials --resource-group RG1 --name AKS1 --admin`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "Step 1: the cluster must exist, with Microsoft Entra integration and Azure RBAC enabled at creation, before anything can be assigned on it.",
+   "Step 2: the role assignment scope is built from the cluster resource ID, so you retrieve it from the created cluster first.",
+   "Step 3: assigning the Azure Kubernetes Service RBAC Reader role at the scope of the namespace dev gives User1 read-only access to that namespace without any cluster-wide permission.",
+   "Incorrect: this re-enables the static local accounts that bypass Microsoft Entra ID. It is not needed and weakens the design. Use it only as a break-glass measure when Entra sign-in is unavailable.",
+   "Incorrect: get-credentials --admin downloads the static admin credential, which bypasses Azure RBAC for Kubernetes authorization. Use it only for emergency access, not to configure user permissions."
+  ],
+  "explanation": "Azure RBAC for Kubernetes authorization is enabled when the cluster is created with --enable-aad and --enable-azure-rbac. A role assignment needs the cluster resource ID as a scope, so the ID is retrieved before the AKS RBAC Reader role is assigned at the namespace scope.",
+  "ref": "https://learn.microsoft.com/azure/aks/entra-id-authorization"
+ },
+ {
+  "id": "3.3.3-01",
+  "obj": "3.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs workloads in AKS that pull images from Azure Container Registry. The cluster must pull images without imagePullSecrets, admin credentials or other stored secrets, and with the least privilege needed to read images.\n\nWhich role assignment should you configure?",
+  "choices": [
+   "AcrPull for the kubelet managed identity, scoped to the registry",
+   "AcrPush for the kubelet managed identity, scoped to the registry",
+   "Contributor for the kubelet managed identity, scoped to the resource group",
+   "AcrPull for a service principal whose secret is stored as an imagePullSecret"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: AcrPull grants pull permission only, and a managed identity needs no stored secret. Scoping it to the registry gives the least privilege that satisfies the requirement.",
+   "Incorrect: AcrPush also allows pushing images, which exceeds the need to read images. Use it for build pipelines that publish images to the registry.",
+   "Incorrect: Contributor on the resource group is a broad control-plane role and does not follow least privilege. Use data-plane roles such as AcrPull for image access instead of broad roles.",
+   "Incorrect: a service principal secret in an imagePullSecret is a stored credential that must be rotated, which the stem forbids. Use it only for external clients that cannot use a managed identity."
+  ],
+  "explanation": "AKS authenticates to Azure Container Registry with Microsoft Entra ID, so the kubelet managed identity needs only the data-plane AcrPull role on the registry. This removes imagePullSecrets and avoids the admin account.",
+  "ref": "https://learn.microsoft.com/azure/container-registry/secure-container-registry"
+ },
+ {
+  "id": "3.3.3-02",
+  "obj": "3.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank must let an external partner pipeline push images to the repository partner/app1 in Azure Container Registry. The partner cannot use Microsoft Entra identities, and the pipeline must not be able to read or write any other repository.\n\nWhat should you use?",
+  "choices": [
+   "A token linked to a scope map that grants push on partner/app1",
+   "The AcrPush role assigned to a service principal at registry scope",
+   "The admin account of the registry with its two passwords",
+   "An ABAC condition on the Container Registry Repository Writer role"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: a token with a scope map limits the partner to push on partner/app1 and works without a Microsoft Entra identity, which satisfies both constraints.",
+   "Incorrect: AcrPush at registry scope allows pushing to every repository, and a service principal is a Microsoft Entra identity the partner cannot use. Use it for your own pipelines.",
+   "Incorrect: the admin account is a single registry-wide credential with full push and pull permissions. Use it only for short tests, because it cannot be limited to one repository.",
+   "Incorrect: ABAC conditions limit repositories on a role assignment, but the assignee must be a Microsoft Entra identity, which the partner does not have. Use ABAC for identities you manage in Entra."
+  ],
+  "explanation": "Repository-scoped tokens are backed by scope maps that list repositories and permitted actions. They suit clients that cannot use Microsoft Entra ID and limit access to named repositories, unlike registry-wide roles or the admin account.",
+  "ref": "https://learn.microsoft.com/azure/container-registry/secure-container-registry"
+ },
+ {
+  "id": "3.3.3-03",
+  "obj": "3.3.3",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Relecloud must create a new Azure Container Registry named relecloudacr that is reachable through a private IP address in the subnet Subnet1 of the virtual network VNet1. The resource group is RG1.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az acr create --resource-group RG1 --name relecloudacr --sku Premium`",
+   "`REGISTRY_ID=$(az acr show --name relecloudacr --query id --output tsv)`",
+   "`az network private-endpoint create --name pe1 --resource-group RG1 --vnet-name VNet1 --subnet Subnet1 --private-connection-resource-id $REGISTRY_ID --group-ids registry --connection-name conn1`",
+   "`az acr create --resource-group RG1 --name relecloudacr --sku Basic`",
+   "Create a repository-scoped token and a scope map for the registry."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "Step 1: the registry is created in the Premium tier, which is the tier that supports private endpoints.",
+   "Step 2: the private endpoint targets the registry through its resource ID, so you retrieve the ID after the registry exists.",
+   "Step 3: the private endpoint uses the registry group ID and places a private IP address of the registry in Subnet1.",
+   "Incorrect: the Basic tier does not support private endpoints, so the endpoint creation would fail. Use Basic for development registries that do not need network isolation.",
+   "Incorrect: tokens and scope maps control who can access repositories, not which network can reach the registry. Use them for external clients that cannot use Microsoft Entra ID."
+  ],
+  "explanation": "Private endpoints for Azure Container Registry require the Premium service tier. The private endpoint is created against the registry resource ID with the registry group ID, so the registry must exist and its ID must be known before the endpoint is created.",
+  "ref": "https://learn.microsoft.com/azure/container-registry/container-registry-private-endpoints"
+ },
+ {
+  "id": "3.3.3-04",
+  "obj": "3.3.3",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Contoso, Ltd. plans to switch the role assignment permissions mode of an Azure Container Registry from RBAC Registry to RBAC Registry + ABAC Repository Permissions by running az acr update with --role-assignment-mode rbac-abac. A build service currently holds the AcrPush role on the registry.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "After the switch, the existing AcrPush assignment continues to grant push access.",
+   "Assigning Container Registry Repository Writer without a condition grants permissions on all repositories in the registry.",
+   "Assigning ABAC-enabled roles to existing identities before the switch reduces the risk of cutting off access."
+  ],
+  "answer": [
+   1,
+   2
+  ],
+  "rationale": [
+   "No: legacy roles such as AcrPull, AcrPush and AcrDelete are not honored in ABAC-enabled registries, so the build service would lose access. Replace them with ABAC-enabled roles first.",
+   "Yes: an ABAC-enabled role without a condition grants registry-wide permissions, similar to the legacy roles. Add a repository condition when you want to limit the identity to named repositories.",
+   "Yes: switching the mode without equivalent ABAC-enabled assignments can cut off existing identities. Assign the new roles first, then run the update, as the migration guidance recommends."
+  ],
+  "explanation": "In ABAC-enabled mode the registry honors ABAC-enabled roles such as Container Registry Repository Reader and Writer, and the legacy AcrPull, AcrPush and AcrDelete roles are not honored. Assign the new roles before the switch to avoid cutting off access.",
+  "ref": "https://learn.microsoft.com/azure/container-registry/container-registry-rbac-abac-repository-permissions"
+ },
+ {
+  "id": "3.3.4-01",
+  "obj": "3.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. deploys a Windows container group in Azure Container Instances. The container needs a database password that must not be visible when the container group properties are viewed in the Azure portal or Azure CLI.\n\nWhat should you use?",
+  "choices": [
+   "An environment variable that uses the secureValue property",
+   "An environment variable that uses the value property",
+   "A secret volume mounted into the container",
+   "A build argument baked into the container image"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: a secure environment variable shows only its name in container properties, and the value is available only from inside the container. It works for both Windows and Linux containers.",
+   "Incorrect: the value property is shown in clear text when you query the container group in the portal or with az container show. Use it for non-sensitive settings.",
+   "Incorrect: secret volumes keep secrets in a RAM-backed read-only volume, but they are currently restricted to Linux containers and the stem uses Windows. Use them when a Linux container prefers files to variables.",
+   "Incorrect: a build argument baked into the image stores the password in the image layers, where anyone who can pull the image can read it. Pass secrets at deployment time instead."
+  ],
+  "explanation": "Azure Container Instances supports secure environment variables through the secureValue property, and their values are visible only inside the container. Secret volumes are an alternative but are limited to Linux containers.",
+  "ref": "https://learn.microsoft.com/azure/container-instances/container-instances-environment-variables"
+ },
+ {
+  "id": "3.3.4-02",
+  "obj": "3.3.4",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Contoso, Ltd. has a container app named app1 in the resource group RG1 and a key vault named kv1 that uses Azure RBAC authorization. The app must read the secret db-password from kv1 through a Key Vault reference, without any stored credential, and expose it to the container as the environment variable DB_PASSWORD. Assume that $PRINCIPAL_ID and $KEYVAULT_ID contain the correct values when they are used.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az containerapp identity assign --resource-group RG1 --name app1 --system-assigned`",
+   "`az role assignment create --role \"Key Vault Secrets User\" --assignee $PRINCIPAL_ID --scope $KEYVAULT_ID`",
+   "`az containerapp secret set --resource-group RG1 --name app1 --secrets \"db-password=keyvaultref:<SECRET_URI>,identityref:system\"`",
+   "`az containerapp update --resource-group RG1 --name app1 --set-env-vars DB_PASSWORD=secretref:db-password`",
+   "`az keyvault set-policy --name kv1 --object-id $PRINCIPAL_ID --secret-permissions get`",
+   "`az containerapp update --resource-group RG1 --name app1 --set-env-vars DB_PASSWORD=<plain-text-value>`"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "Step 1: the container app needs a managed identity before it can authenticate to Key Vault, and the identity provides the principal ID used in the next step.",
+   "Step 2: the Key Vault Secrets User role lets the identity read secret values from a vault that uses Azure RBAC authorization.",
+   "Step 3: the secret definition with keyvaultref and identityref makes Container Apps retrieve the value from Key Vault with the identity, which now has access.",
+   "Step 4: the environment variable refers to the secret with secretref, so the value reaches the container without being stored in the app configuration.",
+   "Incorrect: set-policy writes a vault access policy, which does not apply because kv1 uses Azure RBAC authorization. Use it only for vaults that still use the access policy permission model.",
+   "Incorrect: a plain-text value stores the secret in the app configuration, which defeats the purpose of the Key Vault reference. Use a secretref instead."
+  ],
+  "explanation": "A Key Vault reference needs a managed identity, a role that lets the identity read secrets, a Container Apps secret that points at the vault secret, and an environment variable that refers to that secret. Each step depends on the previous one.",
+  "ref": "https://learn.microsoft.com/azure/container-apps/manage-secrets"
+ },
+ {
+  "id": "3.3.4-03",
+  "obj": "3.3.4",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Litware, Inc. hosts container apps in Azure Container Apps. You must apply a security control to each of four apps.\n\nWhich control should you use for each requirement? To answer, drag the appropriate controls to the correct requirements. Each control may be used once, more than once, or not at all.",
+  "choices": [
+   "IP restrictions for ingress",
+   "Built-in authentication with Microsoft Entra ID",
+   "Mutual TLS (mTLS)",
+   "Key Vault reference secret",
+   "Private endpoint",
+   "Token store"
+  ],
+  "targets": [
+   "App1: public ingress must accept requests from the address range 203.0.113.0/24 and reject other addresses",
+   "App2: users must sign in with Microsoft Entra ID before requests reach the container",
+   "App3: traffic between apps in the same environment must be authenticated and encrypted",
+   "App4: a connection string that is stored in Azure Key Vault must be available as a secret without storing its value in the app"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "IP restrictions let you define allow or deny rules for ingress by address range, which is the control that limits public ingress to one range.",
+   "Built-in authentication provides Microsoft Entra ID sign-in in front of the app, so unauthenticated requests are handled before they reach the container.",
+   "mTLS authenticates and encrypts service-to-service traffic inside the environment, with both sides verifying each other.",
+   "A Key Vault reference secret makes Container Apps retrieve the value from Key Vault by using a managed identity, so the value is not stored in the app configuration."
+  ],
+  "notes": [
+   "Allows or denies ingress traffic by IP address or range. Use it to limit who can reach a public endpoint, not to authenticate users.",
+   "Easy Auth style sign-in with Microsoft Entra ID or other providers for ingress-enabled apps. Use it to authenticate users before they reach the app.",
+   "Client certificate based authentication and encryption between services in the environment. Use it for service-to-service trust, not for user sign-in.",
+   "A secret that points at a Key Vault secret and is read with a managed identity that has the Key Vault Secrets User role. Use it to keep secret values out of the app.",
+   "A private IP address for inbound access in a workload profiles environment. Use it to remove public exposure, not to filter by address range or authenticate users.",
+   "Stores authentication tokens for the built-in authentication feature and refreshes them. Use it when the app needs the user tokens, not to authenticate users itself."
+  ],
+  "explanation": "Container Apps combines ingress controls (IP restrictions, built-in authentication, mTLS) with secret handling (Key Vault references with managed identity) and network isolation (private endpoints). Match the control to the layer that the requirement names.",
+  "ref": "https://learn.microsoft.com/azure/container-apps/secure-deployment"
+ },
+ {
+  "id": "3.3.4-04",
+  "obj": "3.3.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Relecloud deploys a container group to Azure Container Instances in the subnet ACISubnet of VNet1. The container group uses a user-assigned managed identity with the AcrPull role to pull an image from an Azure Container Registry that has a private endpoint. Trusted services access and a NAT gateway are already configured. The private endpoint was created in ACISubnet, which is delegated to Microsoft.ContainerInstance/containerGroups. The deployment fails.\n\nWhat should you do?",
+  "choices": [
+   "Move the registry private endpoint to a subnet that is not delegated to Azure Container Instances.",
+   "Enable the admin user on the registry and pass its credentials to the container group.",
+   "Assign the AcrPush role instead of AcrPull to the managed identity.",
+   "Keep the private endpoint in ACISubnet and disable private endpoint network policies on the subnet."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: ACI-delegated subnets can contain only container groups, so the private endpoint must be in another subnet. The identity-based pull is otherwise correctly configured.",
+   "Incorrect: enabling the admin user works around the symptom with a shared registry-wide credential and does not fix the subnet placement. Use identity-based pulls to avoid stored credentials.",
+   "Incorrect: pulling an image needs only AcrPull, and the stem says the identity already has it. AcrPush adds the ability to push images and does not resolve a subnet conflict.",
+   "Incorrect: private endpoint network policies control NSG and route table enforcement on a subnet, not whether a delegated subnet may contain a private endpoint. The delegated subnet still accepts only container groups."
+  ],
+  "explanation": "A subnet that is delegated to Azure Container Instances can contain only container groups. The registry private endpoint must therefore be created in a different subnet of the virtual network, and the managed identity pull then works through the private endpoint.",
+  "ref": "https://learn.microsoft.com/azure/container-instances/using-azure-container-registry-mi"
+ },
+ {
+  "id": "3.3.5-01",
+  "obj": "3.3.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has an HTTP-triggered function named Func1 in a function app that contains several functions. Callers must present a key that grants access to Func1 but not to the other functions, and the key must not allow calls to the runtime administrative endpoints.\n\nWhat should you do?",
+  "choices": [
+   "Set the authorization level to function and share a function key of Func1.",
+   "Set the authorization level to function and share a host key.",
+   "Set the authorization level to admin and share the master key.",
+   "Set the authorization level to function and share a system key."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: a function key is valid only for its own function and does not grant access to the /admin endpoints, which matches both constraints.",
+   "Incorrect: a host key works for every function in the app, so a caller could invoke the other functions. Use host keys when a client needs the whole app.",
+   "Incorrect: the master key is a special host key that also grants administrative access to the runtime REST APIs. Reserve it for administrators and never distribute it to callers.",
+   "Incorrect: system keys are created and managed by extensions for internal webhook endpoints, such as the Event Grid trigger, and you cannot set their values. They are not meant for client callers."
+  ],
+  "explanation": "HTTP authorization levels map to key types: function requires a function or host key, and admin requires the master key. A function key is scoped to one function, a host key to every function in the app, and the master key also opens the /admin runtime endpoints.",
+  "ref": "https://learn.microsoft.com/azure/azure-functions/function-keys-how-to"
+ },
+ {
+  "id": "3.3.5-02",
+  "obj": "3.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. hosts an HTTP-triggered function app that is called by a public single-page application. Users must sign in with Microsoft Entra ID, requests without a valid sign-in must be rejected by the platform before they reach the function code, and no shared secret may be embedded in the client.\n\nWhat should you configure?",
+  "choices": [
+   "App Service Authentication with Microsoft Entra ID and Require authentication",
+   "A function authorization level with a host key sent by the client",
+   "An access restriction rule that allows the corporate IP range",
+   "The functionsRuntimeAdminIsolationEnabled site property"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: the platform authenticates users with Microsoft Entra ID and rejects unauthenticated requests before the function code runs, with no secret in the client.",
+   "Incorrect: a host key is a shared secret that would have to be embedded in a public client, where anyone can read it. It also does not identify the signed-in user.",
+   "Incorrect: an IP restriction limits network sources but does not authenticate users, and users of a public SPA connect from arbitrary addresses. Use it to limit callers to known networks.",
+   "Incorrect: this property disables the /admin runtime endpoints. It does not authenticate users of the HTTP functions. Use it to harden the administrative surface of the app."
+  ],
+  "explanation": "App Service Authentication, also called Easy Auth, runs in front of the function code and can require authentication with Microsoft Entra ID. Access keys are shared secrets and do not identify users, so they are unsuitable for public clients.",
+  "ref": "https://learn.microsoft.com/azure/azure-functions/security-concepts"
+ },
+ {
+  "id": "3.3.5-03",
+  "obj": "3.3.5",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Woodgrove Bank runs four function apps. You must configure a network or access control for each requirement.\n\nWhich control should you use for each requirement? To answer, drag the appropriate controls to the correct requirements. Each control may be used once, more than once, or not at all.",
+  "choices": [
+   "functionsRuntimeAdminIsolationEnabled set to true",
+   "Access restriction rules",
+   "Private endpoint",
+   "Virtual network integration",
+   "Authorization level anonymous",
+   "Host key rotation"
+  ],
+  "targets": [
+   "Func1: the /admin runtime endpoints must be unavailable, even to a caller that has the master key",
+   "Func2: inbound requests must be accepted only from the IP address of an API Management instance",
+   "Func3: clients must reach the app only on a private IP address in a virtual network",
+   "Func4: the app must read secrets through Key Vault references from a key vault that blocks public access"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "Setting functionsRuntimeAdminIsolationEnabled to true disables the /admin endpoints, so even the master key cannot call them.",
+   "Access restriction rules define allow and deny rules by IP address, so one allow rule for the API Management address limits inbound callers.",
+   "A private endpoint gives the app a private IP address in the virtual network for inbound traffic, which removes the public path.",
+   "Virtual network integration lets the app reach network-restricted resources, so Key Vault references can retrieve secrets from a vault that blocks public access."
+  ],
+  "notes": [
+   "A site property that disables the administrative runtime endpoints. Use it to reduce the administrative attack surface, not to filter callers.",
+   "Allow and deny rules evaluated by priority for inbound traffic from IP ranges or service tags. Use them to limit who can reach the public endpoint.",
+   "A network interface with a private IP address that brings the app into your virtual network for inbound traffic. Use it to remove public exposure.",
+   "Gives the app outbound access to resources in a virtual network. Use it for Key Vault references to network-restricted vaults or virtual network triggers.",
+   "Requires no key at all, so anyone who can reach the endpoint can call it. Use it only for deliberately public functions with other controls in front.",
+   "Regenerates keys on a schedule. It limits the lifetime of shared secrets but does not restrict network paths or disable endpoints."
+  ],
+  "explanation": "Functions security combines runtime hardening (disabling /admin endpoints), inbound network controls (access restrictions and private endpoints) and outbound controls (virtual network integration). Match the direction and layer named in the requirement.",
+  "ref": "https://learn.microsoft.com/azure/azure-functions/security-concepts"
+ },
+ {
+  "id": "3.3.5-04",
+  "obj": "3.3.5",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank hosts an HTTP-triggered function app on the Elastic Premium plan. Requests must be inspected for common web attacks such as SQL injection and cross-site scripting, and clients must not be able to bypass the inspection by calling the default function app endpoint directly.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Place Azure Application Gateway with a WAF policy in front of the function app.",
+   "Restrict inbound access to the function app to the gateway, for example by using a private endpoint.",
+   "Enable App Service Authentication with Microsoft Entra ID on the function app.",
+   "Set the authorization level of each function to function.",
+   "Set functionsRuntimeAdminIsolationEnabled to true on the function app."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "rationale": [
+   "Correct: the WAF policy on Application Gateway inspects request content for attacks such as SQL injection and cross-site scripting.",
+   "Correct: without a restriction on the function app endpoint, clients can call the app directly and skip the WAF. A private endpoint or gateway-only access rule closes that path.",
+   "Incorrect: authentication proves who the caller is but does not inspect request content for attacks. Use it to require sign-in, as a separate control.",
+   "Incorrect: function authorization requires an access key but does not inspect payloads, and callers that hold the key can still send malicious content. Use it as a coarse gate.",
+   "Incorrect: this property disables the /admin runtime endpoints and does not inspect or restrict HTTP function traffic. Use it to harden the administrative surface."
+  ],
+  "explanation": "A web application firewall inspects HTTP content, and Application Gateway or Azure Front Door provide it. Because the function app also has its own endpoint, direct access must be blocked, for example with a private endpoint or access restrictions that allow only the gateway.",
+  "ref": "https://learn.microsoft.com/azure/azure-functions/security-concepts"
+ },
+ {
+  "id": "3.3.6-01",
+  "obj": "3.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys has a Consumption logic app with a workflow that starts with the Request trigger. Callers must authenticate to the trigger endpoint by presenting Microsoft Entra ID access tokens instead of using the shared access signature in the callback URL.\n\nWhat should you configure?",
+  "choices": [
+   "An authorization policy that enables OAuth 2.0 with Microsoft Entra ID",
+   "Easy Auth on the logic app resource",
+   "Secure inputs and outputs on the trigger",
+   "An allowed inbound IP address range for the trigger"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: an authorization policy with issuer and audience claims makes the trigger accept OAuth access tokens from Microsoft Entra ID, which can replace the SAS key.",
+   "Incorrect: Easy Auth is the Azure Functions provision for Standard workflows that start with the Request trigger. The stem uses a Consumption logic app, which uses authorization policies instead.",
+   "Incorrect: secure inputs and outputs obfuscate data in run history. They do not authenticate callers. Use them to hide sensitive values in monitoring views.",
+   "Incorrect: an IP range limits where calls may come from but does not authenticate the caller or validate tokens. Use it as an additional access control next to authentication."
+  ],
+  "explanation": "For a Consumption workflow with a request-based trigger, you add an authorization policy at the logic app resource level that enables OAuth 2.0 with Microsoft Entra ID. The claims of an inbound token, such as issuer and audience, are compared with the policy, and SAS can be disabled when only OAuth is wanted.",
+  "ref": "https://learn.microsoft.com/azure/logic-apps/set-up-security-permissions"
+ },
+ {
+  "id": "3.3.6-02",
+  "obj": "3.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a logic app workflow that retrieves a password from Azure Key Vault and passes it to an HTTP action. Operators must be able to open the run history and see the inputs and outputs of the other actions, but the password must not be visible in the run history.\n\nWhat should you configure?",
+  "choices": [
+   "Secure outputs on the Key Vault action and secure inputs on the HTTP action",
+   "A run history access restriction that uses the range 0.0.0.0-0.0.0.0",
+   "An allowed inbound IP address range for the workflow trigger",
+   "Disabled shared access signature (SAS) authentication on the trigger"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: obfuscating the output of the Key Vault action and the input of the HTTP action hides the password in run history, while the other actions stay visible to operators.",
+   "Incorrect: the range 0.0.0.0-0.0.0.0 blocks access to inputs and outputs of every action, so operators could not see the other actions either. Use it for just-in-time data access.",
+   "Incorrect: an inbound IP range controls who can call the trigger and has no effect on what run history shows. Use it to limit callers to known networks.",
+   "Incorrect: disabling SAS changes how callers authenticate to a Request trigger and does not hide data in run history. Use it to enforce OAuth with Microsoft Entra ID."
+  ],
+  "explanation": "Secure inputs and secure outputs obfuscate the content of an action in run history, so operators can still see the run but not the sensitive values. Restricting run history by IP range hides inputs and outputs for every action, which is too broad here.",
+  "ref": "https://learn.microsoft.com/azure/logic-apps/set-up-security-permissions"
+ },
+ {
+  "id": "3.3.6-03",
+  "obj": "3.3.6",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Litware, Inc. protects a Consumption logic app workflow that starts with the Request trigger. The workflow is called by other workflows and by an on-premises application.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "The trigger can accept calls that use OAuth 2.0 with Microsoft Entra ID and calls that use SAS at the same time without errors.",
+   "You can disable SAS authentication so that callers must use OAuth 2.0 with Microsoft Entra ID.",
+   "If you select Only other Logic Apps, a parent workflow that uses the HTTP action can still call the nested workflow.",
+   "In the Azure portal, an inbound IP address restriction applies to both the triggers and the actions of the workflow."
+  ],
+  "answer": [
+   1,
+   3
+  ],
+  "rationale": [
+   "No: using both schemes at the same time makes Azure Logic Apps generate an error, because the service cannot decide which scheme to apply. Choose one scheme, or disable SAS.",
+   "Yes: for a Consumption workflow that starts with the Request trigger, you can disable SAS and restrict authorization to OAuth 2.0 with Microsoft Entra ID.",
+   "No: Only other Logic Apps works only when the parent uses the built-in Azure Logic Apps action. A call made with the HTTP action is blocked with a 401 Unauthorized error.",
+   "Yes: in the portal the IP restriction affects both triggers and actions. To set the filters separately, use the accessControl object in an Azure Resource Manager template."
+  ],
+  "explanation": "A Consumption Request trigger can use one authorization scheme at a time, either SAS or OAuth with Microsoft Entra ID, and SAS can be disabled. The Only other Logic Apps option accepts calls made with the built-in Azure Logic Apps action, and the portal IP restriction applies to triggers and actions.",
+  "ref": "https://learn.microsoft.com/azure/logic-apps/set-up-security-permissions"
+ },
+ {
+  "id": "3.3.6-04",
+  "obj": "3.3.6",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Relecloud exposes workflows of a Standard logic app through Azure API Management. Only API Management may call the Request trigger endpoints. Callers must be authenticated with a managed identity, and no SAS key may be stored or passed in a query string.\n\nWhat should you do?",
+  "choices": [
+   "Enable Easy Auth with Microsoft Entra ID on the logic app and call it with the API Management managed identity.",
+   "Store the SAS key of each workflow in Key Vault and add it with the set-query-parameter policy in API Management.",
+   "Add an OAuth 2.0 authorization policy for Microsoft Entra ID tokens to the Standard logic app resource.",
+   "Restrict the inbound IP addresses of the logic app to the outbound address of the API Management instance."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Easy Auth authenticates the caller with Microsoft Entra ID, and API Management presents a token for its managed identity, so no SAS key is stored or sent in a query string.",
+   "Incorrect: this is the SAS-based pattern that the stem forbids. It is a valid option when a managed identity cannot be used, with the keys protected in Key Vault.",
+   "Incorrect: authorization policies with OAuth claims are the mechanism for Consumption workflows. Standard workflows use Easy Auth for managed identity authentication.",
+   "Incorrect: an IP restriction controls access but does not authenticate the caller with a managed identity. Use it as an additional control next to Easy Auth, not instead of it."
+  ],
+  "explanation": "For Standard workflows that start with the Request trigger, Easy Auth with Microsoft Entra ID can authenticate callers by managed identity. API Management then obtains a token with its managed identity, so no SAS key is needed, and an IP restriction can still be added as an extra access control.",
+  "ref": "https://learn.microsoft.com/azure/logic-apps/set-up-security-permissions"
+ },
+ {
+  "id": "3.3.7-01",
+  "obj": "3.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has an Azure App Service web app that is reachable over both HTTP and HTTPS. Requests to the default domain that arrive over HTTP must be redirected to HTTPS.\n\nWhat should you do?",
+  "choices": [
+   "Turn on the HTTPS Only setting in the general settings of the app.",
+   "Set the minimum inbound TLS version of the app to 1.3.",
+   "Bind a TLS/SSL certificate to a custom domain of the app.",
+   "Require incoming client certificates for the app."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: HTTPS Only redirects all HTTP traffic to HTTPS, so every client connection to the app is encrypted. The redirect is not enabled by default.",
+   "Incorrect: the minimum TLS version rejects older TLS versions on HTTPS connections and does not redirect HTTP requests. Use it to retire weak protocol versions.",
+   "Incorrect: a certificate on a custom domain makes HTTPS possible for that name, but HTTP requests are still served unless you redirect them. Use it when you add a custom domain.",
+   "Incorrect: client certificates make the app verify the identity of the caller (mutual TLS) and do not redirect HTTP requests. Use them when you must authenticate clients, for example in business-to-business scenarios."
+  ],
+  "explanation": "The HTTPS Only setting redirects HTTP requests to HTTPS and is not turned on by default. The minimum TLS version controls which protocol versions are accepted, and certificates enable HTTPS on custom domains, but neither redirects HTTP traffic.",
+  "ref": "https://learn.microsoft.com/azure/app-service/overview-security"
+ },
+ {
+  "id": "3.3.7-02",
+  "obj": "3.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. hosts an API in Azure App Service that is called by native mobile apps and other API clients. All requests must be authenticated with Microsoft Entra ID, no authentication code may be added to the API, and unauthenticated requests must receive HTTP 401 instead of a redirect to a sign-in page.\n\nWhich App Service Authentication settings should you configure?",
+  "choices": [
+   "Require authentication, and return HTTP 401 Unauthorized for unauthenticated requests",
+   "Allow unauthenticated requests, and validate the Entra token in the API code",
+   "Require authentication, and redirect unauthenticated requests with HTTP 302 Found",
+   "Require authentication, and return HTTP 404 Not found for unauthenticated requests"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Require authentication blocks unauthenticated traffic without code changes, and the HTTP 401 response is the recommended choice for APIs and native clients.",
+   "Incorrect: allowing unauthenticated requests defers the decision to the application, which means writing authentication code that the stem forbids. Use it when the app must serve anonymous pages.",
+   "Incorrect: the HTTP 302 redirect sends browser clients to the sign-in page, which is recommended for websites. API clients and native apps cannot complete such a redirect.",
+   "Incorrect: HTTP 404 hides the existence of the app but misreports the failure and gives API clients no signal to authenticate. Use it only when you deliberately conceal the resource."
+  ],
+  "explanation": "With Require authentication, App Service rejects unauthenticated traffic before it reaches your code. For unauthenticated requests you choose the response: HTTP 302 redirect suits websites, and HTTP 401 Unauthorized suits APIs.",
+  "ref": "https://learn.microsoft.com/azure/app-service/overview-authentication-authorization"
+ },
+ {
+  "id": "3.3.7-03",
+  "obj": "3.3.7",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank hosts the web app App1 in the resource group RG1. App1 must accept traffic from its own Azure Front Door profile, which has the ID in $afd.FrontDoorId, and must reject every other source.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\nAdd-AzWebAppAccessRestrictionRule -ResourceGroupName \"RG1\" -WebAppName \"App1\" `\n  -Name \"FrontDoorOnly\" -Priority 100 -Action [[1]] `\n  -ServiceTag [[2]] `\n  -HttpHeader @{'[[3]]' = $afd.FrontDoorId}\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Allow",
+     "Deny"
+    ],
+    "why": [
+     "Correct: the rule must allow the Front Door traffic. When at least one rule exists, the unmatched rule implicitly denies everything else.",
+     "Incorrect: a Deny rule would block Front Door itself. Use Deny to block specific addresses while the unmatched rule action is set to Allow."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "AzureFrontDoor.Backend",
+     "AzureFrontDoor.Frontend",
+     "AppService"
+    ],
+    "why": [
+     "Correct: AzureFrontDoor.Backend contains the address ranges from which Front Door sends traffic to your origin.",
+     "Incorrect: AzureFrontDoor.Frontend describes the addresses of the Front Door edge that clients connect to, not the addresses it uses to call your origin.",
+     "Incorrect: the AppService tag lists inbound addresses of the App Service platform. It does not identify Front Door traffic."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "x-azure-fdid",
+     "x-forwarded-for",
+     "x-fd-healthprobe"
+    ],
+    "why": [
+     "Correct: Front Door sends its profile ID in the X-Azure-FDID header, so filtering on it limits access to your own profile instead of any Front Door profile.",
+     "Incorrect: X-Forwarded-For carries the originating client IP address and cannot hold a Front Door profile ID. Use it to filter on the original client address behind a proxy.",
+     "Incorrect: X-FD-HealthProbe identifies Front Door health probe requests with the value 1. Use it to treat health probes differently."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "To limit an app to one Front Door profile, add an Allow rule for the AzureFrontDoor.Backend service tag, which holds the addresses Front Door uses to reach origins, and filter on the X-Azure-FDID header that carries the unique profile ID. Once a rule exists, unmatched traffic is denied by default.",
+  "ref": "https://learn.microsoft.com/azure/app-service/app-service-ip-restrictions"
+ },
+ {
+  "id": "3.3.7-04",
+  "obj": "3.3.7",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Litware, Inc. hosts App1 in Azure App Service. App1 has a private endpoint in the subnet PESubnet of VNet1, and the access restriction rules of App1 allow the Azure Front Door service tag. A test shows that a virtual machine in VNet1 can still reach App1 directly through the private endpoint.\n\nWhat should you do to restrict which sources can reach App1 through the private endpoint?",
+  "choices": [
+   "Add network security group rules to the subnet that contains the private endpoint.",
+   "Add a deny rule for VNet1 to the access restrictions of the main site.",
+   "Set the unmatched rule action of the main site to Deny.",
+   "Add a service endpoint rule for the subnet of the virtual machine."
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: restrictions for private endpoints are configured with network security groups, so NSG rules on PESubnet control which sources can reach App1 privately.",
+   "Incorrect: access restriction rules are evaluated only for the default endpoint, not for traffic through a private endpoint. Use them to filter public inbound traffic by IP, service tag or header.",
+   "Incorrect: the unmatched rule action is part of the same access restriction evaluation and does not apply to private endpoint traffic. Use it to define the default for public traffic.",
+   "Incorrect: service endpoint rules are not supported on apps that have a private endpoint, and they would allow a subnet rather than restrict one. Use them for apps without private endpoints."
+  ],
+  "explanation": "Access restrictions apply to traffic that enters through the default (public) endpoint. Traffic through a private endpoint goes directly to the site, so you control it with network security groups on the subnet of the private endpoint.",
+  "ref": "https://learn.microsoft.com/azure/app-service/overview-access-restrictions"
+ },
+ {
+  "id": "3.3.8-01",
+  "obj": "3.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has just created a WAF policy with a managed rule set for an Application Gateway WAF v2. The security team must observe which requests match rules against production traffic and tune false positives without blocking any request.\n\nWhich WAF mode should you configure?",
+  "choices": [
+   "Detection mode, with WAF logging enabled",
+   "Prevention mode, with WAF logging enabled",
+   "Prevention mode with the Bot Manager rule set",
+   "Prevention mode with a custom rate-limit rule"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Detection mode only logs requests that match rules, so you can review the WAF logs and tune exclusions without affecting production traffic.",
+   "Incorrect: Prevention mode blocks requests that exceed the anomaly threshold, so false positives would block legitimate users. Switch to it after tuning.",
+   "Incorrect: Prevention mode blocks requests that match the Bot Manager rules, such as bad bots. It does not support an observe-only phase. Use it when you are ready to enforce bot protection.",
+   "Incorrect: a rate-limit custom rule in Prevention mode blocks clients that exceed the threshold. That is enforcement, not observation. Use it to limit abusive request rates."
+  ],
+  "explanation": "Detection mode logs requests that match rules and does not block them, so it is used while tuning. After exclusions and overrides are in place, the policy is switched to Prevention mode so that matching requests are blocked.",
+  "ref": "https://learn.microsoft.com/azure/web-application-firewall/secure-web-application-firewall"
+ },
+ {
+  "id": "3.3.8-02",
+  "obj": "3.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has an Application Gateway WAF v2 that protects three sites. A global WAF policy is associated with the gateway. For the path /payments of one site, all managed rules must stay enabled with no exclusions, while the rest of that site and the other sites keep the global policy.\n\nWhich WAF policy association should you use?",
+  "choices": [
+   "A per-URI policy associated with the path-based rule for /payments",
+   "A per-site policy associated with the listener of that site",
+   "A second global policy associated with the application gateway",
+   "A custom rule with the Allow action for the path /payments"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: a per-URI policy overrides the per-site and global policies for the /payments path only, so you can keep all rules enabled and drop exclusions there.",
+   "Incorrect: a per-site policy applies to the whole listener, so the rest of the site would also move to the stricter policy. Use it when one site needs different settings from the others.",
+   "Incorrect: a policy associated with the gateway is the global policy, and it would change protection for all three sites. Use it to define the baseline for every site.",
+   "Incorrect: an Allow custom rule skips all later rule evaluation for matching requests, which removes protection instead of strengthening it. Use Allow only for trusted traffic."
+  ],
+  "explanation": "A WAF policy can be associated with the gateway (global), a listener (per-site) or a path-based rule (per-URI), and the most specific association wins. A per-URI policy therefore changes the behavior for one path while everything else keeps the broader policy.",
+  "ref": "https://learn.microsoft.com/azure/web-application-firewall/ag/policy-overview"
+ },
+ {
+  "id": "3.3.8-03",
+  "obj": "3.3.8",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Tailspin Toys uses Azure Front Door with a WAF policy named waf1. A custom rate-limit rule must block any client IP address that sends more than 1,000 requests in one minute. A match condition for the path /promo is added after the rule is created.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\naz network front-door waf-policy rule create \\\n  --name rateLimitRule --policy-name waf1 --resource-group RG1 \\\n  --rule-type [[1]] \\\n  --rate-limit-duration 1 --rate-limit-threshold [[2]] \\\n  --action [[3]] --priority 1 --defer\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "RateLimitRule",
+     "MatchRule"
+    ],
+    "why": [
+     "Correct: RateLimitRule is the custom rule type that counts requests per client over a duration and acts when the threshold is exceeded.",
+     "Incorrect: MatchRule is the custom rule type that evaluates match conditions on single requests, such as IP lists or geo filters. It has no duration or threshold."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "1000",
+     "60",
+     "1"
+    ],
+    "why": [
+     "Correct: the threshold is the number of requests allowed in the duration, so 1000 with a duration of 1 minute matches the requirement.",
+     "Incorrect: 60 would allow 60 requests per minute, which is far lower than the requirement. The duration is in minutes, not seconds, so 60 is not a time value either.",
+     "Incorrect: 1 would block a client after a single request in the minute. The 1 value belongs to the duration parameter, which is already set."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "Block",
+     "Allow",
+     "Log"
+    ],
+    "why": [
+     "Correct: Block stops requests from a client that exceeds the threshold until the next period starts.",
+     "Incorrect: Allow lets the requests through, which defeats the purpose of the rate limit. Use Allow for trusted sources that must bypass other rules.",
+     "Incorrect: Log records the match and lets the request continue. Use it to observe rate-limit hits before you enforce them."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "A rate-limit custom rule has the rule type RateLimitRule, a duration of one or five minutes, a threshold of requests per client, and an action. The rule must also contain a match condition, which is why the --defer argument postpones submission until the condition is added.",
+  "ref": "https://learn.microsoft.com/azure/web-application-firewall/afds/waf-front-door-rate-limit-configure"
+ },
+ {
+  "id": "3.3.8-04",
+  "obj": "3.3.8",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Relecloud operates a retail site behind Azure Front Door Premium with a WAF policy in Prevention mode. The site receives credential stuffing attempts from known bad bots that must be identified by signature, while search engine crawlers must still be able to index the site. The company has no customers in one country and must block all traffic from that country.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable the Bot Manager managed rule set and set the action for bad bots to Block.",
+   "Create a custom rule with a geo-location match condition for the country and the Block action.",
+   "Create a rate-limit custom rule that allows 100 requests per minute for each client IP address.",
+   "Add a per-rule exclusion for the default rule set rules that match the bot traffic.",
+   "Create a custom rule with the Allow action for requests whose User-Agent header names a search engine."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "rationale": [
+   "Correct: the Bot Manager rule set identifies known bad bots by signature and lets you block them while good bots such as search engine crawlers stay allowed.",
+   "Correct: a custom rule with a geo-location condition and the Block action blocks the country, and it is evaluated before the managed rules.",
+   "Incorrect: a rate-limit rule throttles heavy clients but does not identify bots by signature or select a country. Use it to limit abusive request volumes.",
+   "Incorrect: exclusions remove request attributes from inspection to cut false positives, so they would weaken protection against the traffic you want to stop. Use them to tune legitimate requests.",
+   "Incorrect: an Allow rule skips all other rules for matching requests, and the User-Agent header can be forged, so attackers could bypass the WAF. Use the Bot Manager rule set to allow verified good bots."
+  ],
+  "explanation": "The Bot Manager managed rule set classifies traffic into good, bad and unknown bots, so bad bots can be blocked while good crawlers are allowed. Country-based blocking is a custom rule with a geo-location match condition, and custom rules run before managed rules.",
+  "ref": "https://learn.microsoft.com/azure/web-application-firewall/afds/afds-overview"
+ },
+ {
+  "id": "3.3.9-01",
+  "obj": "3.3.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. publishes an API through Azure API Management. Clients present JSON Web Tokens that are issued by a third-party OpenID Connect identity provider, not by Microsoft Entra ID. Requests without a valid token must be rejected at the gateway before they reach the back end.\n\nWhich policy should you add to the inbound section?",
+  "choices": [
+   "validate-jwt",
+   "validate-azure-ad-token",
+   "validate-client-certificate",
+   "ip-filter"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: validate-jwt validates a token from a third-party identity provider at the gateway and rejects requests with a missing or invalid token.",
+   "Incorrect: validate-azure-ad-token is designed for tokens issued by Microsoft Entra ID. The stem uses a third-party provider. Use it when Entra ID is the issuer.",
+   "Incorrect: validate-client-certificate checks the certificate that a client presents during mutual TLS, not a bearer token. Use it when clients authenticate with certificates.",
+   "Incorrect: ip-filter allows or denies calls by caller IP address and does not inspect tokens. Use it to limit calls to known address ranges."
+  ],
+  "explanation": "The validate-jwt policy enforces the existence and validity of a JWT from any supported identity provider, checking items such as signature, issuer, audience and claims. For tokens issued by Microsoft Entra ID, the validate-azure-ad-token policy is the dedicated alternative.",
+  "ref": "https://learn.microsoft.com/azure/api-management/validate-jwt-policy"
+ },
+ {
+  "id": "3.3.9-02",
+  "obj": "3.3.9",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. publishes an Azure Functions back end through Azure API Management. The function app requires a Microsoft Entra ID access token, and no secret, key or certificate may be stored in the API Management instance. The instance has a system-assigned managed identity that has been granted access to the function app.\n\nWhich policy should you add to the inbound section?",
+  "choices": [
+   "authentication-managed-identity with the resource of the function app",
+   "authentication-basic with a service account",
+   "authentication-certificate with a client certificate",
+   "validate-azure-ad-token with the audience of the function app"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: the policy requests a token for the function app resource by using the managed identity and adds it as a Bearer token to the back-end call, with no stored credential.",
+   "Incorrect: authentication-basic sends a stored user name and password to the back end, and the function app needs an Entra token. Use it for back ends that accept basic authentication.",
+   "Incorrect: authentication-certificate presents a client certificate that you must upload and manage, which the stem excludes. Use it for back ends that require mutual TLS.",
+   "Incorrect: validate-azure-ad-token checks tokens on incoming requests from callers. It does not obtain a token for the call to the back end. Use it to authorize API callers."
+  ],
+  "explanation": "The authentication-managed-identity policy obtains a Microsoft Entra access token for a resource by using the managed identity of the API Management instance and sets it in the Authorization header of the back-end request. No credential is stored in the instance.",
+  "ref": "https://learn.microsoft.com/azure/api-management/authentication-managed-identity-policy"
+ },
+ {
+  "id": "3.3.9-03",
+  "obj": "3.3.9",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank publishes an API through Azure API Management in the Standard tier. Callers are authenticated employees whose requests all leave through one corporate NAT address. You must limit each user to 10 calls per minute, and the user is identified by the subject claim of the JWT in the Authorization header.\n\nHow should you complete the policy? To answer, select the appropriate options in the answer area.\n\n```\n<inbound>\n    <base />\n    <[[1]] calls=\"10\" renewal-period=\"[[2]]\"\n        counter-key=\"@([[3]])\" />\n</inbound>\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "rate-limit-by-key",
+     "rate-limit",
+     "quota-by-key"
+    ],
+    "why": [
+     "Correct: rate-limit-by-key limits the call rate for a key that you define with the counter-key expression.",
+     "Incorrect: rate-limit limits calls per subscription and has no counter-key attribute, so it cannot count per JWT subject. Use it for simple per-subscription throttling.",
+     "Incorrect: quota-by-key enforces call volume or bandwidth quotas over renewal periods, typically long ones. Use it for monthly volume quotas rather than a per-minute call rate."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "60",
+     "1",
+     "600"
+    ],
+    "why": [
+     "Correct: the renewal period is in seconds, so 10 calls with a period of 60 means 10 calls per minute.",
+     "Incorrect: a period of 1 second would allow 10 calls per second, which is far above the limit. The value is not in minutes.",
+     "Incorrect: a period of 600 seconds would allow 10 calls per 10 minutes, which is stricter than required."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "context.Request.Headers.GetValueOrDefault(\"Authorization\",\"\").AsJwt()?.Subject",
+     "context.Request.IpAddress",
+     "context.Subscription.Id"
+    ],
+    "why": [
+     "Correct: this expression reads the Authorization header, parses the JWT and uses its subject as the key, so each user gets an own counter.",
+     "Incorrect: the caller IP address is the same for all employees behind the corporate NAT, so they would share one counter. Use it for anonymous APIs.",
+     "Incorrect: the subscription ID identifies the API Management subscription, which many users share. Use it to limit calls per subscription, not per user."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "rate-limit-by-key throttles by a key that you compute with a policy expression, so you can count calls per JWT subject instead of per address. The renewal period is expressed in seconds, so 60 gives a per-minute limit. The policy is not available in the Consumption tier.",
+  "ref": "https://learn.microsoft.com/azure/api-management/api-management-sample-flexible-throttling"
+ },
+ {
+  "id": "3.3.9-04",
+  "obj": "3.3.9",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Litware, Inc. protects the back end of an API in Azure API Management by using gateway policies.\n\nWhich policy should you use for each requirement? To answer, drag the appropriate policies to the correct requirements. Each policy may be used once, more than once, or not at all.",
+  "choices": [
+   "validate-content",
+   "validate-parameters",
+   "validate-status-code",
+   "ip-filter",
+   "validate-jwt",
+   "rate-limit-by-key"
+  ],
+  "targets": [
+   "API1: requests whose JSON body does not match the schema of the operation must be rejected",
+   "API2: requests whose query, path or header parameters do not match the operation schema must be rejected",
+   "API3: back-end responses that use a status code that the operation does not define must be rejected",
+   "API4: calls must be accepted from the address range of a partner network and rejected from other addresses"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "validate-content checks the request body against the schema, so malformed JSON is rejected before it reaches the back end.",
+   "validate-parameters checks header, query and path parameters against the schema of the operation.",
+   "validate-status-code checks the status code of back-end responses against the codes that the operation defines.",
+   "ip-filter allows or denies calls from specific IP addresses or ranges at the API or operation level."
+  ],
+  "notes": [
+   "Validates the body of requests or responses against a schema. Use it to stop malformed or oversized payloads at the gateway.",
+   "Validates header, query and path parameters of requests against the API definition. Use it when the parameters, not the body, must be checked.",
+   "Checks the status code of back-end responses against the definition. Use it to stop unexpected responses from reaching the client.",
+   "Filters callers by IP address or range. Use it to limit calls to known networks, not to validate content.",
+   "Validates a bearer token on the request. Use it to require authentication, not to check schemas or addresses.",
+   "Throttles calls per key that you compute. Use it to limit call rates, not to validate content or filter addresses."
+  ],
+  "explanation": "API Management policies protect back ends at the gateway: content and parameter validation check requests, status code validation checks responses, and ip-filter limits callers by address. Identify whether the requirement concerns the body, the parameters, the response or the caller address.",
+  "ref": "https://learn.microsoft.com/azure/api-management/secure-api-management"
+ }
+]

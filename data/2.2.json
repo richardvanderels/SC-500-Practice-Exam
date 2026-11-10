@@ -1,0 +1,747 @@
+[
+ {
+  "id": "2.2.1-01",
+  "obj": "2.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. hosts DB1 on an Azure SQL Database logical server named Server1. A Microsoft Entra admin is already configured for Server1. Company policy states that no user or application may connect to Server1 by using a SQL login and password.\n\nWhat should you do?",
+  "choices": [
+   "Enable Microsoft Entra-only authentication on Server1.",
+   "Set the minimum TLS version of Server1 to 1.2.",
+   "Configure Always Encrypted for the columns in DB1.",
+   "Add a server-level IP firewall rule for the corporate network."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Microsoft Entra-only authentication disables SQL authentication on the logical server so that only Microsoft Entra identities can connect. A Microsoft Entra admin must be set first, and the SQL Security Manager role is enough to turn the setting on.",
+  "rationale": [
+   "Correct: Entra-only authentication blocks every SQL login on Server1, including the server admin login, and allows only Microsoft Entra identities. The Entra admin already exists, which is its prerequisite.",
+   "Incorrect: the minimum TLS version controls which protocol versions clients can use to connect. It does not stop SQL logins, so a SQL user could still sign in over TLS 1.2. Use it to reject weak protocols.",
+   "Incorrect: Always Encrypted protects the contents of selected columns from privileged users. It has no effect on how users authenticate to the server. Use it to hide column values from DBAs.",
+   "Incorrect: a firewall rule limits which client IP addresses may reach the server, but a SQL login from an allowed address would still succeed. Use firewall rules to restrict network sources."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication?view=azuresql"
+ },
+ {
+  "id": "2.2.1-02",
+  "obj": "2.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. stores payment card numbers in a column of DB1, an Azure SQL database. Help desk users must see only the last four digits of the card number in query results. The stored values and the application code must not change.\n\nWhich feature should you configure?",
+  "choices": [
+   "Dynamic data masking",
+   "Always Encrypted",
+   "Transparent data encryption",
+   "Row-level security"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Dynamic data masking obfuscates values in query results for users without the UNMASK permission, while the data in the database is not changed and applications need no modification. A partial mask can expose only the last four digits.",
+  "rationale": [
+   "Correct: a partial masking rule shows only the last four characters to users who lack UNMASK. The masking is applied to the result set, so stored data and application queries stay the same.",
+   "Incorrect: Always Encrypted changes the stored values into ciphertext and needs an enabled client driver that holds the keys, so the application is affected. Use it when even DBAs must not read plaintext.",
+   "Incorrect: transparent data encryption encrypts the database files at rest and decrypts data transparently for every authorized query, so help desk users would still see full card numbers.",
+   "Incorrect: row-level security filters which rows a user can read through a predicate. It cannot show part of a value in a column. Use it to separate tenants or regions in one table."
+  ],
+  "ref": "https://learn.microsoft.com/sql/relational-databases/security/dynamic-data-masking?view=sql-server-ver17"
+ },
+ {
+  "id": "2.2.1-03",
+  "obj": "2.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank must protect the database, log and backup files of DB1 at rest. DB1 is an Azure SQL database. The bank must control rotation and revocation of the encryption key and requires no changes to applications.\n\nWhat should you configure?",
+  "choices": [
+   "Transparent data encryption with a customer-managed key in Azure Key Vault",
+   "Transparent data encryption with a service-managed key",
+   "Always Encrypted with a column master key in the Windows certificate store",
+   "Dynamic data masking with the default masking function"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Transparent data encryption (TDE) encrypts the whole database at rest without application changes. A customer-managed key (TDE protector) in Azure Key Vault lets the organization control rotation, revocation and auditing of the key.",
+  "rationale": [
+   "Correct: TDE encrypts data, log and backup files transparently, and the customer-managed TDE protector in Key Vault gives the bank control over rotation and revocation of the key.",
+   "Incorrect: TDE with a service-managed key also encrypts at rest, but Azure manages the certificate and its rotation, so the bank has no control. It is the default for new databases.",
+   "Incorrect: Always Encrypted encrypts selected columns on the client side and requires driver and application support. It does not encrypt log and backup files as a whole.",
+   "Incorrect: dynamic data masking only obfuscates values in query results. It does not encrypt anything at rest and has no key to rotate. Use it to limit what non-privileged users see."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+ },
+ {
+  "id": "2.2.1-04",
+  "obj": "2.2.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys hosts DB1 and DB2 on an Azure SQL Database logical server named Server1. Server1 has one server-level IP firewall rule that allows the administrator workstation at 198.51.100.10. A partner must connect to DB2 only from 203.0.113.0/24. The partner must not be able to reach DB1 from that range.\n\nWhat should you create?",
+  "choices": [
+   "A database-level IP firewall rule on DB2 for 203.0.113.0/24",
+   "A server-level IP firewall rule on Server1 for 203.0.113.0/24",
+   "A virtual network rule on Server1 for the partner subnet",
+   "A server-level rule that allows Azure services and resources to access Server1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Database-level IP firewall rules are stored in the individual database and grant access only to that database. Server-level rules apply to every database on the server, so they would also expose DB1. Database-level rules are created with Transact-SQL.",
+  "rationale": [
+   "Correct: a database-level rule on DB2 lets the 203.0.113.0/24 range reach DB2 only, and the server-level rule for the administrator already exists as the prerequisite.",
+   "Incorrect: a server-level rule applies to all databases on Server1, so the partner could also connect to DB1. Use it when the same clients need access to every database.",
+   "Incorrect: a virtual network rule allows traffic from a subnet of your own virtual network through service endpoints. The partner connects from a public range, so it does not apply here.",
+   "Incorrect: the allow Azure services setting creates the 0.0.0.0 rule for Azure-hosted resources and opens the server to all databases. It does not limit a partner IP range to DB2."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/firewall-configure?view=azuresql"
+ },
+ {
+  "id": "2.2.1-05",
+  "obj": "2.2.1",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Litware, Inc. must create an Azure SQL Database logical server named Server1 in resource group RG1. SQL authentication must be disabled from the start, and the Microsoft Entra group SqlAdmins is the administrator. After creation, an engineer must verify the authentication setting.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz sql server create -g RG1 -n Server1 --[[1]] --external-admin-principal-type Group --external-admin-name SqlAdmins --external-admin-sid <object-id>\naz sql server ad-only-auth [[2]] -g RG1 -n Server1\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "enable-ad-only-auth",
+     "assign-identity",
+     "admin-password"
+    ],
+    "why": [
+     "Correct: --enable-ad-only-auth creates the server with Microsoft Entra-only authentication turned on, together with the external admin, so SQL authentication is blocked from the start.",
+     "Incorrect: --assign-identity gives the server a managed identity, which is needed for example for TDE with a customer-managed key. It does not change which authentication methods are allowed.",
+     "Incorrect: --admin-password sets the SQL administrator password. That configures SQL authentication, which is the opposite of the requirement."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "get",
+     "enable",
+     "disable"
+    ],
+    "why": [
+     "Correct: az sql server ad-only-auth get returns the azureAdOnlyAuthentication property, so the engineer can verify the state without changing it.",
+     "Incorrect: enable turns the feature on. The server was already created with it on, so this command would change nothing and would not verify the state.",
+     "Incorrect: disable turns the feature off and would re-allow SQL authentication. Use it only when a documented exception requires SQL logins."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "az sql server create accepts --enable-ad-only-auth together with the external admin parameters, so the server never allows SQL authentication. The ad-only-auth command group enables, disables or reads the setting afterwards.",
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication-create-server?view=azuresql"
+ },
+ {
+  "id": "2.2.1-06",
+  "obj": "2.2.1",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Adatum Corporation configures transparent data encryption on Server1, an Azure SQL Database logical server, to use a customer-managed key (TDE protector) in an Azure key vault named KV1. The server uses a managed identity to access KV1.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Soft-delete and purge protection must be enabled on KV1 before the TDE protector can be configured.",
+   "If KV1 is behind a firewall and does not use a private endpoint, the option to allow trusted Microsoft services to bypass the firewall must be enabled.",
+   "If an administrator removes the get, wrapKey and unwrapKey permissions of the server identity on KV1, the databases on Server1 stay available."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Customer-managed TDE depends on the key vault. Azure SQL validates soft-delete and purge protection, the firewall must admit trusted Microsoft services unless private endpoints are used, and losing key access makes the databases inaccessible.",
+  "rationale": [
+   "Yes: Azure SQL validates that the key vault has soft-delete and purge protection turned on and fails the TDE protector setup otherwise. This prevents accidental or malicious key loss from making databases inaccessible.",
+   "Yes: with a key vault firewall, trusted Microsoft services must be allowed to bypass it so that the server can reach the key, unless the vault is reached through private endpoints.",
+   "No: the server needs get, wrapKey and unwrapKey (or the Key Vault Crypto Service Encryption User role) continuously. Removing them moves the databases to the Inaccessible state."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+ },
+ {
+  "id": "2.2.1-07",
+  "obj": "2.2.1",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Relecloud stores national identification numbers in a column of DB1, an Azure SQL database. DBAs must not be able to read the plaintext values. Applications must run pattern-matching queries with LIKE on the column, and the column must be re-encrypted in place without moving data out of the database.\n\nWhat should you use?",
+  "choices": [
+   "Always Encrypted with secure enclaves and randomized encryption",
+   "Always Encrypted with deterministic encryption and no enclave",
+   "Transparent data encryption with a customer-managed key",
+   "Dynamic data masking with a partial masking function"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Always Encrypted without enclaves allows only equality comparisons on deterministic columns and must move data out of the database to encrypt it. With secure enclaves and randomized encryption, the engine can run LIKE, comparisons, and in-place cryptographic operations inside the enclave while DBAs still cannot read plaintext.",
+  "rationale": [
+   "Correct: enclave-enabled keys let the engine perform pattern matching and in-place encryption inside a secure enclave, and the keys are never exposed to the DBAs. Rich queries require randomized encryption.",
+   "Incorrect: deterministic encryption without an enclave supports only equality lookups, joins and grouping, not LIKE, and encryption or key rotation requires moving data to the client. It fits equality-only search.",
+   "Incorrect: TDE decrypts data for every authorized session, including DBAs, so it does not hide plaintext from them. Use it to protect files at rest.",
+   "Incorrect: dynamic data masking changes only what non-privileged users see, and users with CONTROL or UNMASK still read plaintext. It is not encryption and cannot enforce separation from DBAs."
+  ],
+  "ref": "https://learn.microsoft.com/sql/relational-databases/security/encryption/always-encrypted-enclaves?view=sql-server-ver17"
+ },
+ {
+  "id": "2.2.1-08",
+  "obj": "2.2.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders runs App1 in a subnet of VNet1. App1 must reach Server1, an Azure SQL Database logical server, by using private IP addresses only. No connection from the public internet may reach Server1.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Create a private endpoint for Server1 in a subnet of VNet1.",
+   "Set public network access for Server1 to disabled.",
+   "Add a virtual network rule on Server1 for the subnet of App1.",
+   "Enable the setting that allows Azure services and resources to access Server1.",
+   "Add a server-level IP firewall rule for the public IP address of App1."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Azure Private Link gives the server a private IP address in the virtual network, and denying public network access forces all connections through that private endpoint. Virtual network rules, IP firewall rules and the Azure services rule all keep the public endpoint in use.",
+  "rationale": [
+   "Correct: a private endpoint gives Server1 a private IP address in VNet1, so App1 connects over private addressing.",
+   "Correct: disabling public network access removes the public path, so every connection must come through the private endpoint.",
+   "Incorrect: a virtual network rule limits which subnets may reach the server through service endpoints on its public endpoint. It does not give Server1 a private IP address and leaves public exposure in place.",
+   "Incorrect: this setting creates the 0.0.0.0 rule that admits all Azure services, including those in other subscriptions. It widens the public exposure instead of removing it.",
+   "Incorrect: an IP firewall rule for the public IP of App1 allows traffic over the public endpoint. It uses public addressing, which the requirement forbids. Use it for clients that connect from fixed public addresses."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/secure-database?view=azuresql"
+ },
+ {
+  "id": "2.2.1-09",
+  "obj": "2.2.1",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Contoso, Ltd. runs four Azure SQL databases with different protection requirements. You must select a feature for each database.\n\nWhich feature should you use for each database? To answer, drag the appropriate features to the correct databases. Each feature may be used once, more than once, or not at all.",
+  "choices": [
+   "Transparent data encryption",
+   "Dynamic data masking",
+   "Always Encrypted",
+   "Ledger",
+   "Row-level security"
+  ],
+  "targets": [
+   "DB1: database, log and backup files must be encrypted at rest with no application changes",
+   "DB2: support staff must see masked phone numbers in query results while the stored data stays unchanged",
+   "DB3: keys must stay with the client application so that DBAs cannot read social security numbers",
+   "DB4: auditors need cryptographic proof that table data has not been tampered with"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "DB1 needs transparent encryption of files at rest without application changes, which is TDE. Always Encrypted would require client changes and covers only selected columns.",
+   "DB2 needs masked output with unchanged stored data, which dynamic data masking provides through masking rules and the UNMASK permission.",
+   "DB3 needs keys held by the client so that DBAs cannot see plaintext, which is Always Encrypted. Masking and TDE both leave plaintext visible to privileged users.",
+   "DB4 needs tamper evidence with cryptographic verification, which ledger provides through an immutable, verifiable record of changes."
+  ],
+  "notes": [
+   "Encrypts database, log and backup files at rest with an AES key, by default with a service-managed key. Use it for at-rest protection with no application change.",
+   "Obfuscates column values in query results for users without UNMASK, with no change to stored data. Use it to limit exposure to non-privileged users.",
+   "Encrypts columns on the client so that keys are never exposed to the engine. Use it to keep sensitive data from DBAs and other privileged users.",
+   "Records changes in a tamper-evident, cryptographically verifiable ledger. Use it for integrity proof toward auditors and regulators.",
+   "Filters which rows a user can read by using a predicate and a security policy. Use it for tenant or region separation, not for hiding column values or encryption."
+  ],
+  "explanation": "Match the control to the threat: TDE for files at rest, masking for query output, Always Encrypted for privileged users, ledger for tamper evidence, and row-level security for row filtering.",
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/security-overview?view=azuresql"
+ },
+ {
+  "id": "2.2.2-01",
+  "obj": "2.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Microsoft Sentinel. The audit log of DB1, an Azure SQL database, must be queried with KQL in a Log Analytics workspace together with other security data.\n\nWhich audit log destination should you configure for DB1?",
+  "choices": [
+   "A Log Analytics workspace",
+   "An Azure Storage account",
+   "Azure Event Hubs",
+   "A ledger digest storage location"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure SQL Database auditing can write to an Azure Storage account, a Log Analytics workspace or Event Hubs, in any combination. Only the Log Analytics workspace destination makes the audit records available for KQL queries in Azure Monitor logs.",
+  "rationale": [
+   "Correct: audit records sent to Log Analytics land in the workspace, where you can query them with KQL and combine them with other tables, which is what the scenario requires.",
+   "Incorrect: a storage account keeps audit logs as blob files. They can be read with sys.fn_get_audit_file or Storage Explorer, but not queried with KQL. Use it for long retention or immutable storage.",
+   "Incorrect: Event Hubs streams audit events to another consumer such as a third-party SIEM. A stream processor is needed to write them anywhere queryable, so it is not a direct KQL source.",
+   "Incorrect: ledger digest storage holds database digests that are used to verify the ledger of tamper-evident tables. It is a separate feature and not an auditing destination."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/auditing-overview?view=azuresql"
+ },
+ {
+  "id": "2.2.2-02",
+  "obj": "2.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has Server1, an Azure SQL Database logical server that hosts 12 databases. More databases are created every month. Every existing and future database on Server1 must be audited by using one configuration.\n\nWhat should you do?",
+  "choices": [
+   "Enable auditing at the server level on Server1.",
+   "Enable auditing on each database and repeat it for each new database.",
+   "Enable the Defender for Azure SQL Databases plan for the subscription.",
+   "Run vulnerability assessment scans on Server1 on a schedule."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A server auditing policy applies to all existing and newly created databases on the server. A database-level policy applies to a single database and can exist side by side with the server policy.",
+  "rationale": [
+   "Correct: the server-level policy covers every existing and new database on Server1 without per-database work.",
+   "Incorrect: database-level auditing works for one database at a time, so each new database would need its own configuration. Use it when a single database needs different settings or its own log folder.",
+   "Incorrect: Defender for Azure SQL Databases detects threats and provides vulnerability assessment. It does not record database events in an audit log. Use it for alerts on suspicious activity.",
+   "Incorrect: vulnerability assessment scans look for misconfigurations and excess permissions. They do not capture queries or sign-ins. Use them to track security posture over time."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/auditing-setup?view=azuresql"
+ },
+ {
+  "id": "2.2.2-03",
+  "obj": "2.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. runs MI1, an Azure SQL Managed Instance. An administrator will write the audit of MI1 to a blob container by using CREATE SERVER AUDIT ... TO URL. The instance must authenticate to the container with a SAS token.\n\nWhat should you create in MI1 before you create the server audit?",
+  "choices": [
+   "A credential that is named after the container URL and holds the SAS token",
+   "A diagnostic setting that has the SQLSecurityAuditEvents category selected",
+   "A database audit specification for the user database",
+   "A Microsoft Entra admin for the managed instance"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "For the TO URL destination, the instance needs a credential named after the container URL with the identity SHARED ACCESS SIGNATURE and the SAS token as the secret. The server audit, then an audit specification, are created after that.",
+  "rationale": [
+   "Correct: CREATE CREDENTIAL with IDENTITY = SHARED ACCESS SIGNATURE and the SAS token as secret, named with the container URL, lets MI1 write to the container.",
+   "Incorrect: a diagnostic setting is used when the destination is Event Hubs or Azure Monitor logs together with a server audit TO EXTERNAL_MONITOR. It is not part of the blob storage path.",
+   "Incorrect: an audit specification defines which actions are audited and needs the server audit to exist first. Creating it before the destination exists is not possible.",
+   "Incorrect: a Microsoft Entra admin controls who can sign in as an administrator. It is not needed for the audit to write to storage. Use it for Entra authentication on the instance."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/managed-instance/auditing-configure?view=azuresql"
+ },
+ {
+  "id": "2.2.2-04",
+  "obj": "2.2.2",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Tailspin Toys must send the audit log of Server1, an Azure SQL Database logical server in resource group RG1, to a new Log Analytics workspace named LAW1. An engineer then must confirm that audit events arrive.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create the Log Analytics workspace LAW1.",
+   "`$id = az monitor log-analytics workspace show --workspace-name LAW1 --resource-group RG1 -o tsv --query id`",
+   "`Set-AzSqlServerAudit -ResourceGroupName RG1 -ServerName Server1 -LogAnalyticsTargetState Enabled -WorkspaceResourceId $id`",
+   "In LAW1, open Logs and run `search \"SQLSecurityAuditEvents\"`.",
+   "`Set-AzSqlServerMSSupportAudit -ResourceGroupName RG1 -ServerName Server1 -LogAnalyticsTargetState Enabled -WorkspaceResourceId $id`",
+   "`az sql db audit-policy update --resource-group RG1 --server Server1 --name DB1 --state Enabled --storage-account st1`"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "The workspace must exist before you can read its resource ID, and the ID is a parameter of the audit cmdlet. Verification comes last because audit events appear only after the policy is enabled.",
+  "rationale": [
+   "Step 1: the workspace is the destination, so it must exist before anything can reference it.",
+   "Step 2: the workspace resource ID is the value that the audit command needs, and it can be read only once the workspace exists.",
+   "Step 3: Set-AzSqlServerAudit with -LogAnalyticsTargetState Enabled and the workspace resource ID enables the server audit policy and creates the diagnostic setting for the audit events.",
+   "Step 4: after the policy is on, searching the workspace for SQLSecurityAuditEvents confirms that audit records are arriving.",
+   "Incorrect: Set-AzSqlServerMSSupportAudit configures auditing of Microsoft support operations, a separate policy. Use it to audit support engineers, not regular database activity.",
+   "Incorrect: this command enables database-level auditing for DB1 with a storage account as destination, not the server-level policy and not Log Analytics. Use it for a per-database blob destination."
+  ],
+  "ref": "https://learn.microsoft.com/powershell/module/az.sql/set-azsqlserveraudit?view=azps-16.5.0"
+ },
+ {
+  "id": "2.2.2-05",
+  "obj": "2.2.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank enabled server auditing on Server1 with three destinations: a storage account, a Log Analytics workspace and an event hub. User1 has the SQL Security Manager role on Server1 and permissions on the storage account and the workspace. When User1 saves the audit configuration, the save fails.\n\nWhat should you do?",
+  "choices": [
+   "Grant User1 permissions on the Event Hubs namespace that is used as a destination.",
+   "Assign User1 the SQL Server Contributor role on Server1.",
+   "Make User1 the Microsoft Entra admin of Server1.",
+   "Move the audit configuration from the server level to the database level."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When several audit targets are configured, the user who saves the configuration needs permissions on all of the targets, because the settings are saved for every target. A missing permission on one target fails the whole save.",
+  "rationale": [
+   "Correct: with multiple targets the save writes settings for all of them, so User1 also needs permissions on the Event Hubs namespace.",
+   "Incorrect: SQL Server Contributor manages the server resource but gives no rights on the destination resources.",
+   "Incorrect: the Microsoft Entra admin is an authentication setting for logging in to the databases. It does not grant rights on the storage account, workspace or event hub.",
+   "Incorrect: a database-level policy still sends records to the same destinations and needs the same target permissions. Use database-level auditing for per-database settings, not to bypass permissions."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/auditing-setup?view=azuresql"
+ },
+ {
+  "id": "2.2.2-06",
+  "obj": "2.2.2",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Adatum Corporation currently writes the audit log of Server1 to blob storage. The security team must send the audit log to the Log Analytics workspace whose resource ID is in $id and must stop writing to blob storage.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```powershell\nSet-AzSqlServerAudit -ResourceGroupName RG1 -ServerName Server1 `\n  -[[1]] Enabled -WorkspaceResourceId $id `\n  -[[2]] Disabled\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "LogAnalyticsTargetState",
+     "EventHubTargetState",
+     "BlobStorageTargetState"
+    ],
+    "why": [
+     "Correct: -LogAnalyticsTargetState Enabled turns on the Log Analytics destination, and it goes together with -WorkspaceResourceId.",
+     "Incorrect: -EventHubTargetState controls the event hub destination and would need an event hub name and authorization rule, not a workspace ID.",
+     "Incorrect: -BlobStorageTargetState controls the storage destination. Enabling it would keep writing to blob storage and would need a storage account resource ID."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "BlobStorageTargetState",
+     "LogAnalyticsTargetState",
+     "EventHubTargetState"
+    ],
+    "why": [
+     "Correct: -BlobStorageTargetState Disabled stops audit records from being written to blob storage while the other destination stays on.",
+     "Incorrect: disabling -LogAnalyticsTargetState would cancel the destination that you just enabled in the same command.",
+     "Incorrect: -EventHubTargetState Disabled changes the event hub destination, which is not used here, and would leave blob storage on."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "Set-AzSqlServerAudit has one state parameter per destination: BlobStorageTargetState, EventHubTargetState and LogAnalyticsTargetState. Enable one and disable another in the same call to change the destination.",
+  "ref": "https://learn.microsoft.com/powershell/module/az.sql/set-azsqlserveraudit?view=azps-16.5.0"
+ },
+ {
+  "id": "2.2.2-07",
+  "obj": "2.2.2",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Relecloud configured auditing of DB1 and Server1 in Azure SQL Database. Server1 sends its server-level audit to a Log Analytics workspace by using the Azure portal, and DB1 also has its own database-level audit that writes to a storage account.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "If an administrator deletes the diagnostic setting that the portal created for the audit, audit logs stop reaching the workspace without an explicit failure.",
+   "The database-level audit of DB1 replaces the server-level audit for DB1.",
+   "During very high activity, auditing can allow transactions to proceed without recording every selected event."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Auditing to Log Analytics or Event Hubs depends on a diagnostic setting that fails silently when deleted, so alert on its deletion. Database and server audits run side by side, and auditing favors availability and performance over guaranteed capture.",
+  "rationale": [
+   "Yes: the SQLSecurityAuditEvents diagnostic setting is critical for the destination. If it is deleted, auditing fails silently, so Microsoft recommends an alert on the deletion of diagnostic settings.",
+   "No: when server auditing is enabled and a database-level audit is also configured, both exist side by side, and DB1 is audited by both policies.",
+   "Yes: auditing is optimized for availability and performance of the database, so during very high activity or network load, some events marked for auditing might not be recorded."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/auditing-setup?view=azuresql"
+ },
+ {
+  "id": "2.2.2-08",
+  "obj": "2.2.2",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders must audit the operations that Microsoft support engineers perform on Server1, an Azure SQL Database logical server, and must be able to review them. Server1 already sends its regular audit to a Log Analytics workspace.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Turn on auditing of Microsoft support operations for Server1 and select a destination.",
+   "Query the workspace for AzureDiagnostics rows with Category equal to DevOpsOperationsAudit.",
+   "Query the workspace for rows with Category equal to SQLSecurityAuditEvents.",
+   "Enable database-level auditing on every database on Server1.",
+   "Enable the Defender for Azure SQL Databases plan on the subscription."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Auditing of Microsoft support operations is a separate setting that writes to its own destinations with the DevOpsOperationsAudit category. You review the events by querying that category in the workspace.",
+  "rationale": [
+   "Correct: the Enable Auditing of Microsoft support operations setting is the feature that records support engineer queries and sign-ins, and it needs a destination such as Log Analytics.",
+   "Correct: support operations are logged under the DevOpsOperationsAudit category, so this query returns them from the workspace.",
+   "Incorrect: SQLSecurityAuditEvents is the category of the regular audit events. Support operations are written under a different category, so this query would not show them.",
+   "Incorrect: database-level auditing records regular activity per database and does not add the support engineer operations. Use it for per-database audit settings.",
+   "Incorrect: Defender for Azure SQL Databases generates threat alerts and vulnerability findings. It does not provide a log of support engineer operations."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/database/auditing-microsoft-support-operations?view=azuresql"
+ },
+ {
+  "id": "2.2.2-09",
+  "obj": "2.2.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Contoso, Ltd. has MI1, an Azure SQL Managed Instance with a server audit named Audit1 that writes standard events to Azure Monitor logs. The security team must also audit Microsoft support operations on MI1 and must keep the standard events.\n\nWhat should you do?",
+  "choices": [
+   "Create a separate server audit for Microsoft support operations.",
+   "Select the Microsoft support operations option on Audit1.",
+   "Add a server audit specification with the BATCH_COMPLETED_GROUP to Audit1.",
+   "Create a database audit specification in the master database."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Auditing of Microsoft support operations on SQL Managed Instance needs its own server audit. Enabling the option on an existing audit overwrites that audit so that it logs only support operations.",
+  "rationale": [
+   "Correct: a separate server audit (for example with OPERATOR_AUDIT = ON) logs support operations and leaves Audit1 and its standard events untouched.",
+   "Incorrect: selecting the option on an existing audit overwrites it, and Audit1 would then log only Microsoft support operations, so the standard events would be lost.",
+   "Incorrect: the BATCH_COMPLETED_GROUP captures queries executed by regular users. It is already part of the standard audit and does not capture Microsoft support operations.",
+   "Incorrect: a database audit specification in master audits actions in that database for a server audit. It does not enable the Microsoft support operations audit."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-sql/managed-instance/auditing-configure?view=azuresql"
+ },
+ {
+  "id": "2.2.3-01",
+  "obj": "2.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a subscription that contains Azure SQL databases, SQL Server on virtual machines, Azure Database for PostgreSQL servers and Azure Cosmos DB accounts. The security team wants one switch in Microsoft Defender for Cloud that enables threat protection for all of these database types.\n\nWhich Defender plan should you enable on the subscription?",
+  "choices": [
+   "Databases",
+   "Servers",
+   "Storage",
+   "Cloud Security Posture Management"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The Defender for Databases plan groups four offerings: Azure SQL Databases, SQL Servers on Machines, open-source relational databases and Azure Cosmos DB. Turning the Databases plan on activates all four, and each is priced separately.",
+  "rationale": [
+   "Correct: switching the Databases plan to On in Environment settings activates the four database protection plans for the subscription.",
+   "Incorrect: the Servers plan protects virtual machines and servers at the host level, for example with endpoint protection. It does not provide the database-specific threat detection of the Databases plan.",
+   "Incorrect: the Storage plan protects storage accounts, for example against malware uploads and anomalous access. Use it for Blob, file and data lake storage, not for databases.",
+   "Incorrect: Cloud Security Posture Management assesses configuration and attack paths across resources. It is a posture feature and does not turn on the database threat protection plans."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-databases-plan"
+ },
+ {
+  "id": "2.2.3-02",
+  "obj": "2.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. creates a new Azure Cosmos DB account. The account must be covered by Microsoft Defender for Azure Cosmos DB.\n\nWhich API should you select for the account?",
+  "choices": [
+   "API for NoSQL",
+   "API for MongoDB",
+   "API for Apache Cassandra",
+   "API for Apache Gremlin"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for Azure Cosmos DB supports accounts that use the API for NoSQL. The APIs for MongoDB, Apache Cassandra, Table and Apache Gremlin are not supported.",
+  "rationale": [
+   "Correct: Azure Cosmos DB for NoSQL is the supported API for Defender for Azure Cosmos DB.",
+   "Incorrect: accounts that use the API for MongoDB are not supported by Defender for Azure Cosmos DB. Select it when MongoDB wire-protocol compatibility is needed and accept that this plan does not cover it.",
+   "Incorrect: the API for Apache Cassandra is not supported by this plan. Select it for Cassandra-compatible workloads, and use other controls to monitor them.",
+   "Incorrect: the API for Apache Gremlin, used for graph data, is not supported by this plan. Select it for graph workloads when threat protection coverage is not required."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-defender-for-cosmos"
+ },
+ {
+  "id": "2.2.3-03",
+  "obj": "2.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank hosts an Azure Database for PostgreSQL flexible server named PG1. The security team must detect anomalous and potentially harmful attempts to access or exploit PG1 and receive the alerts in Microsoft Defender for Cloud.\n\nWhich plan should you enable?",
+  "choices": [
+   "Microsoft Defender for open-source relational databases",
+   "Microsoft Defender for Azure SQL Databases",
+   "Microsoft Defender for SQL Servers on Machines",
+   "Microsoft Defender for Azure Cosmos DB"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for open-source relational databases detects anomalous activity on supported open-source engines such as Azure Database for PostgreSQL and Azure Database for MySQL flexible servers. It can be enabled on the subscription or on the server.",
+  "rationale": [
+   "Correct: this plan covers Azure Database for PostgreSQL and MySQL flexible servers and raises alerts in Defender for Cloud.",
+   "Incorrect: Defender for Azure SQL Databases protects Azure SQL single databases, elastic pools, managed instances and dedicated SQL pools, not PostgreSQL. Use it for SQL engine workloads.",
+   "Incorrect: Defender for SQL Servers on Machines protects SQL Server instances that run on virtual machines or Azure Arc-enabled servers. PG1 is a PaaS PostgreSQL server.",
+   "Incorrect: Defender for Azure Cosmos DB protects Azure Cosmos DB accounts that use the API for NoSQL. PG1 is a relational PostgreSQL server."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-introduction"
+ },
+ {
+  "id": "2.2.3-04",
+  "obj": "2.2.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys has Server1, a Windows server in a branch office that runs SQL Server 2019. Server1 is not in Azure. The security team needs vulnerability assessment and threat protection for the databases on Server1 in Microsoft Defender for Cloud.\n\nWhat should you do?",
+  "choices": [
+   "Onboard Server1 to Azure Arc and enable Microsoft Defender for SQL Servers on Machines.",
+   "Enable Microsoft Defender for open-source relational databases on the subscription.",
+   "Enable Microsoft Defender for Azure Cosmos DB on the subscription.",
+   "Enable Microsoft Defender for SQL on a new Azure SQL logical server."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for SQL Servers on Machines protects SQL Server on Azure VMs and on-premises or multicloud machines. On-premises machines must be onboarded as Azure Arc-enabled servers so that Defender for Cloud can reach them.",
+  "rationale": [
+   "Correct: Arc onboarding makes Server1 visible to Defender for Cloud, and the SQL Servers on Machines plan adds vulnerability assessment and threat protection for its databases.",
+   "Incorrect: the open-source relational databases plan covers PostgreSQL and MySQL flexible servers, not SQL Server. Use it for those engines.",
+   "Incorrect: the Azure Cosmos DB plan covers Cosmos DB accounts that use the API for NoSQL. Server1 runs SQL Server.",
+   "Incorrect: enabling Defender for SQL on an Azure SQL logical server protects the databases on that logical server. It does not extend to a separate SQL Server instance in a branch office."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-usage"
+ },
+ {
+  "id": "2.2.3-05",
+  "obj": "2.2.3",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Fabrikam, Inc. enables the Databases plan for a subscription in Microsoft Defender for Cloud. The subscription contains an Azure SQL managed instance, an Azure Database for MySQL flexible server and an Azure Cosmos DB account that uses the API for NoSQL.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Enabling the Databases plan activates the Azure SQL Databases, SQL Servers on Machines, open-source relational databases and Azure Cosmos DB plans.",
+   "Each of the database protection plans in the Databases plan is priced separately.",
+   "Defender for Azure Cosmos DB reads the documents stored in the account and reduces the performance of the account."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "The Databases plan is a bundle of four separately priced offerings that you enable together at subscription level. Defender for Azure Cosmos DB analyzes activity and does not access account data or affect performance.",
+  "rationale": [
+   "Yes: the Databases plan activates all four Defender plans and protects all supported databases on the subscription.",
+   "Yes: each of the four database protection plans has its own price, so cost should be estimated per plan, for example with the Defender for Cloud cost calculator.",
+   "No: Defender for Azure Cosmos DB detects threats such as SQL injection and suspicious access patterns, and it does not access the account data or affect the service performance."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-overview"
+ },
+ {
+  "id": "2.2.3-06",
+  "obj": "2.2.3",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Relecloud must enable the correct Microsoft Defender for Cloud plan for each database resource.\n\nWhich plan should you use for each resource? To answer, drag the appropriate plans to the correct resources. Each plan may be used once, more than once, or not at all.",
+  "choices": [
+   "Defender for Azure SQL Databases",
+   "Defender for open-source relational databases",
+   "Defender for SQL Servers on Machines",
+   "Defender for Azure Cosmos DB",
+   "Defender for Storage"
+  ],
+  "targets": [
+   "MI1: an Azure SQL managed instance",
+   "MySQL1: an Azure Database for MySQL flexible server",
+   "SQL1: SQL Server on an Azure Arc-enabled on-premises machine",
+   "Cosmos1: an Azure Cosmos DB account that uses the API for NoSQL"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "MI1 is an Azure SQL managed instance, which is covered by Defender for Azure SQL Databases together with single databases, elastic pools and dedicated SQL pools.",
+   "MySQL1 is an open-source relational database on Azure, covered by Defender for open-source relational databases for PostgreSQL and MySQL flexible servers.",
+   "SQL1 is SQL Server on an Arc-enabled machine, which is covered by Defender for SQL Servers on Machines after Arc onboarding.",
+   "Cosmos1 uses the API for NoSQL, which is the supported API of Defender for Azure Cosmos DB."
+  ],
+  "notes": [
+   "Protects Azure SQL single databases, elastic pools, managed instances and Synapse dedicated SQL pools with vulnerability assessment and threat protection.",
+   "Detects anomalous access and exploit attempts on Azure Database for PostgreSQL and MySQL flexible servers, and on supported AWS RDS engines.",
+   "Protects SQL Server on Azure VMs, Arc-enabled on-premises servers and multicloud machines. Use it for IaaS SQL Server.",
+   "Detects SQL injection, compromised identities and suspicious access on Azure Cosmos DB accounts that use the API for NoSQL.",
+   "Protects storage accounts against malicious uploads and anomalous access. It is not a database plan, so it does not apply to these resources."
+  ],
+  "explanation": "Choose the Defender plan by database type: Azure SQL family, open-source relational, SQL Server on machines, and Azure Cosmos DB for NoSQL. Storage protection is a different plan.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-overview"
+ },
+ {
+  "id": "2.2.3-07",
+  "obj": "2.2.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation has a subscription with 15 Azure Cosmos DB accounts. Because of cost, the Databases plan is off for the subscription. Only the production account CosmosPROD must be protected by Microsoft Defender for Azure Cosmos DB, and the other 14 accounts must not be charged.\n\nWhat should you do?",
+  "choices": [
+   "Enable Microsoft Defender for Azure Cosmos DB on the CosmosPROD account.",
+   "Enable the Databases plan on the subscription and select the Azure Cosmos DB resource type.",
+   "Enable Microsoft Defender for open-source relational databases on CosmosPROD.",
+   "Enable Microsoft Defender for Azure SQL Databases on the subscription."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for Azure Cosmos DB can be enabled at the subscription level or on a single account. Subscription-level enablement covers all Azure Cosmos DB accounts, so protecting one account needs resource-level enablement in the portal, PowerShell, CLI, an ARM template or Azure Policy.",
+  "rationale": [
+   "Correct: resource-level enablement protects only CosmosPROD, so the other 14 accounts are not charged.",
+   "Incorrect: selecting the Azure Cosmos DB type in the Databases plan limits the plan to that database type, but it still protects every Cosmos DB account in the subscription, so all 15 are charged.",
+   "Incorrect: the open-source relational databases plan covers PostgreSQL and MySQL servers and does not apply to Cosmos DB accounts.",
+   "Incorrect: Defender for Azure SQL Databases protects the Azure SQL family and does not apply to Azure Cosmos DB accounts. Use it for SQL databases, managed instances and dedicated SQL pools."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-enable-cosmos-protections"
+ },
+ {
+  "id": "2.2.3-08",
+  "obj": "2.2.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders enables Microsoft Defender for Azure SQL Databases on a subscription. The subscription contains an Azure SQL elastic pool, an Azure SQL managed instance, an Azure Synapse Analytics dedicated SQL pool, an Azure Synapse serverless SQL pool, and an Azure Database for PostgreSQL flexible server.\n\nWhich three resources should you list as protected by this plan? Each correct answer presents part of the solution.",
+  "choices": [
+   "The Azure SQL elastic pool",
+   "The Azure SQL managed instance",
+   "The Azure Synapse Analytics dedicated SQL pool",
+   "The Azure Synapse Analytics serverless SQL pool",
+   "The Azure Database for PostgreSQL flexible server"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Defender for Azure SQL Databases protects Azure SQL single databases and elastic pools, managed instances and Synapse dedicated SQL pools. Serverless SQL pools are not covered, and PostgreSQL is covered by the open-source relational databases plan.",
+  "rationale": [
+   "Correct: single databases and elastic pools are protected by Defender for Azure SQL Databases.",
+   "Correct: Azure SQL managed instances are protected by this plan as well.",
+   "Correct: Synapse Analytics dedicated SQL pools (formerly SQL Data Warehouse) are covered by this plan.",
+   "Incorrect: Defender for SQL does not apply to serverless SQL pools or Apache Spark pools in Azure Synapse Analytics. Only dedicated SQL pools are covered.",
+   "Incorrect: PostgreSQL flexible servers are covered by Defender for open-source relational databases, a different plan in the Databases bundle."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-introduction"
+ },
+ {
+  "id": "2.2.3-09",
+  "obj": "2.2.3",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Litware, Inc. must enable Microsoft Defender for Azure Cosmos DB on one account named Cosmos1 in resource group RG1 by using Az PowerShell, and then verify the setting.\n\nHow should you complete the script? To answer, select the appropriate options in the answer area.\n\n```powershell\n$id = \"/subscriptions/<subscription-id>/resourceGroups/RG1/providers/[[1]]/Cosmos1/\"\n[[2]] -ResourceId $id\nGet-AzSecurityAdvancedThreatProtection -ResourceId $id\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Microsoft.DocumentDb/databaseAccounts",
+     "Microsoft.Sql/servers",
+     "Microsoft.DBforPostgreSQL/flexibleServers"
+    ],
+    "why": [
+     "Correct: Azure Cosmos DB accounts are Microsoft.DocumentDb/databaseAccounts resources, which is the resource type in the resource ID.",
+     "Incorrect: Microsoft.Sql/servers is the type of an Azure SQL logical server. Use it as the resource ID type when enabling Defender for SQL on a logical server.",
+     "Incorrect: Microsoft.DBforPostgreSQL/flexibleServers identifies an Azure Database for PostgreSQL flexible server. Use it for the open-source relational databases plan."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Enable-AzSecurityAdvancedThreatProtection",
+     "Get-AzSecurityAdvancedThreatProtection"
+    ],
+    "why": [
+     "Correct: Enable-AzSecurityAdvancedThreatProtection with the account resource ID enables Defender for Azure Cosmos DB at the resource level.",
+     "Incorrect: Get-AzSecurityAdvancedThreatProtection only reads the current setting. It is the right command for the verification line that follows, but it would not enable anything."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "Resource-level enablement uses Enable-AzSecurityAdvancedThreatProtection with the resource ID of the account, and Get-AzSecurityAdvancedThreatProtection verifies it. The provider path of the ID identifies the resource type.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-enable-cosmos-protections"
+ }
+]

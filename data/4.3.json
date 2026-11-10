@@ -1,0 +1,689 @@
+[
+ {
+  "id": "4.3.1-01",
+  "obj": "4.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a Microsoft Security Copilot workspace named Workspace1 whose Customer Data storage location is the United States. A new regulation requires that the prompts and responses of the European subsidiary are stored in the European Union.\n\nWhich action should you perform?",
+  "choices": [
+   "Create a new workspace and select the European Union as its Customer Data storage location.",
+   "Change the Customer Data storage location of Workspace1 on the Owner settings page of the portal.",
+   "Change the prompt evaluation location of the capacity that Workspace1 uses to Europe (EU).",
+   "Turn off the data sharing options in the Owner settings that apply to Workspace1 in the portal."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The Customer Data storage location is chosen when a workspace is created and cannot be changed afterwards. To store data in another geography you create a new workspace and pick that geography.",
+  "rationale": [
+   "Correct: the storage location is set at workspace creation and is fixed for the life of the workspace, so a new workspace in the EU geography is the way to keep the subsidiary's data there.",
+   "Incorrect: the Owner settings page shows the storage location but does not let you edit it once the workspace exists. Use Owner settings for capacity association, data sharing, audit logging and file upload.",
+   "Incorrect: the prompt evaluation location controls where GPU resources process prompts, not where Customer Data is stored at rest. Change it when you need to move prompt processing, for example away from a busy region.",
+   "Incorrect: data sharing options control whether Microsoft may capture and review data to improve the product. They do not relocate storage. Turn them off to limit sharing, not to meet a residency requirement."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/privacy-data-security"
+ },
+ {
+  "id": "4.3.1-02",
+  "obj": "4.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a Microsoft 365 E5 tenant in which Security Copilot was auto provisioned. The tenant now contains three Security Copilot workspaces. An administrator must identify which workspace powers the embedded Security Copilot experiences in Microsoft Defender, Microsoft Entra and Microsoft Purview.\n\nWhich workspace should the administrator identify?",
+  "choices": [
+   "The default workspace, which is the earliest-created workspace in the tenant.",
+   "The workspace that is linked to the capacity with the largest number of SCUs.",
+   "The workspace that a Copilot owner created most recently in the tenant.",
+   "The workspace whose storage location matches the geography of the signed-in user."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Auto provisioning creates a default workspace and links it to the default capacity. If workspaces already exist, the earliest-created one becomes the default, and the embedded experiences across Defender, Entra, Purview and Intune use it.",
+  "rationale": [
+   "Correct: embedded experiences in Defender, Entra, Purview and Intune use the default workspace, and when a tenant already has workspaces the earliest-created one is the default.",
+   "Incorrect: the number of SCUs on a capacity decides how much work the workspace can run, not which workspace the embedded experiences use. Compare SCUs when you size capacity, not when you look for the default.",
+   "Incorrect: creation time matters, but the newest workspace is not the default. The earliest-created workspace is. A newer workspace is used from the standalone portal when a user selects it.",
+   "Incorrect: the storage location is a property of each workspace and does not route embedded experiences by user geography. It matters for data residency, not for choosing the default workspace."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/auto-provisioning-security-copilot"
+ },
+ {
+  "id": "4.3.1-03",
+  "obj": "4.3.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. provisioned 2 SCUs for Security Copilot. During incident response spikes the provisioned units run out within the hour and requests fail. Finance requires that extra units are paid for only when they are consumed and that total spending has an upper limit.\n\nWhat should you configure?",
+  "choices": [
+   "Overage units with a maximum limit on the capacity.",
+   "Overage units set to unlimited on the capacity.",
+   "A larger number of provisioned SCUs sized for the peak hour.",
+   "A second capacity that is attached to a new workspace."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Overage units are billed on demand as they are consumed and can be capped with a maximum, which absorbs spikes without paying for idle units. Provisioned SCUs are billed for every full hour whether used or not.",
+  "rationale": [
+   "Correct: overage SCUs are billed only when consumed, and a maximum limit keeps the cost predictable while still absorbing the spikes that exhaust the provisioned units.",
+   "Incorrect: unlimited overage also bills only on consumption, but it has no spending ceiling, which breaks the upper-limit requirement. Use it when uninterrupted access matters more than a cap.",
+   "Incorrect: provisioned SCUs are billed per full hour even when idle, so sizing them for the peak pays for unused units the rest of the day. Use it for steady, predictable usage.",
+   "Incorrect: a second capacity attached to a new workspace splits the load across workspaces and does not add headroom to the existing one. Use it when separate workspaces need separate billing."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/security-compute-units-capacity"
+ },
+ {
+  "id": "4.3.1-04",
+  "obj": "4.3.1",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Relecloud is not licensed for Microsoft 365 E5 or E7 and must provision Security Copilot capacity from the Azure portal.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "In the Azure portal, open Microsoft Security compute capacities and, under the Microsoft Security Copilot plan, select Create.",
+   "Select the subscription, resource group, capacity name, prompt evaluation location and number of SCUs.",
+   "Select Review + create, verify the information and select Create.",
+   "Select Finish setup in the Security Copilot portal.",
+   "Assign the Copilot contributor role to the analysts in the Azure portal.",
+   "Purchase Microsoft 365 E5 licenses for the users who will use Security Copilot."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Provisioning through Azure starts with the capacity wizard, where you choose the subscription, resource group, evaluation location and SCUs. Only after the capacity exists can you finish the setup in the Security Copilot portal, where the workspace and roles are handled.",
+  "rationale": [
+   "Step 1: the Azure capacity wizard is reached from Microsoft Security compute capacities by creating a capacity under the Microsoft Security Copilot plan.",
+   "Step 2: the wizard needs the subscription, resource group, a capacity name, the prompt evaluation location and the number of SCUs before it can be reviewed.",
+   "Step 3: review and create deploys the capacity resource. Billing starts as soon as the capacity exists, whether or not it is attached to an environment.",
+   "Step 4: after the capacity is created, finish the setup in the Security Copilot portal, where the capacity is attached to a workspace.",
+   "Incorrect: Copilot owner and contributor roles are assigned on the Role assignment page of the Security Copilot portal, not with Azure RBAC. Assign them after setup is finished.",
+   "Incorrect: E5 licenses are a different path, because eligible E5 and E7 tenants are auto provisioned. Tenants without that license provision SCUs instead, so no license purchase is part of this procedure."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manual-onboarding"
+ },
+ {
+  "id": "4.3.1-05",
+  "obj": "4.3.1",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Woodgrove Bank provisioned a Security Copilot capacity of 4 provisioned SCUs and no overage units. User1 has the Copilot owner role but has no Azure role assignment on the capacity resource.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "If analysts consume all 4 SCUs between 9:00 and 9:30, Security Copilot requests are stopped until the capacity refreshes at 10:00.",
+   "SCUs that are not used between 9:00 and 10:00 are added to the SCUs that are available between 10:00 and 11:00.",
+   "User1 can associate the workspace with a different capacity from the Owner settings page."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Provisioned capacity refreshes on fixed clock-hour blocks, unused SCUs expire at the end of the hour and requests stop when the provisioned units run out unless overage is available. Changing the capacity association also needs Azure Owner or Contributor on the capacity resource.",
+  "rationale": [
+   "Yes: provisioned SCUs refresh each full billing hour, and when they run out requests stop unless another capacity type, such as overage units, is available.",
+   "No: unused provisioned SCUs expire at the end of the hour and do not roll over, so the 10:00 block starts again with the 4 provisioned SCUs.",
+   "No: changing or associating a capacity needs Azure Owner or Contributor access to the capacity resource in the Azure portal. The Copilot owner role alone is not enough."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/security-compute-units-capacity"
+ },
+ {
+  "id": "4.3.1-06",
+  "obj": "4.3.1",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys is not licensed for Microsoft 365 E5 or E7. User1 must provision Security Compute Units and complete the initial Security Copilot setup. User1 currently has no role assignments.\n\nWhich roles should you assign to User1?",
+  "choices": [
+   "Azure Contributor on the resource group and Microsoft Entra Security Administrator.",
+   "Azure Reader on the subscription and Microsoft Entra Global Reader.",
+   "Azure Contributor on the resource group and Microsoft Entra Security Reader.",
+   "Azure Reader on the subscription and Microsoft Entra Security Administrator."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Attaching SCU capacity to a Security Copilot workspace needs an Azure Contributor or Owner role on the subscription or resource group, plus Security Administrator or higher in the tenant being onboarded.",
+  "rationale": [
+   "Correct: Azure Contributor or Owner lets User1 create the capacity resource, and Security Administrator or higher in the tenant lets User1 complete onboarding.",
+   "Incorrect: Reader cannot create a capacity resource and Global Reader is a read-only role that cannot complete onboarding. Reader roles are fine for viewing usage, not provisioning.",
+   "Incorrect: Contributor covers the Azure side, but Security Reader is read-only and is below the Security Administrator level that onboarding requires in the tenant.",
+   "Incorrect: Security Administrator covers the tenant side, but Reader on the subscription cannot create or change the capacity resource. Contributor or Owner is required for that."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manual-onboarding"
+ },
+ {
+  "id": "4.3.1-07",
+  "obj": "4.3.1",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. uses a Security Copilot workspace whose Customer Data storage location is Australia. The capacity uses Australia (ANZ) as the prompt evaluation location. During peak hours analysts report failed prompts because GPU capacity in the selected evaluation location is busy. Data at rest must stay in the workspace storage location.\n\nWhat should you configure?",
+  "choices": [
+   "Prompt evaluation anywhere in the world on the capacity.",
+   "A new workspace with the United States as its storage location.",
+   "Unlimited overage units on the capacity that the workspace uses.",
+   "Data sharing so that Microsoft can capture prompts for performance."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Prompt evaluation location is separate from data storage location. Allowing evaluation anywhere in the world lets the service use free GPU capacity when the selected geography is busy, while stored data remains in the workspace geography.",
+  "rationale": [
+   "Correct: the evaluate-anywhere option mitigates a busy GPU region by letting the system pick the location with capacity, and it does not move the stored Customer Data.",
+   "Incorrect: a workspace in the United States would store data outside Australia and does nothing for GPU load in ANZ. Use a new workspace when storage must move to another geography.",
+   "Incorrect: overage SCUs add compute units when provisioned units run out. The failures here come from busy GPUs in the evaluation location, not from exhausted SCUs.",
+   "Incorrect: data sharing lets Microsoft capture data to improve the product and can store data outside the workspace geography. It does not relieve GPU load and conflicts with the residency requirement."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/privacy-data-security"
+ },
+ {
+  "id": "4.3.2-01",
+  "obj": "4.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. analysts must create sessions and run promptbooks in Security Copilot. They must not change owner settings, view the usage dashboard or publish custom plugins for the tenant.\n\nWhich role should you assign to the analysts?",
+  "choices": [
+   "Copilot contributor",
+   "Copilot owner",
+   "Microsoft Entra Security Administrator",
+   "Microsoft Entra Billing Administrator"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Copilot contributor can create sessions, run promptbooks and share promptbooks, but cannot manage owner settings, view the usage dashboard or publish tenant plugins. Copilot owner and the Entra roles that inherit it grant those management rights.",
+  "rationale": [
+   "Correct: the contributor role gives access to the platform for sessions and promptbooks and excludes owner-level settings, the usage dashboard and tenant plugin publishing.",
+   "Incorrect: the owner role adds owner settings, the usage dashboard, capacity management and tenant plugin control, which the stem excludes. Use it for the few administrators who manage Security Copilot.",
+   "Incorrect: Security Administrator automatically inherits Copilot owner, so analysts would receive owner rights. It is also a privileged Entra role that should not be assigned just for Copilot access.",
+   "Incorrect: Billing Administrator is one of the Entra roles that inherit Copilot owner access, so it grants the owner-level rights the analysts must not have. It fits people who manage billing and capacity."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.2-02",
+  "obj": "4.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Adatum Corporation wants User1 to manage Security Copilot owner settings and to count as one of the Security Copilot owners without a separate Security Copilot role assignment. User1 must receive the access by holding a Microsoft Entra role.\n\nWhich Microsoft Entra role should you assign to User1?",
+  "choices": [
+   "Security Administrator",
+   "Security Reader",
+   "Reports Reader",
+   "Application Administrator"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A fixed set of Microsoft Entra, Intune and Purview roles automatically inherit Copilot owner access. Security Administrator is in that set, while read-only and unrelated roles are not.",
+  "rationale": [
+   "Correct: Security Administrator is one of the Microsoft Entra roles that automatically inherit Copilot owner access, so User1 becomes an owner without a Security Copilot role assignment.",
+   "Incorrect: Security Reader is a read-only security role that is not in the list of Entra roles inheriting Copilot owner access. Use it for read access to security data, not to manage Copilot.",
+   "Incorrect: Reports Reader reads usage and activity reports and is not among the roles that inherit Copilot owner. It would not make User1 an owner or give access to owner settings.",
+   "Incorrect: Application Administrator manages app registrations and enterprise applications and is not in the inherited owner list. It fits app management tasks rather than Security Copilot administration."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.2-03",
+  "obj": "4.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Adatum Corporation assigned User1 the Copilot contributor role. User1 has no Microsoft Entra roles. When User1 asks Security Copilot for Microsoft Sentinel incidents, the Microsoft Sentinel plugin returns no data. User1 must be able to read incidents and must not receive write access.\n\nWhich role should you assign to User1?",
+  "choices": [
+   "Microsoft Sentinel Reader on the Sentinel workspace",
+   "Microsoft Sentinel Contributor on the Sentinel workspace",
+   "Copilot owner in Security Copilot",
+   "A custom Defender XDR role that includes Security Copilot permission"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security Copilot uses on-behalf-of authentication, so plugins only return data the signed-in user is allowed to read. For Sentinel that access comes from Azure RBAC, and Microsoft Sentinel Reader gives read access to incidents.",
+  "rationale": [
+   "Correct: Copilot roles control platform access, while data access comes from the service role. Microsoft Sentinel Reader on the workspace lets the plugin read incidents without write rights.",
+   "Incorrect: Microsoft Sentinel Contributor would also expose incidents but adds write access, which the stem forbids. Use it for analysts who must change incidents and create analytics rules.",
+   "Incorrect: Copilot owner adds platform administration but no Sentinel data access, because Security Copilot roles do not grant access to security data by themselves. The plugin would still return nothing.",
+   "Incorrect: a Defender XDR role with Security Copilot permission governs access to Defender portal data and the embedded Copilot there. It does not grant Azure RBAC read access to a Sentinel workspace."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.2-04",
+  "obj": "4.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Northwind Traders has a Security Copilot workspace in which the Everyone group is assigned the Copilot contributor role. The company wants only the members of SecOps-Group, a Microsoft Entra security group, to use the platform. The company does not want to assign privileged Microsoft Entra roles for this purpose.\n\nWhat should you do?",
+  "choices": [
+   "Remove the Everyone group from Copilot contributor and add SecOps-Group on the Role assignment page.",
+   "Assign the Security Administrator role to SecOps-Group in Microsoft Entra ID.",
+   "Add SecOps-Group to Copilot owner and keep the Everyone group as Copilot contributor.",
+   "Remove the Everyone group and assign Azure Contributor on the capacity resource group to SecOps-Group."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security Copilot roles are managed on the Role assignment page and can be given to groups. Removing the broad Everyone assignment and adding a security group follows least privilege without using a privileged Entra role.",
+  "rationale": [
+   "Correct: Everyone is the broad default contributor assignment. Replacing it with SecOps-Group on the Role assignment page limits platform access to that group and needs no privileged Entra role.",
+   "Incorrect: Security Administrator is privileged and inherits Copilot owner, so it grants more than platform use. It also leaves the Everyone group in place, so other users keep access.",
+   "Incorrect: owner gives administrative rights to SecOps-Group, which exceeds the need to use the platform, and keeping Everyone as contributor does not restrict access. Owner suits only the administrators.",
+   "Incorrect: Azure Contributor on the resource group lets users manage the capacity resource but is not a Security Copilot role, so it does not grant platform access to the group."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.2-05",
+  "obj": "4.3.2",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Contoso, Ltd. wants the members of Analysts-Group, a Microsoft Entra security group, to use the standalone Security Copilot portal and to retrieve Microsoft Sentinel incidents through the Microsoft Sentinel plugin. The group must not receive privileged Microsoft Entra roles and must not manage Security Copilot settings.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Add Analysts-Group to the Copilot contributor role on the Role assignment page.",
+   "Assign Microsoft Sentinel Reader on the Sentinel workspace to Analysts-Group.",
+   "Assign the Microsoft Entra Security Administrator role to Analysts-Group.",
+   "Add Analysts-Group to the Copilot owner role on the Role assignment page.",
+   "Assign Azure Contributor on the capacity resource group to Analysts-Group."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Two layers are needed: a Security Copilot role for platform access and a service role for the data. Contributor plus Microsoft Sentinel Reader gives the group platform use and read access to incidents without privileged or management rights.",
+  "rationale": [
+   "Correct: Copilot contributor gives the group access to the standalone portal and sessions without owner-level settings.",
+   "Correct: Microsoft Sentinel Reader is the Azure RBAC role that lets the Sentinel plugin read incidents on behalf of the user, with read-only access.",
+   "Incorrect: Security Administrator is privileged and inherits Copilot owner, so it breaks both restrictions. Use a security group in a Copilot role instead of a privileged role for Copilot access.",
+   "Incorrect: Copilot owner lets the group manage settings, capacity association, data sharing and plugins, which the stem forbids. Reserve owner for the administrators.",
+   "Incorrect: Azure Contributor on the capacity resource group manages the SCU capacity resource. It grants neither Security Copilot platform access nor read access to Sentinel incidents."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.2-06",
+  "obj": "4.3.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys enabled Microsoft Intune as a data source in Security Copilot. User1 is assigned a custom Intune role-based access control (RBAC) role that is limited by scope tags. User1 has no Microsoft Entra roles and no Security Copilot role assignments.\n\nWhich access should User1 receive in Copilot in Intune?",
+  "choices": [
+   "Copilot contributor access, limited to the Intune data that the custom role and scope tags allow",
+   "Copilot owner access, limited to the Intune data that the custom role and scope tags allow",
+   "No access until a Copilot owner adds User1 on the Role assignment page",
+   "Copilot contributor access to all Intune data because Copilot does not evaluate Intune RBAC"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When Intune is enabled as a data source, the Intune Administrator role inherits Copilot owner and other built-in and custom Intune RBAC roles inherit Copilot contributor. Copilot still honors Intune RBAC roles and scope tags for data access.",
+  "rationale": [
+   "Correct: custom Intune RBAC roles inherit Copilot contributor, and Copilot honors the Intune role and scope tags, so User1 only sees the data the role allows.",
+   "Incorrect: owner is inherited only by the Intune Administrator Entra role among the Intune roles. A custom Intune role with scope tags does not inherit owner access.",
+   "Incorrect: with Intune enabled as a data source, Intune roles inherit contributor automatically, so no separate assignment is needed. Manual assignment is for users with no inherited access.",
+   "Incorrect: Copilot honors Intune RBAC and scope tags, and a user without permission gets an error. Contributor gives platform access, not broader data access than the Intune role allows."
+  ],
+  "ref": "https://learn.microsoft.com/intune/copilot/faq"
+ },
+ {
+  "id": "4.3.2-07",
+  "obj": "4.3.2",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Woodgrove Bank has three users who use Security Copilot and must receive access with the least privilege that meets each requirement.\n\nWhich role should you assign to each user? To answer, drag the appropriate roles to the correct users. Each role may be used once, more than once, or not at all.",
+  "choices": [
+   "Copilot owner",
+   "Copilot contributor",
+   "Microsoft Sentinel Reader (Azure RBAC)",
+   "Microsoft Entra Security Administrator"
+  ],
+  "targets": [
+   "User1: must view the Security Copilot usage dashboard and update data sharing options",
+   "User2: must create sessions and run promptbooks in the standalone portal",
+   "User3: already has Copilot contributor and must read Microsoft Sentinel incidents through the plugin"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Viewing the usage dashboard and changing data sharing options are owner capabilities. Sessions and promptbooks need only contributor. Data from a plugin needs the service role, here Azure RBAC on Sentinel, on top of platform access.",
+  "rationale": [
+   "Owner is the only Security Copilot role that can view the usage dashboard and update data sharing and feedback options, so User1 needs it.",
+   "Contributor can create sessions and run promptbooks, which is all User2 needs, and it excludes owner settings.",
+   "User3 already has platform access, and the Sentinel plugin reads data as the user, so the Azure RBAC Microsoft Sentinel Reader role supplies the missing data access."
+  ],
+  "notes": [
+   "Security Copilot role for administrators. Can manage settings, plugins, capacity association and the usage dashboard. Use it for the few people who administer the platform.",
+   "Security Copilot role for analysts. Can create sessions and run promptbooks, with no owner settings. Use it for everyday users.",
+   "Azure RBAC role that gives read access to Sentinel incidents and data. Use it when a plugin must read Sentinel data for a user who already has platform access.",
+   "Privileged Entra role that inherits Copilot owner access. Use it for security administration, not as a way to grant Copilot access to analysts."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/authentication"
+ },
+ {
+  "id": "4.3.3-01",
+  "obj": "4.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys wants to prevent contributors from using the preinstalled Microsoft Defender XDR plugin and the Natural Language to KQL plugin in Security Copilot, including in the embedded experiences. Owners must keep using both plugins.\n\nWhat should you do?",
+  "choices": [
+   "In Plugin settings, restrict the availability of the preinstalled plugins to Owners.",
+   "Ask each contributor to turn off the plugin toggles in the Sources dialog.",
+   "Remove the Copilot contributor role from the Defender administrators.",
+   "Delete both plugins from the Custom section of Manage plugins."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Owners can change the availability of preinstalled plugins for the tenant to everyone or to Owners. The restriction applies immediately to the standalone and embedded experiences, and new preinstalled plugins then default to Owners until configured.",
+  "rationale": [
+   "Correct: the Plugin settings page lets owners restrict preinstalled plugins to Owners, and the restriction also applies to embedded experiences such as Copilot in Defender.",
+   "Incorrect: the toggles in Sources are a personal choice for each user, so they cannot enforce a tenant-wide restriction. Use them when a user wants to personalize which sources a session uses.",
+   "Incorrect: removing the contributor role takes away platform access altogether, including the plugins the Defender administrators should keep using elsewhere. Use it when users no longer need Security Copilot.",
+   "Incorrect: the Custom section holds plugins that were uploaded, and preinstalled plugins do not appear there, so there is nothing to delete. Delete a custom plugin when it should be retired."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manage-plugins"
+ },
+ {
+  "id": "4.3.3-02",
+  "obj": "4.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants contributors to add and manage custom plugins for their own sessions. Only Copilot owners may publish custom plugins that are available to everyone in the organization.\n\nWhich configuration should you apply in Plugin settings?",
+  "choices": [
+   "Set the user scope permission to Owners and Contributors and the organization scope permission to Owners.",
+   "Set the user scope permission to Owners and the organization scope permission to Owners and Contributors.",
+   "Set the user scope permission to Owners and Contributors and the organization scope permission to Owners and Contributors.",
+   "Set the user scope permission to Owners and the organization scope permission to Owners."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Plugin settings has one permission for plugins that a person adds for themselves and a second one for plugins published for the organization. The second permission is available only after the first allows Owners and Contributors.",
+  "rationale": [
+   "Correct: contributors can then add and manage their own custom plugins, while publishing for the whole organization stays with owners.",
+   "Incorrect: the organization scope permission is only enabled when the user scope allows Owners and Contributors, and this combination would not let contributors add personal plugins as required.",
+   "Incorrect: this lets contributors publish plugins for everyone in the organization, which the stem reserves for owners. Use it when a trusted contributor group maintains shared plugins.",
+   "Incorrect: this keeps all custom plugin management with owners, so contributors cannot add plugins for their own sessions. Use it when plugin changes must be centrally controlled."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manage-plugins"
+ },
+ {
+  "id": "4.3.3-03",
+  "obj": "4.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Analysts at Litware, Inc. use the preinstalled Microsoft Sentinel plugin in the standalone Security Copilot portal. Each analyst team works with a different Sentinel workspace and wants prompts to use that workspace by default. The solution must not require uploading custom plugins.\n\nWhat should each analyst do?",
+  "choices": [
+   "Open the personalization settings of the Microsoft Sentinel plugin and specify the default workspace.",
+   "Ask a Copilot owner to set the default Sentinel workspace for the tenant in Plugin settings.",
+   "Create a separate Security Copilot workspace for each Sentinel workspace.",
+   "Turn off the Microsoft Sentinel plugin and use the Natural Language to KQL plugin instead."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Plugins that show a gear or Set up button are configured per user. The Microsoft Sentinel plugin supports personalization, where a user designates the workspace to use as the default.",
+  "rationale": [
+   "Correct: the Microsoft Sentinel plugin has a per-user setting for the default workspace, reachable by the gear icon in Sources, so each analyst chooses the team workspace.",
+   "Incorrect: Plugin settings controls who can add custom plugins and who can use preinstalled plugins. It does not hold a tenant default Sentinel workspace, because setup is per user.",
+   "Incorrect: Security Copilot workspaces define storage location, capacity and access, and they are not tied to Sentinel workspaces. Create one when you need separate data storage or access.",
+   "Incorrect: turning off the Sentinel plugin removes incident access, and the Natural Language to KQL plugin generates queries but is also set up per user. It does not set a default workspace for the Sentinel plugin."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/use-plugins"
+ },
+ {
+  "id": "4.3.3-04",
+  "obj": "4.3.3",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Fabrikam, Inc. has a Security Copilot tenant. A Copilot owner uploads a custom Security Copilot plugin and makes it available to anyone in the organization. The Plugin settings allow only owners to add and manage custom plugins for the organization.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Contributors can turn the plugin on or off and use it in their sessions.",
+   "Contributors can edit the plugin file in the Custom section.",
+   "The plugin is shown with a private tag to all users."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A plugin that an owner makes available to the organization can be used and toggled by every Security Copilot user, but only owners can modify it. The private tag is added only when a plugin is made available to just the person who added it.",
+  "rationale": [
+   "Yes: plugins that owners publish to the organization can be accessed, turned on or off and used by all Security Copilot users.",
+   "No: custom plugins created by owners are not editable by contributors. Only owners can modify a plugin that they published for the organization.",
+   "No: a private tag is added when a plugin is made available to just the person who uploaded it. A plugin available to the organization is visible to all users without it."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manage-plugins"
+ },
+ {
+  "id": "4.3.3-05",
+  "obj": "4.3.3",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank has these requirements for Security Copilot plugins:\n\n- Contributors can add and manage custom plugins for their own sessions.\n- Only Copilot owners can publish custom plugins for everyone in the organization.\n- The preinstalled Natural Language to KQL plugin is available to Copilot owners and not to contributors.\n\nHow should you configure the Plugin settings? To answer, select the appropriate options in the answer area.\n\nWho can add and manage their own custom plugins: [[1]]\nWho can add and manage custom plugins for everyone in the organization: [[2]]\nAvailability of the preinstalled Natural Language to KQL plugin: [[3]]",
+  "choices": [
+   "Owners and Contributors",
+   "Owners",
+   "Everyone"
+  ],
+  "answer": [
+   1,
+   0,
+   0
+  ],
+  "explanation": "The two custom plugin permissions are independent scopes, user and organization, and preinstalled plugins have a separate availability setting. Restricting a preinstalled plugin to Owners affects the standalone and embedded experiences immediately.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/copilot/security/manage-plugins",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Owners",
+     "Owners and Contributors"
+    ],
+    "why": [
+     "Incorrect: Owners keeps personal custom plugin management with owners, so contributors could not add plugins for their own sessions. Use it when all plugin changes are centrally controlled.",
+     "Correct: Owners and Contributors lets contributors add and manage custom plugins for themselves, and it enables the organization scope permission that is set in the next box."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Owners",
+     "Owners and Contributors"
+    ],
+    "why": [
+     "Correct: Owners keeps publishing for the whole organization with owners, so contributors can add personal plugins but cannot make them available to everyone.",
+     "Incorrect: Owners and Contributors lets contributors publish plugins to everyone in the organization, which the requirement reserves for owners. Use it when a trusted group maintains shared plugins."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "Owners",
+     "Everyone"
+    ],
+    "why": [
+     "Correct: restricting the preinstalled plugin to Owners makes it unavailable to contributors in the standalone and embedded experiences, as required.",
+     "Incorrect: Everyone keeps the plugin available to contributors, which the requirement forbids. Use it for preinstalled plugins that all analysts should be able to use."
+    ]
+   }
+  ]
+ },
+ {
+  "id": "4.3.3-06",
+  "obj": "4.3.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation restricted the preinstalled Microsoft Defender XDR plugin to Owners in Security Copilot. User1, a contributor, sets up a Microsoft-built agent that requires the Microsoft Defender XDR plugin. Other contributors must still not be able to use that plugin in their own sessions.\n\nWhich action should you take?",
+  "choices": [
+   "Keep the plugin restricted, because setting up the agent activates its required plugins for that agent without changing the tenant restriction.",
+   "Make the plugin available to everyone before User1 sets up the agent.",
+   "Assign User1 the Copilot owner role so that the agent can use the restricted plugin.",
+   "Upload a custom copy of the plugin that is available to User1 only."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When you set up a Security Copilot agent, the plugins that the agent requires are enabled automatically and only for that agent. Doing so does not change the status of plugins that you made available or restricted for the organization.",
+  "rationale": [
+   "Correct: required plugins are activated solely for the agent and do not alter the plugin availability that owners configured, so other contributors stay restricted.",
+   "Incorrect: making the plugin available to everyone would let all contributors use it in their sessions, which breaks the stem. Do this only if the organization decides to lift the restriction.",
+   "Incorrect: owner would give User1 broad administrative rights and is not needed, because the agent enables its required plugin itself. Grant owner only to people who manage Security Copilot.",
+   "Incorrect: a custom copy is an unnecessary extra plugin that would need its own vetting and is not required for the agent. Upload custom plugins to add capabilities that are not preinstalled."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/manage-plugins"
+ },
+ {
+  "id": "4.3.4-01",
+  "obj": "4.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. sets up a Microsoft-built agent in Security Copilot. The company wants the agent to run with a dedicated identity that is created for AI agents and scoped to the permissions granted during setup, instead of running with an analyst's credentials.\n\nWhich identity option should you select?",
+  "choices": [
+   "Create an agent identity that uses Microsoft Entra Agent ID",
+   "Connect with an existing user account of an analyst",
+   "Use a managed identity that is assigned to the capacity resource",
+   "Use a service principal that has a client secret"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "During agent setup you choose between creating an agent identity, which uses Microsoft Entra Agent ID and is available for Microsoft-built agents, and connecting an existing user account that lends its credentials and permissions to the agent.",
+  "rationale": [
+   "Correct: creating an agent identity makes a dedicated Microsoft Entra Agent ID for the agent, keeping access scoped and easier to manage than a borrowed user identity.",
+   "Incorrect: connecting an existing user account makes the agent inherit that person's access and permissions while it runs. Use it for agents where an agent identity is not offered.",
+   "Incorrect: a managed identity on the capacity resource is not one of the identity options in agent setup, and it would not represent the agent in Security Copilot. Managed identities suit Azure resources.",
+   "Incorrect: a service principal with a secret is not offered in agent setup either, and a stored secret adds credentials to manage. Use app registrations for apps that call APIs, not for these agents."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/agents-overview"
+ },
+ {
+  "id": "4.3.4-02",
+  "obj": "4.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. wants to browse and deploy partner-built agents that run in Security Copilot. The agents are purchased and deployed through an Azure billing subscription.\n\nWhich location should you use?",
+  "choices": [
+   "Microsoft Security Store",
+   "The Custom section of Manage plugins in Security Copilot",
+   "The Agent Store in Microsoft Copilot",
+   "Microsoft Security compute capacities in the Azure portal"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security Store lists Microsoft and partner security agents. You select Get solution, choose the Azure billing subscription, resource group and name, place the order and then configure the agent in Security Copilot.",
+  "rationale": [
+   "Correct: Microsoft Security Store is where you explore security agents, select Get solution and deploy through an Azure billing subscription, after which you configure the agent in Security Copilot.",
+   "Incorrect: the Custom section is where you upload your own plugin or agent YAML. Use it for agents that you build, not to discover and purchase partner-built agents.",
+   "Incorrect: the Agent Store in Microsoft Copilot lists agents for Microsoft 365 Copilot experiences. It is not the catalog for Security Copilot agents that deploy through Azure billing.",
+   "Incorrect: Microsoft Security compute capacities is where you create SCU capacity. It does not list agents. Use it when you need to provision or resize capacity."
+  ],
+  "ref": "https://learn.microsoft.com/security/store/customers/get-agents-in-security-store"
+ },
+ {
+  "id": "4.3.4-03",
+  "obj": "4.3.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has a partner-built agent from Security Store that reads Microsoft Sentinel and Microsoft Entra data. User1 has the Copilot contributor role and no Microsoft Entra roles. In Security Copilot the Set up button for the agent is disabled and a banner says that consent is required.\n\nWhich user should approve the agent permissions so that User1 can finish the setup?",
+  "choices": [
+   "A Microsoft Entra Global Administrator",
+   "A Security Copilot owner",
+   "A Microsoft Entra Security Administrator",
+   "An Azure subscription Owner"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A partner-built agent that accesses Microsoft product data needs a Global Administrator in the tenant to approve the permissions. Afterwards owners and contributors finish the setup, including identity and trigger.",
+  "rationale": [
+   "Correct: a Global Administrator must approve the Microsoft product permissions that the partner agent needs. User1 copies the link, and after approval can complete the setup.",
+   "Incorrect: a Copilot owner can set up and edit agents but cannot grant tenant consent for Microsoft product permissions. Owners finish setup after the approval is given.",
+   "Incorrect: Security Administrator manages security settings, for example agent settings in Defender, but the consent for a partner agent is an approval by a Global Administrator.",
+   "Incorrect: an Azure subscription Owner controls billing and Azure resources, which matter when purchasing the agent in Security Store. It does not grant consent to Microsoft Entra or Sentinel data."
+  ],
+  "ref": "https://learn.microsoft.com/copilot/security/agents-manage"
+ },
+ {
+  "id": "4.3.4-04",
+  "obj": "4.3.4",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Fabrikam, Inc. must deploy an agent from Microsoft Security Store and then configure it in Security Copilot.\n\nWhich five actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Open the Security Store portal, select Explore agents and select the agent.",
+   "Select Get solution.",
+   "Select the Azure billing subscription, resource group and name, and select Next to review the deployment resources.",
+   "Review the order and deployment details and select Place order.",
+   "Select Open Microsoft Security Copilot and configure the agent.",
+   "Upload the agent YAML file as a custom plugin in Manage plugins.",
+   "Create a Logic Apps connector for the Security Copilot API."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "explanation": "The Security Store flow moves from selecting the agent to Get solution, then billing and deployment details, then Place order. Only after deployment completes can you open Security Copilot and configure the agent instance that was created.",
+  "rationale": [
+   "Step 1: you must find and open the agent in Security Store before any purchase flow is available.",
+   "Step 2: Get solution starts the purchase and deployment flow for the selected agent.",
+   "Step 3: the flow asks for the Azure billing subscription, resource group and name, and then shows the deployment resource information.",
+   "Step 4: Place order starts the purchase and deployment, which creates the billing resources and the agent instance in Copilot.",
+   "Step 5: after the deployment completes, open Security Copilot to configure the deployed agent, including identity and trigger.",
+   "Incorrect: uploading YAML as a custom plugin is the route for an agent that you build yourself. Agents from Security Store are deployed by the store order.",
+   "Incorrect: Logic Apps connectors call the Security Copilot API from external workflows. They are not part of deploying an agent from Security Store."
+  ],
+  "ref": "https://learn.microsoft.com/security/store/customers/get-agents-in-security-store"
+ },
+ {
+  "id": "4.3.4-05",
+  "obj": "4.3.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. set up the Phishing Triage Agent in Microsoft Defender with the identity option Connect an existing user account. The account, ServiceAcct1, holds its Defender role through Microsoft Entra Privileged Identity Management (PIM) eligible assignment. The agent stops triaging alerts after a few hours, and the account must not use long-lived standing privileges.\n\nWhat should you do?",
+  "choices": [
+   "Change the agent identity to a new agent identity that uses Microsoft Entra Agent ID and assign it the required role.",
+   "Issue a Temporary Access Pass for ServiceAcct1 and sign the agent in again.",
+   "Assign the Copilot owner role to ServiceAcct1 in Security Copilot.",
+   "Increase the provisioned SCUs of the capacity that the workspace uses."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A user account that is used as the agent identity must authenticate for long-term background operation, which is not compatible with PIM or Temporary Access Pass. A dedicated agent identity that uses Microsoft Entra Agent ID avoids this and can be assigned only the permissions the agent needs.",
+  "rationale": [
+   "Correct: the identity can be changed after setup, and an agent identity based on Entra Agent ID is scoped to the agent and is not dependent on PIM activation or interactive sign-in.",
+   "Incorrect: a Temporary Access Pass is a short-lived credential, and a user identity for an agent is not compatible with it because it cannot support long-term background operation.",
+   "Incorrect: Copilot owner changes Security Copilot platform rights, not the Defender permissions that the agent needs, and it does not address the PIM activation expiring.",
+   "Incorrect: more SCUs add capacity when the agent runs out of compute. The agent stops because its identity cannot keep authenticating, so extra capacity would not help."
+  ],
+  "ref": "https://learn.microsoft.com/defender-xdr/phishing-triage-agent"
+ },
+ {
+  "id": "4.3.4-06",
+  "obj": "4.3.4",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank wants the Phishing Triage Agent in Microsoft Defender to triage phishing emails that users report from Outlook. Security Copilot capacity is already provisioned and Microsoft Defender for Office 365 Plan 2 is deployed.\n\nWhich three actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Activate unified role-based access control for the Defender for Office 365 workload.",
+   "Enable Monitor reported messages in Outlook in the user reported settings.",
+   "Disable the Auto-Resolve alert tuning rule for emails that are reported by users as malware or phish.",
+   "Enable the Microsoft Sentinel data lake for the tenant.",
+   "Assign the Security Administrator role to the agent identity."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The Phishing Triage Agent works on alerts of the type Email reported by user as malware or phish. It requires unified RBAC for Defender for Office 365, user reporting from Outlook that creates the alert, and no tuning rule that auto-resolves those alerts.",
+  "rationale": [
+   "Correct: the agent identity and the people who monitor it use unified RBAC permissions, so the Defender for Office 365 workload must be activated in the unified RBAC settings.",
+   "Correct: user reported messages from Outlook generate the alerts that the agent triages, so Monitor reported messages in Outlook must be enabled.",
+   "Correct: the agent does not triage alerts that alert tuning has already resolved, so the built-in auto-resolve rule and any similar custom rules must be disabled.",
+   "Incorrect: the Sentinel data lake is used by some Security Store agents that run notebook jobs, but it is not a prerequisite for the Phishing Triage Agent.",
+   "Incorrect: the agent identity needs only the specific Defender permissions in a role, such as Alerts (manage). Security Administrator is a broad privileged role and violates least privilege."
+  ],
+  "ref": "https://learn.microsoft.com/defender-xdr/phishing-triage-agent"
+ }
+]

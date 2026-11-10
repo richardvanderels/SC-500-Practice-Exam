@@ -1,0 +1,1183 @@
+[
+ {
+  "id": "1.2.1-01",
+  "obj": "1.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. must store RSA keys that protect a storage account in HSM-protected form, on hardware validated to FIPS 140-3 Level 3. The company accepts shared HSM infrastructure that Microsoft operates and wants the lowest-cost option that meets the requirement.\n\nWhich resource should you deploy?",
+  "choices": [
+   "Azure Key Vault Standard tier",
+   "Azure Key Vault Premium tier",
+   "Azure Key Vault Managed HSM",
+   "Azure Key Vault Standard tier with purge protection enabled"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Premium vaults support HSM-backed keys on FIPS 140-3 Level 3 hardware in a multitenant service. Standard vaults hold software-protected keys, and Managed HSM adds single-tenant isolation and customer root of trust at a higher cost.",
+  "rationale": [
+   "Incorrect: the Standard tier stores secrets, certificates and software-backed keys and is FIPS 140-2 Level 1. Choose it when software-protected keys are acceptable and cost is the main driver.",
+   "Correct: the Premium tier adds HSM-backed keys validated to FIPS 140-3 Level 3 while staying multitenant, which fits the shared-infrastructure and lowest-cost constraints.",
+   "Incorrect: Managed HSM is a single-tenant pool with a customer-controlled security domain. It meets the compliance level but costs more than needed. Choose it when key sovereignty or single tenancy is required.",
+   "Incorrect: purge protection guards against permanent deletion and does not change the key protection level. The Standard tier still cannot create HSM-backed keys, whatever recovery settings you enable."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/managed-hsm/mhsm-control-data"
+ },
+ {
+  "id": "1.2.1-02",
+  "obj": "1.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. accidentally deleted Vault1 yesterday. Vault1 was created with purge protection and the default retention period, and it holds keys that a storage account uses for encryption. The deployment must reuse the name Vault1 within the hour and must keep the existing keys.\n\nWhich action should you perform?",
+  "choices": [
+   "Recover the soft-deleted Vault1",
+   "Purge the soft-deleted Vault1 and create a new vault named Vault1",
+   "Create a new vault named Vault1 in a different Azure region",
+   "Create a vault with a new name and generate new keys in it"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A deleted vault stays recoverable during the retention period, and recovery restores its name and contents. Key vault names are globally unique, and purge protection blocks early purging, so the name cannot be reused any other way.",
+  "rationale": [
+   "Correct: recovering the soft-deleted vault brings back Vault1 with its keys and its name, which satisfies both constraints. Recovery is possible until the retention period elapses.",
+   "Incorrect: purge protection forbids purging until the retention period ends, even for an owner with the Key Vault Purge Operator role. Purge is the right step only when protection is off and the data is not needed.",
+   "Incorrect: vault names are globally unique and the soft-deleted vault still reserves the name, so a vault named Vault1 cannot be created in another region. The existing keys would also remain in the deleted vault.",
+   "Incorrect: a new name breaks the requirement to reuse Vault1, and new keys do not decrypt data already encrypted with the old keys. Use it only when the old vault is not needed."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/key-vault-recovery"
+ },
+ {
+  "id": "1.2.1-03",
+  "obj": "1.2.1",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Woodgrove Bank needs a new key vault named kv-wb-01 that uses Azure RBAC for data plane authorization and has purge protection enabled. You are signed in to Azure CLI as User1, who has the Owner role on the subscription. You must then store a secret named DbPassword in the vault as User1.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az group create --name rg1 --location eastus`",
+   "`az keyvault create --name kv-wb-01 --resource-group rg1 --enable-rbac-authorization true --enable-purge-protection true`",
+   "`az role assignment create --assignee user1@woodgrovebank.com --role \"Key Vault Secrets Officer\" --scope $VAULT_ID`",
+   "`az keyvault secret set --vault-name kv-wb-01 --name DbPassword --value $SECRET_VALUE`",
+   "`az keyvault set-policy --name kv-wb-01 --object-id $USER1_ID --secret-permissions set`",
+   "`az keyvault purge --name kv-wb-01`"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Dependencies force the order: the resource group holds the vault, the vault must exist before a role can be assigned on it, and under Azure RBAC the data plane write is allowed only after a data role is assigned. Access policies are ignored when RBAC is on.",
+  "rationale": [
+   "Step 1: the resource group must exist because az keyvault create places the vault in it.",
+   "Step 2: the vault is created with Azure RBAC authorization and purge protection. The vault resource ID needed for the role scope exists only after this step.",
+   "Step 3: Owner grants management rights, not data plane rights. Assigning Key Vault Secrets Officer at the vault scope lets User1 write secrets under Azure RBAC.",
+   "Step 4: with the data role in place, the secret can be written. Running it earlier fails with a forbidden error because User1 has no data plane permission yet.",
+   "Incorrect: set-policy writes a vault access policy, which is ignored when the vault uses Azure RBAC. It is the right command only for a vault created with RBAC authorization set to false.",
+   "Incorrect: az keyvault purge permanently deletes a soft-deleted vault. It is not part of provisioning, and purge protection would block it anyway until the retention period ends."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/quick-create-cli"
+ },
+ {
+  "id": "1.2.1-04",
+  "obj": "1.2.1",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Litware, Inc. deploys a vault that must support HSM-backed keys, keep deleted objects recoverable for 30 days, and authorize data plane access with Azure RBAC.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz keyvault create --name kv-lw-01 --resource-group rg1 --location westeurope \\\n  --sku [[1]] --retention-days [[2]] --enable-rbac-authorization [[3]]\n```",
+  "answer": [
+   1,
+   1,
+   0
+  ],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "standard",
+     "premium"
+    ],
+    "why": [
+     "Incorrect: the standard SKU for a vault supports only software-backed keys. Use it when HSM protection is not required and cost matters more.",
+     "Correct: premium is the vault SKU that supports HSM-backed keys, which the requirement names."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "7",
+     "30",
+     "120"
+    ],
+    "why": [
+     "Incorrect: 7 days is the minimum allowed retention but does not meet the 30-day recovery requirement. Choose it only when a short window is acceptable.",
+     "Correct: --retention-days accepts values from 7 to 90, and 30 matches the requirement. The value is set at creation and cannot be changed later.",
+     "Incorrect: 120 is outside the accepted range of 7 to 90 days, so the command would fail. The maximum retention is 90 days."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "true",
+     "false"
+    ],
+    "why": [
+     "Correct: true makes the vault authorize data actions by Azure RBAC and ignore access policies, as required.",
+     "Incorrect: false selects the legacy access policy model, where permissions live in vault access policies instead of role assignments."
+    ]
+   }
+  ],
+  "explanation": "The Premium SKU supports HSM-backed keys, retention days accept 7 to 90 and cannot change after creation, and enable-rbac-authorization true selects Azure RBAC for data actions.",
+  "ref": "https://learn.microsoft.com/cli/azure/keyvault?view=azure-cli-latest"
+ },
+ {
+  "id": "1.2.1-05",
+  "obj": "1.2.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys must store the key encryption keys for a storage account in a single-tenant HSM where the company controls the security domain and root of trust. The same project must also store application connection string secrets and TLS certificates.\n\nWhich two resources should you deploy? Each correct answer presents part of the solution.",
+  "choices": [
+   "An Azure Key Vault Managed HSM instance for the keys",
+   "An Azure Key Vault in the Standard tier for the secrets and certificates",
+   "An Azure Key Vault in the Premium tier for the keys",
+   "A second Azure Key Vault Managed HSM instance for the secrets and certificates",
+   "An Azure Key Vault in the Standard tier for the keys"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Only Managed HSM is single-tenant with a customer-controlled security domain, but it supports only HSM-backed keys. Secrets and certificates therefore belong in a regular Key Vault.",
+  "rationale": [
+   "Correct: Managed HSM is single-tenant and the customer owns the security domain, which meets the sovereignty requirement for the keys.",
+   "Correct: Managed HSM stores only keys, so the secrets and certificates need a regular vault. The Standard tier supports both and costs less than Premium.",
+   "Incorrect: Premium vaults use HSMs shared across customers and Microsoft controls the root of trust. Choose Premium when HSM-backed keys are needed without single tenancy.",
+   "Incorrect: Managed HSM supports only HSM-backed keys, so it cannot hold secrets or certificates. A second instance adds cost without solving the need.",
+   "Incorrect: Standard vaults are multitenant and hold software-protected keys, so they fail the single-tenant and HSM requirements. Use them for secrets, certificates or low-assurance keys."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/managed-hsm/mhsm-control-data"
+ },
+ {
+  "id": "1.2.1-06",
+  "obj": "1.2.1",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Northwind Traders has deployed Vault1 with default settings. Vault1 uses soft delete with the default retention period.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "An administrator can disable soft delete on Vault1 after the vault is created.",
+   "An administrator can reduce the retention period of Vault1 from 90 days to 30 days after the vault is created.",
+   "An administrator can enable purge protection on Vault1 after the vault is created."
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Soft delete cannot be turned off once on, the retention interval is fixed at creation, and purge protection is optional and can be enabled later because it depends only on soft delete being on. Once enabled it cannot be disabled.",
+  "rationale": [
+   "No: soft delete is on by default for new vaults and cannot be disabled once enabled. Plan for recovery behavior instead of trying to switch it off.",
+   "No: the retention interval of 7 to 90 days is chosen at creation and cannot be changed afterwards. To get a different interval you must create a new vault.",
+   "Yes: purge protection is an optional setting that is off by default and can be enabled on an existing vault that has soft delete. Enabling it is irreversible."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/soft-delete-overview"
+ },
+ {
+  "id": "1.2.2-01",
+  "obj": "1.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. must record every data plane request to Vault1, such as secret reads and key operations, in a Log Analytics workspace so that auditors can query them.\n\nWhich setting should you configure?",
+  "choices": [
+   "A diagnostic setting on Vault1 that sends the AuditEvent category to the workspace",
+   "A diagnostic setting on the subscription that sends Administrative activity log events to the workspace",
+   "The Key Vault plan in Microsoft Defender for Cloud on the subscription",
+   "An Event Grid subscription on Vault1 for secret version events"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Key Vault resource logs are emitted through a diagnostic setting on the vault. The AuditEvent category records requests made to the vault, and the setting can send them to Log Analytics, a storage account or an event hub.",
+  "rationale": [
+   "Correct: the AuditEvent category of a vault diagnostic setting logs data plane operations such as secret get and key sign, and the workspace destination makes them queryable with KQL.",
+   "Incorrect: the subscription activity log records control plane operations such as creating or updating the vault. It does not record secret reads. Use it to audit who changed vault configuration.",
+   "Incorrect: Defender for Key Vault detects anomalous access and raises alerts, but it does not give auditors a complete queryable log of every request. Use it for threat detection.",
+   "Incorrect: Event Grid publishes lifecycle events such as new version created or near expiry. It does not log each read request. Use it to trigger rotation or notification workflows."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/howto-logging"
+ },
+ {
+  "id": "1.2.2-02",
+  "obj": "1.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. will use Azure Disk Encryption on virtual machines and store the encryption secrets and key encryption keys in Vault1. The virtual machine extension must be allowed to retrieve secrets and unwrap keys from the vault.\n\nWhich vault setting should you enable?",
+  "choices": [
+   "Azure Virtual Machines for deployment",
+   "Azure Resource Manager for template deployment",
+   "Azure Disk Encryption for volume encryption",
+   "Trusted Microsoft services bypass of the firewall"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Vaults have separate access switches for compute scenarios. The Azure Disk Encryption option permits the disk encryption service to retrieve secrets and unwrap keys, and it is independent of the other two.",
+  "rationale": [
+   "Incorrect: the deployment option lets virtual machines retrieve certificates stored as secrets when a VM is deployed, for example to install a certificate. It does not cover disk encryption keys.",
+   "Incorrect: the template deployment option lets Azure Resource Manager retrieve secrets referenced by a template. Use it for templates that pass secure parameters, not for disk encryption.",
+   "Correct: enabling Azure Disk Encryption for volume encryption (enabled-for-disk-encryption) permits the disk encryption service to retrieve secrets and unwrap keys from the vault.",
+   "Incorrect: the trusted services bypass only matters when the vault firewall is enabled and it governs network access. It does not authorize the disk encryption scenario by itself."
+  ],
+  "ref": "https://learn.microsoft.com/cli/azure/keyvault?view=azure-cli-latest"
+ },
+ {
+  "id": "1.2.2-03",
+  "obj": "1.2.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. uses Vault1, which has soft delete enabled with a 90-day retention period. A security review requires that nobody, including a subscription owner or a user with the Key Vault Purge Operator role, can permanently delete Vault1 or its objects before the retention period elapses.\n\nWhat should you do?",
+  "choices": [
+   "Enable purge protection on Vault1",
+   "Increase the soft-delete retention period of Vault1 to the maximum",
+   "Assign the Key Vault Purge Operator role to the security team only",
+   "Enable Microsoft Defender for Key Vault on the subscription"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Soft delete alone still lets a privileged user purge deleted items right away. Purge protection enforces the retention period, so even owners and Purge Operators must wait, and the setting cannot be reversed.",
+  "rationale": [
+   "Correct: purge protection blocks purging of the vault and its objects until the retention period ends, regardless of role. It is irreversible once enabled, and soft delete must already be on.",
+   "Incorrect: 90 days is already the maximum, and retention cannot be changed after creation. A longer window does not stop an authorized user from purging early without purge protection.",
+   "Incorrect: limiting the Purge Operator role reduces who can purge, but an owner can still purge, so the requirement that nobody can purge is not met. Use role scoping for least privilege, not enforcement.",
+   "Incorrect: Defender for Key Vault raises alerts on unusual access and does not prevent deletion or purge. Use it for detection, not for enforcing retention."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/soft-delete-overview"
+ },
+ {
+  "id": "1.2.2-04",
+  "obj": "1.2.2",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Relecloud must send the AuditEvent logs of a key vault to an existing Log Analytics workspace.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz monitor diagnostic-settings create --name kvlogs \\\n  --resource [[1]] \\\n  --logs '[{\"category\": \"[[2]]\", \"enabled\": true}]' \\\n  --workspace [[3]]\n```",
+  "answer": [
+   0,
+   1,
+   0
+  ],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "the resource ID of the key vault",
+     "the resource ID of the Log Analytics workspace",
+     "the subscription ID"
+    ],
+    "why": [
+     "Correct: the diagnostic setting is attached to the resource that produces the logs, which is the key vault.",
+     "Incorrect: the workspace is the destination and is supplied with --workspace. Attaching the setting to the workspace would collect the workspace logs instead of the vault logs.",
+     "Incorrect: a subscription-level setting exports the activity log, which holds control plane events. Vault data plane audit logs come only from a setting on the vault itself."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "AllMetrics",
+     "AuditEvent",
+     "Administrative"
+    ],
+    "why": [
+     "Incorrect: AllMetrics is a metrics category, passed with --metrics, and holds numeric counters such as request counts. It is not a log category and does not hold request details.",
+     "Correct: AuditEvent is the Key Vault resource log category that records requests made to the vault.",
+     "Incorrect: Administrative is an activity log category for subscription-level control plane events. It is not offered by a key vault diagnostic setting."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "the resource ID of the Log Analytics workspace",
+     "the resource ID of the storage account"
+    ],
+    "why": [
+     "Correct: --workspace takes the Log Analytics workspace resource ID, which meets the requirement for the logs to land in that workspace.",
+     "Incorrect: a storage account is a valid archive destination, but it uses --storage-account, not --workspace, and the logs would not be queryable in the workspace."
+    ]
+   }
+  ],
+  "explanation": "A diagnostic setting is created on the resource that emits the logs, here the key vault, uses the AuditEvent category for data plane audit logs, and names the workspace resource ID as the destination.",
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/apps-api-keys-secrets#creating-and-securing-an-azure-key-vault-instance"
+ },
+ {
+  "id": "1.2.2-05",
+  "obj": "1.2.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation created Vault1 six months ago with a soft-delete retention period of 7 days. A new compliance rule requires that deleted keys stay recoverable for 90 days. Several applications use Vault1 through versionless key and secret identifiers.\n\nWhat should you do?",
+  "choices": [
+   "Run az keyvault update on Vault1 to set the retention period to 90 days",
+   "Create a new vault with a retention period of 90 days and migrate the objects to it",
+   "Disable soft delete on Vault1 and enable it again with a 90-day retention period",
+   "Enable purge protection on Vault1 so that the retention period is extended"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The retention interval is chosen when the vault is created and cannot be modified afterwards. Soft delete cannot be turned off, so the only way to get a different interval is a new vault and a migration of its objects.",
+  "rationale": [
+   "Incorrect: the retention interval cannot be changed after creation, so an update of the existing vault is not possible. This option would apply only to a setting that the service lets you modify.",
+   "Correct: because the interval is fixed at creation, a new vault with 90 days is the way to meet the rule. Objects are then migrated, for example by backup and restore of keys, and applications are repointed.",
+   "Incorrect: soft delete cannot be disabled once enabled, so the disable and re-enable cycle is not possible. The retention value stays as it was set at creation.",
+   "Incorrect: purge protection enforces whatever retention period exists. It uses the same 7-day interval and does not lengthen it, so deleted keys would still be purged after 7 days."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/soft-delete-overview"
+ },
+ {
+  "id": "1.2.2-06",
+  "obj": "1.2.2",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank stores certificates, as secrets, and application secrets in Vault1. Two deployment scenarios must work without any user holding data plane permissions on the vault: virtual machines must retrieve certificates from Vault1 when they are deployed, and Azure Resource Manager templates must read secrets from Vault1 during deployment.\n\nWhich two vault settings should you enable? Each correct answer presents part of the solution.",
+  "choices": [
+   "Azure Virtual Machines for deployment",
+   "Azure Resource Manager for template deployment",
+   "Azure Disk Encryption for volume encryption",
+   "Purge protection",
+   "Allow trusted Microsoft services to bypass the firewall"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Vaults expose three compute-related access switches. Deployment lets virtual machines retrieve certificates stored as secrets, and template deployment lets Azure Resource Manager retrieve secrets. Disk encryption is a separate switch for another scenario.",
+  "rationale": [
+   "Correct: enabled-for-deployment permits Azure virtual machines to retrieve certificates stored as secrets in the vault while they are deployed.",
+   "Correct: enabled-for-template-deployment permits Azure Resource Manager to retrieve secrets from the vault when a template references them.",
+   "Incorrect: this switch permits Azure Disk Encryption to retrieve secrets and unwrap keys. Enable it for encrypted disks, which this scenario does not mention.",
+   "Incorrect: purge protection enforces retention of deleted objects and has no effect on whether VMs or templates can read from the vault. Use it for recovery protection.",
+   "Incorrect: the trusted services bypass applies when the vault firewall is enabled and the scenario does not mention a firewall. It does not replace the VM and template access switches."
+  ],
+  "ref": "https://learn.microsoft.com/cli/azure/keyvault?view=azure-cli-latest"
+ },
+ {
+  "id": "1.2.3-01",
+  "obj": "1.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. runs App1 on Azure App Service with a system-assigned managed identity. App1 must read the values of secrets in Vault1, which uses Azure RBAC, and must not be able to create, change or delete any object.\n\nWhich role should you assign to the managed identity at the vault scope?",
+  "choices": [
+   "Key Vault Secrets User",
+   "Key Vault Secrets Officer",
+   "Key Vault Reader",
+   "Key Vault Administrator"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Key Vault Secrets User reads secret contents. Secrets Officer adds management actions, Reader sees metadata only, and Administrator allows every data plane operation.",
+  "rationale": [
+   "Correct: Key Vault Secrets User can read secret values and nothing more, which matches the read-only requirement for App1.",
+   "Incorrect: Key Vault Secrets Officer can also create, update and delete secrets, which exceeds the read-only requirement. Assign it to operators who manage secrets.",
+   "Incorrect: Key Vault Reader reads vault and object metadata but cannot read secret values, so App1 would fail to get its secrets. Use it for inventory or audit roles.",
+   "Incorrect: Key Vault Administrator allows all data plane operations on keys, secrets and certificates, which violates least privilege. Assign it to a small group of vault administrators."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/rbac-guide"
+ },
+ {
+  "id": "1.2.3-02",
+  "obj": "1.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. uses vault access policies on Vault1. A security review finds that a user with the Contributor role on the resource group can give themselves access to secrets. The company wants only Owner and User Access Administrator roles to be able to grant data plane access.\n\nWhat should you do?",
+  "choices": [
+   "Switch Vault1 to the Azure RBAC permission model",
+   "Add an access policy that denies Contributor users",
+   "Enable the Key Vault firewall on Vault1",
+   "Enable purge protection on Vault1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "With access policies, any role that includes Microsoft.KeyVault/vaults/write can edit the policies and grant itself data access. With Azure RBAC, granting access requires role assignment rights held by Owner and User Access Administrator.",
+  "rationale": [
+   "Correct: under Azure RBAC, data plane access comes from role assignments, which only Owner or User Access Administrator roles can create. This closes the self-grant path of Contributor.",
+   "Incorrect: access policies have no deny entries, only grants, and Contributor can still edit the policy list. Use Azure RBAC deny assignments or the RBAC model for this control.",
+   "Incorrect: the firewall restricts the networks that can reach the data plane. It does not stop an authorized management user from editing access policies. Use it to limit network exposure.",
+   "Incorrect: purge protection controls permanent deletion of deleted objects and does not govern who can grant access. Use it for recovery protection."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/rbac-access-policy"
+ },
+ {
+  "id": "1.2.3-03",
+  "obj": "1.2.3",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Litware, Inc. has Vault1, which uses Azure RBAC. User1 is assigned the Contributor role on the resource group that contains Vault1. User1 has no other role assignments. The security team assigns the Key Vault Secrets User role to User2 at the scope of a single secret named Secret1 in Vault1.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "User1 can read the value of Secret1.",
+   "User1 can assign the Key Vault Secrets Officer role to User3 on Vault1.",
+   "User2 can read the value of Secret1."
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Contributor is a control plane role: it manages the vault resource but gives no data access and cannot create role assignments. Azure RBAC for Key Vault supports assignments at the scope of an individual secret.",
+  "rationale": [
+   "No: Contributor has control plane rights on the vault but no data actions, so User1 cannot read secret values. A data role such as Key Vault Secrets User is required.",
+   "No: Contributor cannot create role assignments, because Microsoft.Authorization write actions are excluded. Owner, User Access Administrator or Key Vault Data Access Administrator can.",
+   "Yes: Azure RBAC for Key Vault allows role assignments at the scope of an individual secret. Key Vault Secrets User at that scope lets User2 read Secret1, but no other secret."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/rbac-migration"
+ },
+ {
+  "id": "1.2.3-04",
+  "obj": "1.2.3",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Tailspin Toys uses Azure RBAC on Vault1. You must assign a built-in role to each principal at the vault scope and follow least privilege.\n\nWhich role should you assign to each principal? To answer, drag the appropriate roles to the correct principals. Each role may be used once, more than once, or not at all.",
+  "choices": [
+   "Key Vault Secrets User",
+   "Key Vault Certificates Officer",
+   "Key Vault Reader",
+   "Key Vault Administrator",
+   "Key Vault Crypto User"
+  ],
+  "answer": [
+   1,
+   0,
+   2
+  ],
+  "targets": [
+   "Admin1: creates, imports and renews certificates but must not manage vault permissions",
+   "App1: reads secret values at runtime",
+   "Auditor1: lists keys, secrets and certificates and reads their metadata, but must not read secret values"
+  ],
+  "notes": [
+   "Can read secret contents but cannot create or change secrets. Use it for applications that only consume secrets.",
+   "Can perform any action on the certificates of a vault except managing permissions. Use it for certificate administrators.",
+   "Reads metadata of the vault and its keys, secrets and certificates but cannot read sensitive values. Use it for auditors and inventory tools.",
+   "Can perform all data plane operations on all objects in the vault. Use it only for a small group of administrators, as it exceeds least privilege here.",
+   "Can use keys for cryptographic operations such as encrypt and sign, but cannot manage keys or read secrets. Use it for applications that call crypto operations."
+  ],
+  "explanation": "Match the narrowest role to each task: certificate lifecycle management without permission management, secret value reads, and metadata-only inventory access.",
+  "rationale": [
+   "Admin1 manages the certificate lifecycle, including create, import and renew, and must not manage permissions, which is what Certificates Officer provides.",
+   "App1 needs to read secret values only, so Secrets User fits and the broader officer or administrator roles would exceed the requirement.",
+   "Auditor1 needs to see which objects exist without reading sensitive values, which is the purpose of the Reader role."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/certificates/certificate-access-control"
+ },
+ {
+  "id": "1.2.3-05",
+  "obj": "1.2.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Northwind Traders has Vault1, which uses Azure RBAC. Engineers must hold the Key Vault Administrator role on Vault1 only while they perform a change, activation must require approval from the security lead, and the access must expire automatically.\n\nWhat should you do?",
+  "choices": [
+   "Create eligible Key Vault Administrator assignments in Privileged Identity Management with approval required",
+   "Create permanent Key Vault Administrator assignments and add a Conditional Access policy that requires MFA",
+   "Create a vault access policy with all permissions for an engineer group and remove it after each change",
+   "Assign the Key Vault Data Access Administrator role permanently to the engineer group"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure RBAC for Key Vault integrates with Privileged Identity Management, which supports eligible assignments, approval on activation and automatic expiry. Access policies cannot be governed by PIM.",
+  "rationale": [
+   "Correct: PIM eligible assignments give just-in-time access, approval can be required on activation, and activation expires automatically. All three requirements are met on an Azure RBAC vault.",
+   "Incorrect: a permanent assignment is always active, so access does not expire, and MFA does not add approval. Conditional Access controls how a sign-in is allowed, not when a role is active.",
+   "Incorrect: access policies are the legacy model and do not integrate with PIM, and manual cleanup is neither automatic nor approval-based. The assignment would also overlap with vault access policy limits.",
+   "Incorrect: Data Access Administrator manages role assignments on the vault and is not just-in-time here, because a permanent assignment never expires. It also does not grant approval-based activation."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/rbac-access-policy"
+ },
+ {
+  "id": "1.2.3-06",
+  "obj": "1.2.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank has a single vault, Vault1, that uses vault access policies and stores the secrets of 20 applications. App2, which has a managed identity, must read only one secret, Secret5. The company must keep a single vault and must not give App2 access to any other secret.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Switch Vault1 to the Azure RBAC permission model",
+   "Assign the Key Vault Secrets User role to the App2 identity at the scope of Secret5",
+   "Add an access policy for the App2 identity with the Get secret permission",
+   "Assign the Key Vault Reader role to the App2 identity at the vault scope",
+   "Create a second vault for Secret5 and add an access policy for App2"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Access policies apply at the vault level only, so any secret permission covers every secret. Azure RBAC supports assignments on an individual secret, which allows one secret to be shared in a single vault.",
+  "rationale": [
+   "Correct: Azure RBAC is required for object-level scopes. Existing applications need equivalent role assignments before the switch because access policies are ignored under RBAC.",
+   "Correct: a Key Vault Secrets User assignment scoped to Secret5 lets App2 read that secret and no other, which meets the least privilege constraint in one vault.",
+   "Incorrect: an access policy applies at the vault level, so Get on secrets would let App2 read all 20 secrets. Use it only when vault-wide access is intended.",
+   "Incorrect: Key Vault Reader reads metadata only and cannot read secret values, so App2 would not get Secret5. It also applies to the whole vault in this assignment.",
+   "Incorrect: a second vault would isolate Secret5, but the stem requires a single vault. Separate vaults are the workaround for access policies when object scopes are not available."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/rbac-migration"
+ },
+ {
+  "id": "1.2.4-01",
+  "obj": "1.2.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has Vault1 with the firewall enabled and the default action set to deny. A reporting server in the on-premises datacenter must read secrets from Vault1. The server reaches the internet through the static public range 198.51.100.0/24 and has no connectivity to any Azure virtual network.\n\nWhich firewall configuration should you add to Vault1?",
+  "choices": [
+   "An IP address rule for 198.51.100.0/24",
+   "A virtual network rule for the Azure subnet that hosts other servers",
+   "The option to allow trusted Microsoft services to bypass the firewall",
+   "An IP address rule for the on-premises private range 10.20.0.0/16"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The Key Vault firewall admits public IPv4 addresses and ranges through IP rules. The server connects from a static public range, so an IP rule for that range is the direct fit.",
+  "rationale": [
+   "Correct: an IP rule admits a static public address range, which is how the on-premises server presents itself to the vault.",
+   "Incorrect: a virtual network rule admits resources in an Azure subnet that has the Key Vault service endpoint. The on-premises server is not in that subnet. Use it for Azure-hosted workloads.",
+   "Incorrect: the trusted services bypass admits listed Microsoft services, not customer servers. Use it for services such as an Azure Machine Learning workspace.",
+   "Incorrect: IP rules accept only public addresses, and private ranges such as 10.0.0.0/8 are not allowed. The vault sees the public range of the server, not its private address."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/network-security"
+ },
+ {
+  "id": "1.2.4-02",
+  "obj": "1.2.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has Vault1 with the firewall enabled. An Azure Machine Learning workspace stores and retrieves its workspace secrets in Vault1 through the service side of Azure. The service does not run in any virtual network that the company controls, and the firewall currently blocks it.\n\nWhat should you do?",
+  "choices": [
+   "Select Allow trusted Microsoft services to bypass this firewall",
+   "Add an IP address rule for 10.0.0.0/16",
+   "Add a virtual network rule for the subnet used by the compute clusters",
+   "Enable purge protection on Vault1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure Machine Learning is a trusted service that reaches the vault from the service side, so the bypass option admits it. Private endpoints and customer subnets do not cover service-side access.",
+  "rationale": [
+   "Correct: the trusted services bypass admits listed Microsoft services such as Azure Machine Learning even when the firewall is on. Requests must still authenticate and be authorized.",
+   "Incorrect: IP rules do not accept private ranges such as 10.0.0.0/16, and the service-side call does not originate from the customer network. Use IP rules for static public addresses.",
+   "Incorrect: a virtual network rule admits resources in a subnet that has a service endpoint, but the secrets access comes from the service side, not from the compute subnet.",
+   "Incorrect: purge protection controls deletion and has no effect on network access. Use it to stop early purging of deleted objects."
+  ],
+  "ref": "https://learn.microsoft.com/azure/machine-learning/how-to-managed-network?view=azureml-api-2#managed-virtual-network-architecture"
+ },
+ {
+  "id": "1.2.4-03",
+  "obj": "1.2.4",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Tailspin Toys must configure Vault1 so that the firewall denies traffic by default, admits requests from the public range 203.0.113.0/24, and lets trusted Microsoft services bypass the firewall.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz keyvault update --name kv-tt-01 --resource-group rg1 --default-action [[1]]\naz keyvault network-rule add --name kv-tt-01 --resource-group rg1 --ip-address [[2]]\naz keyvault update --name kv-tt-01 --resource-group rg1 --bypass [[3]]\n```",
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Deny",
+     "Allow"
+    ],
+    "why": [
+     "Correct: Deny makes the firewall block requests that match no rule, so only the listed ranges and trusted services are admitted.",
+     "Incorrect: Allow keeps the vault reachable from any network, so the IP and bypass rules would have no restricting effect. Use it when the firewall is intentionally open."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "203.0.113.0/24",
+     "192.168.10.0/24"
+    ],
+    "why": [
+     "Correct: the stated public range is a valid IP rule target for the vault firewall.",
+     "Incorrect: 192.168.10.0/24 is a private RFC 1918 range, which IP rules do not accept, and it is not the range named in the requirement."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "AzureServices",
+     "None"
+    ],
+    "why": [
+     "Correct: AzureServices enables the option that lets trusted Microsoft services bypass the firewall, as required.",
+     "Incorrect: None disables the bypass, so trusted Microsoft services such as Azure Machine Learning are blocked by the firewall. Use it when no service bypass is wanted."
+    ]
+   }
+  ],
+  "explanation": "The firewall is enforced by setting the default action to Deny, IP rules take public ranges only, and bypass AzureServices is the value that lets trusted Microsoft services through.",
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/network-security"
+ },
+ {
+  "id": "1.2.4-04",
+  "obj": "1.2.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has Vault1 with a private endpoint and public network access disabled. A pipeline that runs on Microsoft-hosted Azure DevOps agents fails to read secrets from Vault1 and receives 403 errors. The pipeline must keep running without enabling public access.\n\nWhat should you do?",
+  "choices": [
+   "Run the pipeline on a self-hosted agent inside the virtual network",
+   "Enable the option that lets trusted Microsoft services bypass the firewall",
+   "Add the private IP address of the Microsoft-hosted agent to the firewall IP rules",
+   "Add a service endpoint for Microsoft.KeyVault to the subnet of the private endpoint"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure DevOps is not on the trusted services list, and hosted agents run outside your network. With public access disabled, the caller must come through the private endpoint, which a self-hosted agent in the virtual network can do.",
+  "rationale": [
+   "Correct: a self-hosted agent inside the network reaches the vault through the private endpoint, so the pipeline works without any public exposure.",
+   "Incorrect: Azure DevOps is not on the trusted services list, so the bypass does not admit it. Use the bypass for listed services such as Azure Machine Learning.",
+   "Incorrect: IP rules accept only public addresses, and a hosted agent has no stable private address in your network. Public access is also disabled by requirement.",
+   "Incorrect: a service endpoint is an alternative to a private endpoint for subnet-based firewall rules and does not help agents that run outside the network."
+  ],
+  "ref": "https://learn.microsoft.com/troubleshoot/azure/private-link/troubleshoot-403-access-denied-private-endpoint#resolution-d"
+ },
+ {
+  "id": "1.2.4-05",
+  "obj": "1.2.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Northwind Traders has Vault1 with the firewall enabled and the default action set to deny. The firewall admits the corporate office public range. User1 holds the Key Vault Administrator role on Vault1. From home, User1 can open Vault1 in the Azure portal and sees its name, but listing secrets fails with a forbidden error. From the office, listing works.\n\nWhat should you do to let User1 list secrets from home?",
+  "choices": [
+   "Add the public IP address of User1's home connection to the Vault1 firewall IP rules",
+   "Assign the Key Vault Secrets Officer role to User1 at the vault scope",
+   "Add the private address 192.168.1.20 of User1's home router to the firewall IP rules",
+   "Re-create Vault1 with vault access policies instead of Azure RBAC"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "After firewall rules apply, data plane operations succeed only from admitted networks, including from the portal. The role is already sufficient, so the failure is the client network, and the client public IP must be admitted.",
+  "rationale": [
+   "Correct: the firewall evaluates the client address for data plane calls made from the portal, so adding the home public IP fixes the failure. Remove it afterwards if it was temporary.",
+   "Incorrect: User1 already holds the Administrator role, which includes all secret operations, and the office works with the same role. The failure is network, not authorization.",
+   "Incorrect: IP rules do not accept private ranges, and the vault sees the public address of the home connection. A private router address would never match.",
+   "Incorrect: the permission model controls authorization, not network access. Access policies would be blocked by the same firewall and also lose RBAC benefits."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/network-security"
+ },
+ {
+  "id": "1.2.4-06",
+  "obj": "1.2.4",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Adatum Corporation has App1 in a virtual network. App1 must reach Vault1 only over a private connection. Public network access to Vault1 must be disabled without interrupting App1, and no on-premises or internet client needs access.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create a private endpoint for Vault1 in the subnet used by App1.",
+   "Link the privatelink.vaultcore.azure.net private DNS zone to the virtual network and register the endpoint in it.",
+   "From a VM in the virtual network, confirm that the vault name resolves to the private IP address of the endpoint.",
+   "Run `az keyvault update --name kv-ad-01 --resource-group rg1 --public-network-access Disabled`.",
+   "Add a virtual network rule for the subnet of App1 to the Vault1 firewall.",
+   "Add the on-premises public IP range to the Vault1 firewall allow list."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Private access must be fully working before public access is turned off. The endpoint comes first, DNS makes the vault name resolve to it, the check proves the path, and only then is public access disabled.",
+  "rationale": [
+   "Step 1: the private endpoint creates the private path and the network interface with the private IP. Nothing else can be configured without it.",
+   "Step 2: the private DNS zone makes the vault name resolve to the private IP inside the virtual network, so App1 uses the endpoint instead of the public address.",
+   "Step 3: verifying resolution proves that App1 will reach the vault privately before you close the public path. Skipping it risks an outage in the next step.",
+   "Step 4: disabling public network access blocks data plane access from public networks, so only private endpoint traffic remains. Do it last, once private access works.",
+   "Incorrect: a virtual network rule is the service endpoint pattern for admitting a subnet through the firewall. It is not needed when the app uses a private endpoint.",
+   "Incorrect: adding a public range reopens a public path, which conflicts with the requirement. Use IP rules when a specific public client must keep access."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/network-security"
+ },
+ {
+  "id": "1.2.5-01",
+  "obj": "1.2.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. uses an RSA key in Vault1 as the customer-managed key of a storage account. Policy requires a new version of the key every 12 months without manual work.\n\nWhat should you configure?",
+  "choices": [
+   "A rotation policy on the key",
+   "An Event Grid subscription for the secret near expiry event",
+   "A certificate policy with the autoRenew lifetime action",
+   "An expiration date on the key"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Keys support rotation policies that create new key versions on a schedule. Secrets use event-driven rotation and certificates use lifetime actions, so the key setting is the rotation policy.",
+  "rationale": [
+   "Correct: a key rotation policy generates a new key version at the configured interval, for example 12 months after creation, with no manual steps.",
+   "Incorrect: the near expiry event for secrets can trigger a function that writes a new secret version. It does not rotate a key. Use it for secrets such as database passwords.",
+   "Incorrect: certificate lifetime actions renew X.509 certificates. They do not create new versions of a standalone key. Use them for certificates from an integrated CA.",
+   "Incorrect: an expiration date only marks when the key stops being usable. It does not create a new version, and an expired key would break the storage encryption."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/keys/how-to-configure-key-rotation"
+ },
+ {
+  "id": "1.2.5-02",
+  "obj": "1.2.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. stores TLS certificates in Vault1 that are issued by an internal enterprise certificate authority, which is not integrated with Key Vault. The security team wants an email before each certificate expires so that it can be renewed manually.\n\nWhat should you configure?",
+  "choices": [
+   "The email all contacts lifetime action, together with certificate contacts",
+   "The automatically renew lifetime action at 80 percent of the lifetime",
+   "A rotation policy on the key of each certificate",
+   "A DigiCert issuer object in Vault1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Automatic renewal works only with integrated certificate authorities. For a non-integrated CA, the email contacts lifetime action alerts the contacts at the chosen time, and renewal stays manual.",
+  "rationale": [
+   "Correct: the email all contacts action notifies the vault certificate contacts before expiry without trying to renew, which fits a non-integrated CA and manual renewal.",
+   "Incorrect: autoRenew needs an integrated CA such as DigiCert or GlobalSign. Key Vault cannot request renewals from an internal enterprise CA, so the renewal would not happen.",
+   "Incorrect: key rotation policies apply to standalone keys. They do not renew certificates or send notifications to certificate contacts.",
+   "Incorrect: a DigiCert issuer integrates a different CA than the internal one in use, and it would not notify anyone about the existing certificates. Use it to enable autorenewal with DigiCert."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/certificates/tutorial-rotate-certificates"
+ },
+ {
+  "id": "1.2.5-03",
+  "obj": "1.2.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. stores the password of an Azure SQL server login as a secret in Vault1. The secret has an expiration date. The password must be replaced automatically before it expires, and the SQL server must be updated with the new value.\n\nWhat should you implement?",
+  "choices": [
+   "An Event Grid near expiry subscription that triggers an Azure Function",
+   "A rotation policy on the secret with a rotation interval",
+   "The autoRenew lifetime action on the secret",
+   "A Microsoft Defender for Key Vault alert rule for the secret"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Secrets have no built-in rotation policy. Key Vault publishes a near expiry event to Event Grid, which can call a function that creates a new secret version and updates the dependent service.",
+  "rationale": [
+   "Correct: the near expiry event reaches an Azure Function through Event Grid, and the function creates a new secret version and updates the SQL login. This is the documented rotation pattern.",
+   "Incorrect: rotation policies exist for keys only, and a secret has no rotation interval setting. Use them for keys such as a customer-managed key.",
+   "Incorrect: autoRenew is a certificate lifetime action and does not apply to a plain secret. It cannot update a SQL login either.",
+   "Incorrect: Defender for Key Vault raises alerts on anomalous access and does not rotate secrets or update the SQL server. Use it for threat detection."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/secrets/tutorial-rotation"
+ },
+ {
+  "id": "1.2.5-04",
+  "obj": "1.2.5",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Tailspin Toys must automate lifecycle management for three objects in Vault1.\n\nWhich mechanism should you use for each object? To answer, drag the appropriate mechanisms to the correct objects. Each mechanism may be used once, more than once, or not at all.",
+  "choices": [
+   "Key rotation policy",
+   "Certificate autoRenew lifetime action",
+   "Event Grid near expiry event with an Azure Function",
+   "Email all contacts lifetime action",
+   "Soft delete retention"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "targets": [
+   "Key1: an RSA key that must get a new version every 12 months",
+   "Cert1: a certificate issued by DigiCert that must be renewed at 80 percent of its lifetime",
+   "Secret1: a storage account key stored as a secret that must be regenerated before it expires"
+  ],
+  "notes": [
+   "Creates new key versions at a configured interval, with an optional notification. Use it for keys such as customer-managed keys.",
+   "Renews a certificate automatically at a percentage of lifetime or days before expiry. Use it for certificates from integrated CAs.",
+   "Publishes an event 30 days before secret expiry that triggers custom code. Use it to rotate secrets such as passwords and access keys.",
+   "Sends an email to certificate contacts at the chosen time and does not renew. Use it for certificates from a non-integrated CA.",
+   "Keeps deleted objects recoverable for a set period. It protects against deletion and does not rotate or renew anything."
+  ],
+  "explanation": "Each asset type has its own automation: keys use rotation policies, certificates from integrated CAs use autoRenew, and secrets use event-driven rotation.",
+  "rationale": [
+   "Key1 is an RSA key that needs a new version on a schedule, which a key rotation policy provides.",
+   "Cert1 is issued by DigiCert, an integrated CA, so Key Vault can renew it before expiry with the autoRenew lifetime action.",
+   "Secret1 holds a storage account key and has no rotation policy, so the near expiry event with a function regenerates the alternate key and writes a new version."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/autorotation"
+ },
+ {
+  "id": "1.2.5-05",
+  "obj": "1.2.5",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank must configure a key rotation policy for a key in Vault1. The key must be rotated 18 months after creation, each new version must expire after 2 years, and a notification must be raised 30 days before expiry.\n\nHow should you complete the policy? To answer, select the appropriate options in the answer area.\n\n```json\n{\n  \"lifetimeActions\": [\n    { \"trigger\": { \"timeAfterCreate\": \"[[1]]\" }, \"action\": { \"type\": \"[[2]]\" } },\n    { \"trigger\": { \"timeBeforeExpiry\": \"P30D\" }, \"action\": { \"type\": \"[[3]]\" } }\n  ],\n  \"attributes\": { \"expiryTime\": \"[[4]]\" }\n}\n```",
+  "answer": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "P18M",
+     "P3D",
+     "P30D"
+    ],
+    "why": [
+     "Correct: P18M is an ISO 8601 duration of 18 months, matching the requirement to rotate 18 months after creation.",
+     "Incorrect: P3D is 3 days, which is below the 7-day minimum rotation interval and does not match the requirement.",
+     "Incorrect: P30D rotates after 30 days. It is valid but would rotate far more often than the 18 months required."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Rotate",
+     "Notify"
+    ],
+    "why": [
+     "Correct: the Rotate action creates a new key version when the trigger fires.",
+     "Incorrect: Notify only raises an event and does not create a new version, so the key would never be rotated by this action."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "Notify",
+     "Rotate"
+    ],
+    "why": [
+     "Correct: the timeBeforeExpiry trigger with Notify raises the near expiry event 30 days before expiry, as required.",
+     "Incorrect: a second Rotate action on this trigger would create another version near expiry instead of sending the notification the requirement asks for."
+    ]
+   },
+   {
+    "label": "Box 4",
+    "options": [
+     "P2Y",
+     "P18M",
+     "P30D"
+    ],
+    "why": [
+     "Correct: P2Y sets each newly rotated key version to expire after 2 years, which the requirement states.",
+     "Incorrect: P18M would make each new version expire after 18 months, which is shorter than the required 2 years.",
+     "Incorrect: P30D would expire each new version after 30 days, which is far shorter than required and would make the notification fire almost immediately."
+    ]
+   }
+  ],
+  "explanation": "timeAfterCreate triggers rotation after the stated interval, which must be at least 7 days. The Rotate action creates the new version, Notify raises the near expiry notification, and expiryTime sets the lifetime of each new version.",
+  "ref": "https://learn.microsoft.com/azure/key-vault/keys/how-to-configure-key-rotation"
+ },
+ {
+  "id": "1.2.5-06",
+  "obj": "1.2.5",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation has App1, which encrypts data with a key in Vault1 by using a versioned key identifier. A rotation policy creates a new key version every 12 months, but App1 keeps encrypting with the original version. Data encrypted earlier must still be decryptable after every rotation.\n\nWhat should you do?",
+  "choices": [
+   "Use the versionless key identifier in App1 and keep old versions enabled",
+   "Disable the previous key version after each rotation completes",
+   "Set a shorter expiry time in the rotation policy of the key",
+   "Run an on-demand rotation of the key every month"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Rotation creates a new version of the same key. Consumers should reference the versionless identifier to pick up the latest version, and older versions stay enabled so existing ciphertext and wrapped keys still decrypt.",
+  "rationale": [
+   "Correct: the versionless identifier resolves to the latest version, so App1 starts using new material after rotation, and enabled old versions keep earlier data readable.",
+   "Incorrect: disabling the previous version would break decryption of data and wrapped keys that depend on it. Disable old versions only after data is re-protected.",
+   "Incorrect: a shorter expiry only changes when new versions expire. App1 would still point at the old version by identifier.",
+   "Incorrect: more frequent rotation creates more versions, but App1 still uses the pinned version. The fix is the identifier App1 references, not the rotation frequency."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/keys/how-to-configure-key-rotation"
+ },
+ {
+  "id": "1.2.6-01",
+  "obj": "1.2.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. wants to discover plaintext secrets, such as SSH private keys and database connection strings, on the disks of its Azure virtual machines. The company does not want to deploy or manage any agent on the machines.\n\nWhich Microsoft Defender for Cloud plan should you enable?",
+  "choices": [
+   "Defender CSPM",
+   "Defender for Key Vault",
+   "Defender for Storage",
+   "Defender for Resource Manager"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Agentless machine secrets scanning snapshots machine disks through cloud APIs and is part of the Defender CSPM plan, and also of Defender for Servers Plan 2.",
+  "rationale": [
+   "Correct: the Defender CSPM plan includes agentless machine secrets scanning, which finds plaintext secrets on supported VM disks without any installed agent.",
+   "Incorrect: Defender for Key Vault detects anomalous access to vaults. It does not scan machine disks for plaintext secrets. Use it to monitor the vaults that should hold the secrets.",
+   "Incorrect: Defender for Storage detects threats against storage accounts and scans blobs for malware. It does not scan VM disks for secrets.",
+   "Incorrect: Defender for Resource Manager detects suspicious management operations. It does not inspect VM disks. Use it to monitor control plane activity."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning"
+ },
+ {
+  "id": "1.2.6-02",
+  "obj": "1.2.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has the Defender CSPM plan enabled with agentless scanning. The scan finds a plaintext storage account SAS token on an Azure virtual machine.\n\nWhich security recommendation should the security team look for in Defender for Cloud?",
+  "choices": [
+   "Machines should have secrets findings resolved",
+   "Azure Resource Manager deployments should have secrets findings resolved",
+   "EC2 instances should have secrets findings resolved",
+   "Key vaults should have firewall enabled"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Secrets scanning produces a recommendation per scanned asset type. For Azure virtual machines the recommendation is named Machines should have secrets findings resolved.",
+  "rationale": [
+   "Correct: this is the recommendation raised when secrets scanning finds plaintext secrets on Azure machines.",
+   "Incorrect: this recommendation covers plaintext secrets found in Azure Resource Manager deployments, which is cloud deployment resource scanning. Use it for secrets in deployment resources, not on VM disks.",
+   "Incorrect: this recommendation covers AWS EC2 instances connected to Defender for Cloud. The finding in the scenario is on an Azure virtual machine.",
+   "Incorrect: this recommendation covers vault network exposure, not secrets found on machines. Use it to enforce firewall settings on vaults."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning-servers"
+ },
+ {
+  "id": "1.2.6-03",
+  "obj": "1.2.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has Defender CSPM enabled. Developers sometimes deploy resources from their workstations, and some deployments expose plaintext connection strings in the deployment data. The security team wants an agentless way to detect these secrets in Azure Resource Manager deployments.\n\nWhich capability should you use?",
+  "choices": [
+   "Cloud deployment resource secrets scanning in Defender CSPM",
+   "Machine secrets scanning in Defender CSPM",
+   "Code repository secrets scanning for Azure DevOps",
+   "Microsoft Defender for Key Vault"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Cloud deployment resource scanning reads deployment data through the control plane API and finds plaintext secrets that never reach a repository or a VM disk.",
+  "rationale": [
+   "Correct: this scanning inspects deployment resources through the cloud control plane, so manual deployments from a workstation are covered, and it needs no agent.",
+   "Incorrect: machine scanning inspects VM disk snapshots. Secrets in deployment data are not on a disk, so they would be missed. Use it for secrets stored on machines.",
+   "Incorrect: repository scanning finds exposed secrets in source code in Azure DevOps. A deployment from a workstation may never be committed, so the secrets are not seen.",
+   "Incorrect: Defender for Key Vault monitors access to vaults. It does not scan deployment data for plaintext secrets."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning-cloud-deployment"
+ },
+ {
+  "id": "1.2.6-04",
+  "obj": "1.2.6",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Woodgrove Bank enables Defender CSPM with agentless machine scanning on a subscription that contains Azure virtual machines. The company also connects an AWS account that contains EC2 instances.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A scanning agent must be installed on each Azure virtual machine before plaintext secrets can be discovered.",
+   "Plaintext secrets on the connected AWS EC2 instances can be discovered.",
+   "Insecure SSH private keys that the engine cannot verify as usable for lateral movement are reported as unverified."
+  ],
+  "answer": [
+   1,
+   2
+  ],
+  "explanation": "Machine secrets scanning is agentless, covers Azure VMs and connected AWS and GCP instances, and classifies SSH keys that cannot be verified as unverified.",
+  "rationale": [
+   "No: machine secrets scanning is agentless and uses disk snapshots through cloud APIs, so no agent is installed and VM performance is not affected.",
+   "Yes: machine secrets scanning covers Azure VMs and AWS and GCP instances that are connected to Defender for Cloud, and AWS findings appear under their own recommendation.",
+   "Yes: the engine tests whether SSH private keys can be used to move laterally. Keys that are not successfully verified are categorized as unverified on the Recommendations page."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning-servers"
+ },
+ {
+  "id": "1.2.6-05",
+  "obj": "1.2.6",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys has Defender CSPM with agentless scanning on its Azure and AWS environments. The security team must list every virtual machine that holds a plaintext secret that can authenticate to a storage account, so that remediation can be prioritized by the exposure to critical data.\n\nWhat should you use?",
+  "choices": [
+   "Cloud security explorer, using the plaintext secret to storage account query",
+   "The secure score page with the Remediate vulnerabilities control expanded",
+   "The regulatory compliance dashboard in Defender for Cloud",
+   "The Secrets tab in the asset inventory entry of each virtual machine"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Cloud security explorer queries the cloud security graph, which models relationships such as a secret that can authenticate to a resource. A predefined query returns all matching machines at once.",
+  "rationale": [
+   "Correct: the predefined cloud security explorer query returns every VM with a plaintext secret that can reach a storage account, across Azure, AWS and GCP, using graph relationships.",
+   "Incorrect: secure score summarizes posture as a percentage and does not list machines by secret relationship. Use it to track overall progress.",
+   "Incorrect: the regulatory compliance dashboard maps findings to standards such as controls. It does not show which secret can authenticate to which resource.",
+   "Incorrect: the Secrets tab lists secrets found on one machine and does not show relationships to storage accounts. It is useful once you know which VM to inspect."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/remediate-server-secrets#remediate-secrets-with-cloud-security-explorer"
+ },
+ {
+  "id": "1.2.6-06",
+  "obj": "1.2.6",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders has an Azure subscription that is onboarded to Defender for Cloud with only the free foundational posture capabilities. The security team wants plaintext secrets on the disks of its Azure virtual machines to be reported as recommendations, and the team does not want to install any agent.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable the Defender CSPM plan on the subscription",
+   "Enable agentless scanning for machines in the plan settings",
+   "Install the Azure Monitor Agent on each virtual machine",
+   "Enable the Key Vault plan of Defender for Cloud",
+   "Enable the Defender for Storage plan"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Secrets scanning on machines needs a plan that includes it, here Defender CSPM, and agentless machine scanning turned on for the environment. No agent or vault plan is involved.",
+  "rationale": [
+   "Correct: the Defender CSPM plan provides machine secrets scanning, which the free foundational capabilities do not include.",
+   "Correct: agentless scanning must be enabled for the subscription so that disk snapshots are scanned for secrets, with no agent on the machines.",
+   "Incorrect: the Azure Monitor Agent collects logs and metrics. Secrets scanning is agentless and does not use it, and the requirement is to avoid agents.",
+   "Incorrect: the Key Vault plan detects suspicious vault access and does not scan VM disks. Use it to protect the vaults that store secrets.",
+   "Incorrect: Defender for Storage protects storage accounts against threats and malware. It plays no role in scanning VM disks for plaintext secrets."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/enable-agentless-scanning-vms"
+ },
+ {
+  "id": "1.2.7-01",
+  "obj": "1.2.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants threat protection that detects unusual and potentially harmful attempts to access any key vault in a subscription. The company does not want to manage agents or third-party monitoring tools.\n\nWhat should you do?",
+  "choices": [
+   "Set the Key Vault plan to On in the Defender plans of the subscription",
+   "Configure a diagnostic setting on each vault that sends AuditEvent logs to a workspace",
+   "Enable the Defender for Resource Manager plan on the subscription",
+   "Enable purge protection on each vault"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for Key Vault is a Defender for Cloud plan enabled at the subscription level. It analyzes vault activity and raises alerts about anomalous access without agents.",
+  "rationale": [
+   "Correct: turning on the Key Vault plan in Environment settings enables anomaly detection and alerts for vaults in the subscription, with no agent to manage.",
+   "Incorrect: AuditEvent logging records requests but does not analyze them for threats. Use it for auditing and later investigation.",
+   "Incorrect: Defender for Resource Manager detects suspicious management operations, not anomalous data plane access to vaults. Use it to monitor control plane activity.",
+   "Incorrect: purge protection prevents early purge of deleted objects. It does not detect suspicious access."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-key-vault-plan"
+ },
+ {
+  "id": "1.2.7-02",
+  "obj": "1.2.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. needs an alert when a key vault is accessed from a Tor exit node or from an IP address that Microsoft Threat Intelligence identifies as suspicious.\n\nWhich service should you use?",
+  "choices": [
+   "Microsoft Defender for Key Vault",
+   "Key Vault AuditEvent logging",
+   "Azure Policy",
+   "Azure Event Grid"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Defender for Key Vault raises alerts such as access from a Tor exit node or from a suspicious IP, using anomaly detection and threat intelligence.",
+  "rationale": [
+   "Correct: Defender for Key Vault includes alerts for access from Tor exit nodes and suspicious IP addresses and sends them to Defender for Cloud and optionally by email.",
+   "Incorrect: AuditEvent logging records each request including the caller IP but does not classify an IP as suspicious. Use it as the evidence source for investigation.",
+   "Incorrect: Azure Policy audits or enforces vault configuration, for example the firewall setting. It does not inspect access activity or use threat intelligence.",
+   "Incorrect: Event Grid publishes vault lifecycle events such as near expiry. It does not detect suspicious callers."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/alerts-azure-key-vault"
+ },
+ {
+  "id": "1.2.7-03",
+  "obj": "1.2.7",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has Defender for Key Vault enabled. It raises the alert Suspicious secret listing and query in a key vault for the service principal App3. The owner of App3 confirms that the activity was not legitimate. The team wants to limit the impact of the exposed secrets.\n\nWhat should you do?",
+  "choices": [
+   "Review the secrets listed in the alert, then rotate or disable them",
+   "Create a suppression rule so that the alert is no longer raised for App3",
+   "Enable the Key Vault firewall and add the subnet of App3",
+   "Enable purge protection on the vault"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "After you confirm that an alert is not legitimate, measure the impact from the list of secrets in the alert, and rotate, disable or delete the secrets that the suspicious principal accessed.",
+  "rationale": [
+   "Correct: the alert lists the secrets that were accessed, and rotating or disabling them removes the value of what a threat actor may have copied. Also remove or restrict the principal.",
+   "Incorrect: a suppression rule hides future alerts and is meant for confirmed benign noise. Here the activity is malicious, so suppressing it would hide further abuse.",
+   "Incorrect: a firewall limits future network access but does nothing about secrets that were already read. Use it when the source is an unrecognized IP address.",
+   "Incorrect: purge protection guards against permanent deletion and does not undo the exposure of values that were read."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-key-vault-introduction"
+ },
+ {
+  "id": "1.2.7-04",
+  "obj": "1.2.7",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Relecloud enables the Key Vault plan of Microsoft Defender for Cloud on a subscription that contains 12 vaults.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "An alert can be raised when a vault is accessed from a Tor exit node.",
+   "Defender for Key Vault blocks requests that it classifies as suspicious.",
+   "The plan is enabled by setting the Key Vault plan to On for the subscription in Environment settings."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Defender for Key Vault detects and alerts. It does not block requests, and it is enabled by toggling the Key Vault plan for a subscription in Defender for Cloud.",
+  "rationale": [
+   "Yes: access from a known Tor exit node is one of the Defender for Key Vault alerts, as it can indicate an actor hiding the source location.",
+   "No: the plan generates alerts and recommendations for investigation and does not block traffic. Use the Key Vault firewall or Azure RBAC to prevent access.",
+   "Yes: in Defender for Cloud, Environment settings, the Key Vault plan is toggled on for the subscription and then saved."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-key-vault-plan"
+ },
+ {
+  "id": "1.2.7-05",
+  "obj": "1.2.7",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Woodgrove Bank has Defender for Key Vault enabled. It raises the alert Access from a suspicious IP address to a key vault for Vault1. The IP address is not recognized. The firewall of Vault1 is disabled. The only legitimate callers are App1 in a known subnet and an administrator workstation with a static public IP address.\n\nWhat should you do to prevent access from unknown addresses?",
+  "choices": [
+   "Enable the Vault1 firewall and allow the known subnet and IP address",
+   "Create a suppression rule for the unrecognized IP address in the alert",
+   "Switch Vault1 to the Azure RBAC permission model for data actions",
+   "Increase the soft-delete retention period of Vault1 to 90 days"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "With the firewall disabled, any network can reach the vault endpoint and only authentication limits access. Enabling the firewall with the known subnet and IP admits only those callers, which the Defender response guidance recommends for unrecognized IPs.",
+  "rationale": [
+   "Correct: enabling the firewall with only the legitimate sources blocks the unrecognized address at the network layer, and Defender guidance recommends this for unknown IPs.",
+   "Incorrect: a suppression rule only hides alerts and leaves the vault reachable from the same address. Use it for confirmed benign noise.",
+   "Incorrect: the permission model controls authorization and does not restrict which networks reach the vault. The unknown caller would still reach the endpoint.",
+   "Incorrect: retention affects recovery of deleted objects, not network access, and it cannot be changed after creation."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-key-vault-introduction"
+ },
+ {
+  "id": "1.2.7-06",
+  "obj": "1.2.7",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Adatum Corporation must detect suspicious access to its vaults and, when an alert is raised, investigate earlier operations by the same caller IP address or principal by using KQL queries.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable the Key Vault plan of Defender for Cloud",
+   "Create a diagnostic setting that sends AuditEvent logs to a Log Analytics workspace",
+   "Enable purge protection on each vault",
+   "Enable the Defender CSPM plan",
+   "Create an Event Grid subscription on each vault"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Detection comes from the Defender for Key Vault plan, and investigation of earlier operations needs vault diagnostic logs, which a diagnostic setting sends to Log Analytics for KQL queries.",
+  "rationale": [
+   "Correct: the Key Vault plan analyzes vault activity and raises alerts for anomalous or suspicious access.",
+   "Correct: diagnostic logs of the AuditEvent category record callers and operations, and in Log Analytics they can be queried with KQL when you investigate an alert.",
+   "Incorrect: purge protection prevents early purge of deleted objects. It neither detects suspicious access nor records operations.",
+   "Incorrect: Defender CSPM provides posture management such as attack paths and secrets scanning. It does not analyze vault access behavior.",
+   "Incorrect: Event Grid events announce lifecycle changes such as near expiry. They do not record caller IPs or operations for investigation."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-key-vault-introduction"
+ }
+]

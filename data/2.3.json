@@ -1,0 +1,1990 @@
+[
+ {
+  "id": "2.3.1-01",
+  "obj": "2.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. runs a three-tier app in one virtual network. The web tier VMs are added and removed by scaling operations, and their IP addresses change often. You must allow TCP 443 from the web tier to the app tier in a network security group (NSG) without editing the rule when VMs are added.\n\nWhich source and destination type should you use in the NSG rule?",
+  "choices": [
+   "An application security group for each tier",
+   "A service tag for each tier",
+   "An augmented security rule that lists the VM IP addresses",
+   "A Virtual Network Manager security admin rule that lists the tier subnets"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Application security groups let you write NSG rules against logical groups of NICs instead of IP addresses. Membership changes do not require rule edits, which suits scale-out tiers.",
+  "rationale": [
+   "Correct: An application security group (ASG) groups network interfaces by role. A rule that names ASGs stays valid when VMs join or leave the group, so no IP addresses are maintained.",
+   "Incorrect: A service tag is a Microsoft-managed set of address prefixes for an Azure service, and you cannot create custom service tags for your own tiers. Use it to reference services such as Storage in a rule.",
+   "Incorrect: An augmented rule combines many explicit IP addresses and ranges in one rule, but you still maintain the list. It breaks the requirement when scaling changes the addresses. Use it for static address sets.",
+   "Incorrect: A security admin rule enforces central policy on virtual networks by using address prefixes, not NIC groups, so it still needs address maintenance. Use it for organization-wide baselines, not tier-to-tier rules."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network/application-security-groups"
+ },
+ {
+  "id": "2.3.1-02",
+  "obj": "2.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys has an NSG with a custom inbound rule that denies TCP 3389 from Internet at priority 200 and a custom inbound rule that allows TCP 3389 from 203.0.113.0/24 at priority 300. Users in 203.0.113.0/24 cannot connect to Server1 by using RDP.\n\nWhat should you do?",
+  "choices": [
+   "Change the priority of the allow rule to 150",
+   "Change the priority of the allow rule to 400",
+   "Delete the DenyAllInbound default rule from the NSG",
+   "Add an outbound allow rule for TCP 3389 at priority 100"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "NSG rules are evaluated by ascending priority number, and the first match ends evaluation. To make a narrow allow win over a broad deny, give the allow a smaller number.",
+  "rationale": [
+   "Correct: NSG rules are processed from the lowest number to the highest, and processing stops at the first match. Priority 150 puts the allow rule before the deny rule at 200, so the trusted range matches the allow first.",
+   "Incorrect: A higher number means a lower precedence. Moving the allow rule to 400 leaves the deny rule at 200 ahead of it, so the traffic is still denied. Use a number below 200 to win.",
+   "Incorrect: Default rules cannot be deleted, only overridden by custom rules. DenyAllInbound is also not the rule matching here, because the custom deny at priority 200 matches first.",
+   "Incorrect: NSGs are stateful, so return traffic for an allowed inbound flow needs no outbound rule. The block is the inbound deny rule. An outbound rule helps only when outbound connections are denied."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview"
+ },
+ {
+  "id": "2.3.1-03",
+  "obj": "2.3.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has VM1 in a subnet that has an NSG allowing inbound TCP 22 from 10.10.0.0/24. VM1 also has a network interface NSG that contains only the default rules. An administrator in 10.10.0.0/24 cannot connect to VM1 by using SSH.\n\nWhat should you do?",
+  "choices": [
+   "Add an allow rule for TCP 22 from 10.10.0.0/24 to the NIC-level NSG",
+   "Change the priority of the subnet allow rule to 100",
+   "Delete the DenyAllInbound default rule in the NIC-level NSG",
+   "Add an outbound allow rule for TCP 22 to the subnet NSG"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When a subnet NSG and a NIC NSG both apply, a flow must pass both. Use the effective security rules view to see which one blocks, then add the matching allow rule there.",
+  "rationale": [
+   "Correct: Inbound traffic must be allowed by both the subnet NSG and the NIC NSG. The NIC NSG has no allow rule for SSH, so its DenyAllInbound default rule blocks the flow. A matching allow rule in it fixes the problem.",
+   "Incorrect: Priority only orders rules inside one NSG. The subnet NSG already allows the flow, so a different priority there does not change the decision of the separate NIC NSG that blocks it.",
+   "Incorrect: Default rules cannot be removed. You can only override them with custom rules that have a lower priority number, so this action is not possible even though it targets the right NSG.",
+   "Incorrect: NSGs are stateful, so replies to allowed inbound SSH are permitted automatically. The failure is an inbound deny at the NIC level, not a missing outbound rule at the subnet level."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview"
+ },
+ {
+  "id": "2.3.1-04",
+  "obj": "2.3.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has VMs in the application security groups AsgLogic and AsgDb in one virtual network. Only AsgLogic VMs may connect to AsgDb on TCP 1433. The default AllowVNetInBound rule still permits other traffic inside the virtual network.\n\nWhich pair of custom inbound rules should you create?",
+  "choices": [
+   "Allow AsgLogic to AsgDb on 1433 at priority 110, and deny any source to AsgDb on 1433 at priority 120",
+   "Allow AsgLogic to AsgDb on 1433 at priority 120, and deny any source to AsgDb on 1433 at priority 110",
+   "Allow AsgLogic to AsgDb on 1433 at priority 110, with no deny rule",
+   "Deny any source to AsgDb on 1433 at priority 100, and allow AsgLogic to AsgDb on 1433 at priority 4000"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "To restrict a port inside a virtual network, pair a narrow allow with a broader deny and give the allow the smaller priority number. The deny is needed to override AllowVNetInBound.",
+  "rationale": [
+   "Correct: The allow rule has the lower number, so AsgLogic matches it first. All other sources fall through to the deny at 120, which overrides the default AllowVNetInBound rule at 65000.",
+   "Incorrect: The deny rule at 110 is evaluated first and matches every source, including AsgLogic, so the allow at 120 is never reached. The order of the priorities is reversed.",
+   "Incorrect: Without a deny rule, other VMs in the virtual network still match AllowVNetInBound at priority 65000 and reach the database. An allow rule alone does not restrict anything.",
+   "Incorrect: The deny rule at priority 100 is processed before the allow at 4000 and matches AsgLogic traffic too, so the logic tier is blocked. The allow must be numbered below the deny."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network/application-security-groups"
+ },
+ {
+  "id": "2.3.1-05",
+  "obj": "2.3.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank plans to place 40 VM network interfaces into application security groups (ASGs) and to reference them in NSG rules. The VMs are in two virtual networks.\n\nWhich two design constraints should you account for? Each correct answer presents part of the solution.",
+  "choices": [
+   "The network interfaces in one ASG must be in the same virtual network",
+   "A single NSG rule can name just one ASG as its source",
+   "An ASG can be associated with a subnet in place of an NSG",
+   "A rule that names an ASG also applies to NICs that are not members of it",
+   "The default rules of an NSG can be deleted when ASG rules are used"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "ASGs group NICs of one virtual network and are referenced as a single group per rule source or destination. They are not security boundaries by themselves and do not remove default rules.",
+  "rationale": [
+   "Correct: ASG membership is limited to NICs in a single virtual network. With two virtual networks you need separate ASGs per network, each with its own rule reference.",
+   "Correct: A rule can specify one ASG or one service tag per source or destination, so you cannot list several ASGs in one rule. Use several rules or a combined group instead.",
+   "Incorrect: ASGs are used inside NSG rules to group NICs. They are not associated with subnets and do not replace an NSG, which is the filtering resource attached to a subnet or NIC.",
+   "Incorrect: A rule that names an ASG applies only to NICs that are members of it. A NIC outside the group is not affected even when the subnet NSG contains the rule.",
+   "Incorrect: Default rules cannot be removed. You can override them by creating custom rules with a lower priority number, whether or not ASGs are used."
+  ],
+  "ref": "https://learn.microsoft.com/azure/networking/design-guide/network-application-security-groups"
+ },
+ {
+  "id": "2.3.1-06",
+  "obj": "2.3.1",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Litware, Inc. manages an NSG named NSG1 in a virtual network that contains Server1 and Server2.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A custom rule with priority 4000 is evaluated before the default rule AllowVNetInBound.",
+   "You can delete the default DenyAllInbound rule to allow inbound traffic from the internet.",
+   "One rule can list AsgWeb and AsgApp together as its source application security groups."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Custom rules use priorities 100 to 4096 and run before the default rules. Default rules cannot be removed, and a source or destination can name one ASG.",
+  "rationale": [
+   "Yes: Default rules have priorities 65000 and higher, so any custom rule in the range 100 to 4096 is evaluated before them.",
+   "No: Default rules cannot be deleted. To allow internet traffic you add a custom allow rule with a lower priority number than 65500.",
+   "No: A rule can name only one application security group or service tag per source or destination. Use two rules or one combined group."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview"
+ },
+ {
+  "id": "2.3.1-07",
+  "obj": "2.3.1",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Contoso, Ltd. is writing NSG rules for three requirements.\n\nWhich NSG element should you use for each requirement? To answer, drag the appropriate elements to the correct requirements. Each element may be used once, more than once, or not at all.",
+  "choices": [
+   "Application security group",
+   "Service tag",
+   "Augmented security rule",
+   "Security admin rule"
+  ],
+  "targets": [
+   "Requirement 1: allow SQL traffic between VM groups by role while VM IP addresses change often",
+   "Requirement 2: allow outbound HTTPS to Azure Storage without tracking address ranges that Microsoft changes",
+   "Requirement 3: allow TCP 80, 443 and 8080 from three on-premises address blocks in one rule"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "Requirement 1 depends on VM roles, not on addresses, so grouping NICs in an application security group keeps the rule valid as IPs change.",
+   "Requirement 2 refers to an Azure service whose prefixes Microsoft maintains, which is exactly what the Storage service tag provides.",
+   "Requirement 3 combines several ports and address blocks, which an augmented security rule expresses in one rule instead of several."
+  ],
+  "notes": [
+   "Groups NICs by role and is used as a source or destination in NSG rules. Use it when addresses change but roles stay the same.",
+   "A Microsoft-managed list of address prefixes for an Azure service. Use it to reference services without maintaining IP ranges.",
+   "A rule that holds multiple ports and multiple addresses or ranges. Use it to reduce the number of rules for static sets.",
+   "A rule deployed by Azure Virtual Network Manager that is evaluated before NSG rules. Use it for central baselines, not for per-tier rules."
+  ],
+  "explanation": "Match the element to what changes: roles map to ASGs, Azure service ranges to service tags, and static multi-value sets to augmented rules.",
+  "ref": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview"
+ },
+ {
+  "id": "2.3.1-08",
+  "obj": "2.3.1",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Tailspin Toys is completing the custom inbound rules of NSG1 for a web, logic and database design. Traffic from the internet must reach only AsgWeb on TCP 80. Only AsgLogic may reach AsgDb on TCP 1433, and the default AllowVNetInBound rule must not expose AsgDb to other VMs.\n\nHow should you complete the rules? To answer, select the appropriate options in the answer area.\n\n```text\nPriority  Source      Destination  Port  Access\n100       [[1]]       AsgWeb       80    Allow\n110       AsgLogic    AsgDb        1433  Allow\n[[2]]     *           AsgDb        1433  [[3]]\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Internet",
+     "VirtualNetwork",
+     "AzureLoadBalancer"
+    ],
+    "why": [
+     "Correct: the Internet service tag represents public address space, so the rule admits internet clients to the web tier. The default DenyAllInbound rule blocks the other tiers.",
+     "Incorrect: the VirtualNetwork tag covers the virtual network and connected on-premises space, not internet clients. Use it for traffic between internal tiers.",
+     "Incorrect: the AzureLoadBalancer tag covers the load balancer health probe source, not user traffic. Use it to let probes reach backends."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "120",
+     "100",
+     "105"
+    ],
+    "why": [
+     "Correct: priority 120 is higher than 110, so the AsgLogic allow is evaluated first and the deny catches everything else before AllowVNetInBound at 65000.",
+     "Incorrect: priority 100 is lower than 110, so the deny matches first and blocks AsgLogic as well. The allow rule would never apply.",
+     "Incorrect: priority 105 is also lower than 110, so the deny is evaluated before the AsgLogic allow and blocks the logic tier."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "Deny",
+     "Allow"
+    ],
+    "why": [
+     "Correct: the catch-all rule must deny, so any source other than AsgLogic is blocked from the database port after the allow rule has matched.",
+     "Incorrect: an allow here would permit every source to reach AsgDb on 1433, which is what the default AllowVNetInBound rule already does, so the restriction would be lost."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "Use a service tag for internet clients, give narrow allows smaller priority numbers than the catch-all deny, and deny the rest so the default AllowVNetInBound rule cannot expose the database tier.",
+  "ref": "https://learn.microsoft.com/azure/virtual-network/application-security-groups"
+ },
+ {
+  "id": "2.3.2-01",
+  "obj": "2.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has 30 subscriptions with virtual networks. The central network team must block inbound RDP from the internet on every virtual network, and application teams, who manage their own NSGs, must not be able to override the block.\n\nWhat should you implement?",
+  "choices": [
+   "A Deny rule in an Azure Virtual Network Manager security admin configuration",
+   "A custom inbound deny rule at priority 100 in the NSG of every subnet",
+   "A user-defined route with next hop type None on every subnet",
+   "An Azure Firewall DNAT rule on a central firewall"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure Virtual Network Manager security admin rules give central teams an enforcement layer that is evaluated before NSGs, so application teams cannot weaken the baseline.",
+  "rationale": [
+   "Correct: Security admin rules are defined centrally, applied to the virtual networks of a network group, and evaluated before NSG rules. A Deny action ends evaluation, so NSG allow rules cannot override it.",
+   "Incorrect: NSG rules are owned by the application teams, who can edit or remove them, and you would have to maintain them in 30 subscriptions. They cannot enforce a central policy that teams cannot change.",
+   "Incorrect: A route with next hop None drops traffic by routing, not by port or source filtering, so it would also break legitimate traffic. It is a routing control, not a rule that blocks RDP from the internet.",
+   "Incorrect: A DNAT rule translates inbound traffic from a firewall public IP to a private address. It publishes services and does not block RDP on virtual networks that have their own public IP addresses."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
+ },
+ {
+  "id": "2.3.2-02",
+  "obj": "2.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. creates new virtual networks every week. Every virtual network that has the tag env set to prod must automatically become a target of Azure Virtual Network Manager configurations.\n\nWhat should you configure for the network group?",
+  "choices": [
+   "Dynamic membership that uses Azure Policy",
+   "Static membership with the resource IDs of the virtual networks",
+   "A connectivity configuration that uses a mesh topology",
+   "A security admin configuration for each subscription"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Network groups can use static or dynamic membership. Dynamic membership relies on Azure Policy conditions so new virtual networks are picked up without redeployment.",
+  "rationale": [
+   "Correct: Dynamic membership uses an Azure Policy condition, such as a tag value, with the addToNetworkGroup effect. Matching virtual networks join the group automatically and leave it when they no longer match.",
+   "Incorrect: Static membership lists resource IDs by hand, so each new virtual network must be added manually. Use it for small environments, exceptions or pilots where membership rarely changes.",
+   "Incorrect: A connectivity configuration defines a topology such as mesh or hub-and-spoke for a group. It does not decide which virtual networks belong to the group. Use it after membership is defined.",
+   "Incorrect: A security admin configuration holds rules that apply to a network group. It does not populate the group, so new virtual networks would still need to be added to the group first."
+  ],
+  "ref": "https://learn.microsoft.com/azure/networking/design-guide/azure-virtual-network-manager"
+ },
+ {
+  "id": "2.3.2-03",
+  "obj": "2.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank uses a security admin configuration to manage virtual networks. Management traffic to TCP 5986 must reach the servers even when an application team has an NSG rule that denies the port.\n\nWhich action should you set on the security admin rule?",
+  "choices": [
+   "Always Allow",
+   "Allow with priority 1",
+   "Deny",
+   "Allow with the same priority as the NSG rule"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security admin rules have three actions. Allow continues to NSG rules, while Always Allow and Deny both end evaluation, so only Always Allow guarantees delivery against NSG denies.",
+  "rationale": [
+   "Correct: An Always Allow rule delivers matching traffic to the resource and ends evaluation, so downstream NSG deny rules are skipped. It guarantees reachability of critical management traffic.",
+   "Incorrect: An Allow rule passes matching traffic on to NSG evaluation, where the application team deny rule can still block it. The priority number of the admin rule does not change this.",
+   "Incorrect: A Deny rule blocks traffic before it is delivered, which is the opposite of the requirement. Use it for organization-wide blocks such as inbound SSH from the internet.",
+   "Incorrect: Admin rule priorities are compared with other admin rules, not with NSG priorities, and an Allow action still continues to NSG rules. Matching numbers does not prevent the NSG deny."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
+ },
+ {
+  "id": "2.3.2-04",
+  "obj": "2.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. saved a security admin configuration that denies inbound TCP 23 and associated it with the network group Prod. Hosts in a virtual network in West Europe, which is a member of Prod, still accept connections on TCP 23. The virtual network is listed in the group.\n\nWhat should you do?",
+  "choices": [
+   "Deploy the security admin configuration to the West Europe region",
+   "Associate an NSG that denies TCP 23 with the virtual network",
+   "Add each subnet of the virtual network to Prod as a static member",
+   "Create a connectivity configuration for Prod in West Europe"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security admin rules take effect only after the configuration is deployed to a region. Only one security admin configuration can be deployed per region, so extra rules go into more rule collections.",
+  "rationale": [
+   "Correct: A saved configuration is not enforced until you deploy it to the regions of the target virtual networks. Deployment applies the rules to the virtual networks in the group, with a short delay.",
+   "Incorrect: An NSG would block the port, but it does not fix the central rule and leaves the enforcement gap for other virtual networks. The requirement is to make the existing security admin rule effective.",
+   "Incorrect: Network groups contain virtual networks, not subnets, and the virtual network is already a member. Adding members does not change whether the rules are deployed.",
+   "Incorrect: A connectivity configuration controls topology such as hub-and-spoke or mesh. It carries no security rules, so it would not block TCP 23."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
+ },
+ {
+  "id": "2.3.2-05",
+  "obj": "2.3.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys deploys a security admin rule that denies inbound SSH from the internet to every virtual network in the network group Prod. An administrator tests SSH access and finds the rule enforced on most subnets.\n\nWhich subnet should you expect to be exempt from this security admin rule?",
+  "choices": [
+   "AzureBastionSubnet",
+   "A subnet that has an NSG with an allow rule for SSH",
+   "A subnet in a virtual network that joined Prod through dynamic membership",
+   "A subnet whose VM network interface has its own NSG"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security admin rules are applied at the virtual network level and take precedence over NSGs, except on exempt service subnets such as Azure Bastion, Azure Firewall and VPN gateway subnets.",
+  "rationale": [
+   "Correct: Security admin rules do not apply to certain service subnets, including Azure Bastion, Azure Firewall, VPN Gateway, Azure Route Server and Virtual WAN subnets. AzureBastionSubnet is one of the exemptions.",
+   "Incorrect: An NSG allow rule does not help, because the security admin Deny is evaluated first and ends evaluation. The NSG rule is never reached for that traffic.",
+   "Incorrect: Dynamic membership only decides which virtual networks are targeted. A virtual network that is a member through Azure Policy receives the same rules as a manually added one.",
+   "Incorrect: A NIC-level NSG is evaluated after security admin rules, so it cannot exempt the subnet. The admin Deny applies before any NSG is considered."
+  ],
+  "ref": "https://learn.microsoft.com/azure/networking/design-guide/azure-virtual-network-manager"
+ },
+ {
+  "id": "2.3.2-06",
+  "obj": "2.3.2",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Contoso, Ltd. uses Azure Virtual Network Manager with a security admin configuration and subnet NSGs.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Security admin rules are evaluated before NSG rules.",
+   "An Allow security admin rule ends evaluation, so the NSG rules are skipped.",
+   "You can deploy two different security admin configurations to the same region."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Security admin rules run first and use Allow, Always Allow or Deny. Only one security admin configuration is deployed per region, and extra rules go into rule collections.",
+  "rationale": [
+   "Yes: Security admin rules have higher precedence than NSG rules, so central policy is applied first and NSGs add team-level control afterward.",
+   "No: Allow continues to NSG evaluation, where the traffic can still be denied. Only Always Allow and Deny end evaluation after the admin rule.",
+   "No: Only one security admin configuration can be deployed to a region. To add more rules, create additional rule collections in that configuration."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
+ },
+ {
+  "id": "2.3.2-07",
+  "obj": "2.3.2",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Fabrikam, Inc. has an Azure Virtual Network Manager instance planned for a subscription. The virtual networks of the Prod environment must receive a central rule that blocks inbound TCP 23, and membership is defined by an existing Azure Policy condition.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create the network manager with the security admin feature in its scope.",
+   "Create a network group for the Prod virtual networks.",
+   "Create a security admin configuration with a rule collection that targets the network group.",
+   "Deploy the security admin configuration to the regions of the virtual networks.",
+   "Create a connectivity configuration with a hub-and-spoke topology.",
+   "Associate an NSG that denies TCP 23 with each subnet."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Azure Virtual Network Manager builds on dependencies: manager, then network group, then a configuration that targets the group, and finally deployment to regions.",
+  "rationale": [
+   "Step 1: the network manager is the parent resource, and its scope and features decide which virtual networks and configuration types it can manage, so it must exist first.",
+   "Step 2: the network group must exist before a rule collection can target it. Membership then comes from the existing Azure Policy condition.",
+   "Step 3: the configuration holds the rule collection with the Deny rule and associates the collection with the network group created earlier.",
+   "Step 4: a configuration takes effect only after deployment to a region, so this step comes last and applies the rules to the group members.",
+   "Incorrect: a connectivity configuration builds hub-and-spoke or mesh connectivity and contains no security rules. Use it when you need topology, not filtering.",
+   "Incorrect: NSGs on each subnet are not a central rule and are owned by application teams. Use them for team-level filtering, after the central admin rules."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
+ },
+ {
+  "id": "2.3.2-08",
+  "obj": "2.3.2",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Relecloud uses Azure Virtual Network Manager. A rule collection named Block-SSH denies inbound TCP 22 at priority 100 for the network group All. The App network group must be an exception: SSH may be delivered to its virtual networks, but only when the NSGs of the application teams also allow it.\n\nHow should you complete the exception rule? To answer, select the appropriate options in the answer area.\n\n```text\nCollection       Priority  Action  Direction  Port  Target\nException-App    [[1]]     [[2]]   Inbound    22    App\nBlock-SSH        100       Deny    Inbound    22    All\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "10",
+     "200",
+     "4096"
+    ],
+    "why": [
+     "Correct: priority 10 is lower than 100, so the exception is evaluated before the organization-wide Deny and SSH to App virtual networks matches it first.",
+     "Incorrect: priority 200 is evaluated after the Deny at 100, so the Deny matches first and the exception is never reached.",
+     "Incorrect: priority 4096 is the lowest precedence in the range, so the Deny at 100 matches first and the exception has no effect."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Allow",
+     "Always Allow",
+     "Deny"
+    ],
+    "why": [
+     "Correct: Allow ends the admin rule evaluation for this traffic and continues to NSG evaluation, so application team NSG rules still decide, as the requirement states.",
+     "Incorrect: Always Allow delivers the traffic and skips NSG rules, so a team NSG that denies SSH could no longer block it. Use it when central delivery must be guaranteed.",
+     "Incorrect: Deny would block SSH to the App virtual networks, which contradicts the exception. Use Deny for the organization-wide block."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "A narrower exception needs a smaller priority number than the broad Deny, and the Allow action hands the decision to NSGs instead of bypassing them.",
+  "ref": "https://learn.microsoft.com/azure/virtual-network-manager/concept-enforcement"
+ },
+ {
+  "id": "2.3.3-01",
+  "obj": "2.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank uses Azure Virtual WAN to connect branch offices and spoke virtual networks. Traffic between virtual networks and from branches to the internet must be inspected by Azure Firewall. The network team does not want to create and maintain user-defined routes.\n\nWhat should you deploy?",
+  "choices": [
+   "A secured virtual hub managed by Azure Firewall Manager",
+   "Azure Firewall in a hub virtual network with a route table on each spoke",
+   "An Azure Firewall instance in every spoke virtual network",
+   "An Azure Virtual Network Manager hub-and-spoke connectivity configuration"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A secured virtual hub combines Virtual WAN routing with Azure Firewall policy and removes the need for custom UDRs, covering VNet-to-VNet, branch-to-VNet and internet traffic.",
+  "rationale": [
+   "Correct: A secured virtual hub is a Virtual WAN hub with security and routing policies from Azure Firewall Manager. It provides automated routing, so no user-defined routes are needed to send traffic to the firewall.",
+   "Incorrect: A firewall in a customer-managed hub virtual network works, but each spoke then needs a route table with user-defined routes. That contradicts the requirement to avoid UDR maintenance.",
+   "Incorrect: Firewalls in every spoke fragment policy and cost, and branch traffic is still not routed through them automatically. A central firewall in the hub gives one policy point.",
+   "Incorrect: A Virtual Network Manager connectivity configuration builds peering topology between virtual networks. It does not provide a firewall or branch traffic inspection for Virtual WAN."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall-manager/secured-virtual-hub"
+ },
+ {
+  "id": "2.3.3-02",
+  "obj": "2.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has one Virtual WAN hub with Azure Firewall and two site-to-site branch connections. Traffic from one branch to the other branch must be inspected by the firewall.\n\nWhat should you configure?",
+  "choices": [
+   "A private traffic routing policy by using routing intent",
+   "An internet traffic routing policy only",
+   "Threat intelligence in Alert and deny mode in the firewall policy",
+   "A network security group on the virtual hub"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Routing intent has an internet policy and a private policy. Private traffic includes VNet, branch and inter-hub flows, so a private policy is needed to inspect branch-to-branch traffic.",
+  "rationale": [
+   "Correct: Branch-to-branch inspection requires routing intent, even in a single hub. A private traffic routing policy sends VNet and branch traffic to the firewall as the next hop.",
+   "Incorrect: An internet traffic policy sends only internet-bound traffic to the security solution. Branch-to-branch traffic is private traffic, so it would still bypass the firewall.",
+   "Incorrect: Threat intelligence filters known malicious addresses on traffic that reaches the firewall. It does not change routing, so branch-to-branch traffic still would not reach the firewall.",
+   "Incorrect: A virtual hub is Microsoft-managed, so you cannot attach an NSG to it. NSGs filter traffic on your own virtual network subnets or NICs, not Virtual WAN hub routing."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.3-03",
+  "obj": "2.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a Standard Virtual WAN. The option to configure routing intent on hub1 is unavailable. Hub1 has a custom route table and a static route in defaultRouteTable whose next hop is a virtual network connection.\n\nWhat should you do first?",
+  "choices": [
+   "Remove the custom route table and the static route that uses a virtual network connection as next hop",
+   "Change the Virtual WAN type from Basic to Standard",
+   "Deploy a network virtual appliance in hub1",
+   "Delete and recreate defaultRouteTable"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Routing intent can be enabled only on hubs that meet route prerequisites. Static routes with next hop Azure Firewall are allowed, but custom route tables and routes to connections are not.",
+  "rationale": [
+   "Correct: Routing intent needs a hub that has only noneRouteTable and defaultRouteTable and no static routes that point to a virtual network connection. Removing them meets the prerequisites.",
+   "Incorrect: Routing intent requires a Standard Virtual WAN, but the stem states that the Virtual WAN is already Standard. Changing the type is not the cause of the greyed-out option.",
+   "Incorrect: An NVA is one possible next hop for a routing policy, but the greyed-out option is caused by existing routes. Azure Firewall can also be the next hop, so no NVA is required.",
+   "Incorrect: defaultRouteTable is a built-in table and is part of the allowed set. The blocking items are the custom route table and the static route with a connection next hop."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.3-04",
+  "obj": "2.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. needs private traffic in a Virtual WAN hub to go through Azure Firewall, and internet traffic to go through a software-as-a-service security solution that is deployed in the same hub.\n\nWhich tool should you use to configure the routing policies?",
+  "choices": [
+   "The Virtual WAN portal routing intent settings",
+   "The secured virtual hub settings of Azure Firewall Manager",
+   "An Azure Firewall policy with application rules",
+   "Custom route tables with user-defined routes"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Routing intent can be configured in Azure Firewall Manager or the Virtual WAN portal, but only the Virtual WAN portal supports NVA and SaaS next hops.",
+  "rationale": [
+   "Correct: The Virtual WAN portal lets you choose different next hop resources per policy, including Azure Firewall, NVAs and SaaS solutions in the hub, so private and internet policies can differ.",
+   "Incorrect: Azure Firewall Manager supports routing policies only with Azure Firewall as the next hop, so it cannot point the internet policy to a SaaS solution. Use it when Azure Firewall secures both.",
+   "Incorrect: Firewall policy application rules filter traffic that already reaches the firewall. They do not choose a next hop for traffic, and they cannot send internet traffic to another solution.",
+   "Incorrect: Custom route tables are not allowed on a hub that uses routing intent, and routing intent exists to avoid them. Manual routes would also break the policy prerequisites."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.3-05",
+  "obj": "2.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has Virtual WAN hubs in West US and North Europe. Each hub has Azure Firewall. Traffic between virtual networks that are connected to different hubs must be inspected symmetrically by the firewalls.\n\nWhat should you do?",
+  "choices": [
+   "Enable routing intent on both hubs",
+   "Enable routing intent on the West US hub",
+   "Deploy one Azure Firewall in West US and remove the other",
+   "Create a route table with a static route on each virtual network connection"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Inter-hub traffic inspection with hub firewalls requires routing intent on every participating hub, which keeps flows symmetric between the security appliances.",
+  "rationale": [
+   "Correct: Routing intent is the only Virtual WAN mechanism for inter-hub inspection, and it must be enabled on all hubs so traffic is routed symmetrically between the firewalls.",
+   "Incorrect: Enabling it on one hub leaves return traffic or the other direction uncontrolled, because inter-hub inspection needs routing intent on every hub to stay symmetric.",
+   "Incorrect: Removing a firewall defeats regional inspection and adds latency. The requirement is symmetric inspection across both hubs, which routing intent provides without removing a firewall.",
+   "Incorrect: Static routes on connections are not supported on hubs that use routing intent and would not provide symmetric inter-hub inspection. Routing intent manages these routes for you."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.3-06",
+  "obj": "2.3.3",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Tailspin Toys secures a Virtual WAN hub by using Azure Firewall Manager and routing intent.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Routing intent offers an internet traffic policy and a private traffic policy.",
+   "Removing routing intent restores the previous defaultRouteTable configuration automatically.",
+   "Each spoke virtual network needs a user-defined route to send traffic to the firewall in the hub."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Routing intent has internet and private policies, manages the routes for you, and does not roll back automatically when removed.",
+  "rationale": [
+   "Yes: Routing intent lets you declare policies for internet-bound traffic and for private traffic between virtual networks, branches and hubs.",
+   "No: The system does not save or restore earlier routes. Save gateways, connections and route tables before you enable routing intent so you can reapply them.",
+   "No: A secured virtual hub provides automated routing, so you do not configure user-defined routes on the spokes."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.3-07",
+  "obj": "2.3.3",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. has a Virtual WAN with spoke virtual networks already connected to a hub. The company must inspect private and internet traffic by using Azure Firewall in the hub.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create the Virtual WAN with a virtual hub in the target region.",
+   "Create a firewall policy that contains the required rules.",
+   "Associate the firewall policy with the hub in Azure Firewall Manager.",
+   "Set Internet traffic and Private traffic to Azure Firewall in the security configuration of the hub.",
+   "Create a route table with a 0.0.0.0/0 user-defined route on each spoke subnet.",
+   "Attach a network security group to the virtual hub."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "A secured hub is built in order: Virtual WAN and hub, firewall policy, association of the policy with the hub, and routing policies that send traffic to the firewall.",
+  "rationale": [
+   "Step 1: the Virtual WAN and its hub are the base resources that the policy is associated with and that the spokes connect to, so they come first.",
+   "Step 2: the policy holds the allow rules, threat intelligence and other settings. Without rules the firewall denies all traffic, so create it before associating it.",
+   "Step 3: associating the policy with the hub secures the hub with Azure Firewall and applies the rules to it. The hub must exist before it can be associated.",
+   "Step 4: the routing policies send private and internet traffic to the firewall. They are set after the hub is secured, which enables the traffic flow.",
+   "Incorrect: UDRs on spokes are the manual approach for a customer-managed hub. A secured hub provides automated routing, so these routes are not needed.",
+   "Incorrect: A virtual hub is Microsoft-managed and does not accept an NSG. NSGs belong on subnets or NICs of your own virtual networks."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall-manager/secure-cloud-network"
+ },
+ {
+  "id": "2.3.3-08",
+  "obj": "2.3.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank wants to enable routing intent on a Virtual WAN hub that currently has several custom route tables and a static route that points to a spoke connection.\n\nWhich two conditions should the hub meet before routing intent can be configured? Each correct answer presents part of the solution.",
+  "choices": [
+   "No custom route tables exist besides noneRouteTable and defaultRouteTable",
+   "No static route uses a virtual network connection as next hop",
+   "The Virtual WAN type is Basic",
+   "All virtual network connections are deleted",
+   "A VPN gateway is deployed in the hub"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Routing intent requires a clean routing baseline: only the built-in route tables and no static routes that point to virtual network connections, on a Standard Virtual WAN.",
+  "rationale": [
+   "Correct: Routing intent can be configured only on hubs where the only route tables are noneRouteTable and defaultRouteTable. Custom route tables must be removed first.",
+   "Correct: Static routes whose next hop is a virtual network connection are not allowed. Static routes with next hop Azure Firewall can remain in defaultRouteTable.",
+   "Incorrect: Routing intent is available on Standard Virtual WAN, not Basic. A Basic type would block the feature instead of enabling it.",
+   "Incorrect: Connections stay in place. Routing intent manages their route association and propagation, so deleting them is not required and would disconnect the spokes.",
+   "Incorrect: A VPN gateway is not a prerequisite. Routing intent works for hubs with or without gateways, because it steers traffic to the security next hop."
+  ],
+  "ref": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies"
+ },
+ {
+  "id": "2.3.4-01",
+  "obj": "2.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. configures a point-to-site VPN for remote employees. Users must sign in with Microsoft Entra ID so that Conditional Access and multifactor authentication apply.\n\nWhich tunnel type and client should you use?",
+  "choices": [
+   "OpenVPN with the Azure VPN Client",
+   "IKEv2 with the native Windows VPN client",
+   "SSTP with the native Windows VPN client",
+   "IKEv2 and SSTP with a RADIUS server"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Microsoft Entra ID authentication for P2S requires OpenVPN and the Azure VPN Client. Other tunnel types rely on certificates or RADIUS.",
+  "rationale": [
+   "Correct: Microsoft Entra ID authentication for point-to-site is supported only with the OpenVPN tunnel type and requires the Azure VPN Client. This also enables Conditional Access and MFA.",
+   "Incorrect: IKEv2 supports Azure certificate or RADIUS authentication, not Microsoft Entra ID. Use it for native macOS, iOS or Windows clients with certificates.",
+   "Incorrect: SSTP supports certificate or RADIUS authentication and cannot use Microsoft Entra ID sign-in. It is used by Windows clients that need to cross restrictive firewalls.",
+   "Incorrect: RADIUS can integrate with other identity systems, but the combination of IKEv2 and SSTP does not offer Microsoft Entra ID authentication, so Conditional Access for Entra would not apply."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-about"
+ },
+ {
+  "id": "2.3.4-02",
+  "obj": "2.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a site-to-site VPN connection to a branch office. The branch VPN device accepts only a specific IKE and IPsec algorithm combination that differs from the Azure defaults.\n\nWhat should you configure on the connection?",
+  "choices": [
+   "A custom IPsec/IKE policy",
+   "BGP on the connection",
+   "Active-active mode on the gateway",
+   "A second connection with a different shared key"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Custom IPsec/IKE policies let you align the encryption, integrity, DH group and lifetime settings of a connection with the on-premises device. One policy applies per connection.",
+  "rationale": [
+   "Correct: A custom IPsec/IKE policy sets the exact algorithms for IKE and IPsec on a connection. Azure then proposes and accepts only that combination, which must match the on-premises device.",
+   "Incorrect: BGP exchanges routes dynamically between gateways. It does not change encryption or integrity algorithms, so the algorithm mismatch would remain.",
+   "Incorrect: Active-active mode gives the gateway two instances for availability. It does not change the cryptographic parameters negotiated with the branch device.",
+   "Incorrect: A shared key authenticates the peers. Another key does not alter the proposed algorithms, so the negotiation with the branch device would still fail."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/ipsec-ike-policy-howto"
+ },
+ {
+  "id": "2.3.4-03",
+  "obj": "2.3.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has a VPN gateway that uses the Basic SKU. The company wants point-to-site users to authenticate against an existing RADIUS server.\n\nWhat should you do?",
+  "choices": [
+   "Deploy a VPN gateway that uses a SKU other than Basic",
+   "Select IKEv2 as the tunnel type on the Basic gateway",
+   "Add a secondary RADIUS server to the Basic gateway",
+   "Enable active-active mode on the Basic gateway"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Gateway SKU limits authentication choices. The Basic SKU supports IKEv2 with certificates but not RADIUS or OpenVPN, so a higher SKU is required for those.",
+  "rationale": [
+   "Correct: The Basic SKU does not support RADIUS authentication. You need a gateway SKU that supports it, such as a VpnGw SKU, and then you specify the RADIUS server and secret.",
+   "Incorrect: The Basic SKU supports IKEv2 with certificate authentication, but not RADIUS authentication, so choosing IKEv2 does not add RADIUS support.",
+   "Incorrect: A secondary RADIUS server provides redundancy, but you first need a gateway SKU that supports RADIUS. The Basic SKU cannot be configured for it at all.",
+   "Incorrect: Active-active mode concerns gateway instances and public IP addresses. It does not add authentication types, so the Basic SKU still lacks RADIUS."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-radius-gateway"
+ },
+ {
+  "id": "2.3.4-04",
+  "obj": "2.3.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank has two point-to-site VPN gateways. Finance users must connect only to gateway GW1, and Operations users only to gateway GW2. Users must sign in with Microsoft Entra ID credentials.\n\nWhat should you configure?",
+  "choices": [
+   "A custom audience app ID for each gateway, with the groups assigned to the matching app",
+   "The Microsoft-registered Azure VPN Client audience on both gateways",
+   "Different root certificates on each gateway",
+   "A different tunnel type on each gateway"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "To restrict P2S access by user or group with Entra ID, create a custom audience app per gateway, add the Azure VPN Client to it, and assign users and groups to each app.",
+  "rationale": [
+   "Correct: Granular access with Microsoft Entra ID uses one custom app per gateway. You assign groups to each app, set the app ID as the audience on its gateway, and users can authenticate only to the gateway they are assigned to.",
+   "Incorrect: The Microsoft-registered audience is shared and has no per-group assignment, so every authenticated user could connect to both gateways. Use it when no per-group split is needed.",
+   "Incorrect: Certificates would separate users by certificate, but the requirement is Entra ID sign-in. Use different roots when certificate authentication is acceptable.",
+   "Incorrect: Tunnel types decide the protocol, not who may authenticate. Entra ID supports only OpenVPN anyway, so both gateways would use the same type and no separation occurs."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-users-access"
+ },
+ {
+  "id": "2.3.4-05",
+  "obj": "2.3.4",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys must configure a P2S VPN gateway so that employees authenticate by using Microsoft Entra ID with the Microsoft-registered Azure VPN Client application.\n\nWhich two settings should you configure on the gateway? Each correct answer presents part of the solution.",
+  "choices": [
+   "Set the tunnel type to OpenVPN (SSL)",
+   "Set the audience to the Microsoft-registered Azure VPN Client app ID",
+   "Upload the public key of a trusted root certificate",
+   "Enter the IP address and secret of a RADIUS server",
+   "Select SSTP as the tunnel type"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "An Entra-based P2S gateway needs OpenVPN as tunnel type plus tenant, audience and issuer values. Certificates, RADIUS and SSTP belong to other authentication choices.",
+  "rationale": [
+   "Correct: Microsoft Entra ID authentication works only with the OpenVPN tunnel type, so the gateway must use OpenVPN (SSL).",
+   "Correct: The gateway needs the tenant, the audience and the issuer. The audience for the Microsoft-registered app is its app ID, so no manual app registration is needed in the tenant.",
+   "Incorrect: A root certificate public key belongs to Azure certificate authentication. Use it when clients authenticate with client certificates instead of Entra ID.",
+   "Incorrect: A RADIUS server and shared secret belong to RADIUS authentication, which delegates sign-in to your NPS or RADIUS server. It is not part of Entra ID authentication.",
+   "Incorrect: SSTP supports certificate and RADIUS authentication and cannot be used with Microsoft Entra ID. OpenVPN is required for Entra sign-in."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-gateway"
+ },
+ {
+  "id": "2.3.4-06",
+  "obj": "2.3.4",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Relecloud configures point-to-site VPN access to a virtual network by using a VPN gateway.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Microsoft Entra ID authentication requires the OpenVPN tunnel type and the Azure VPN Client.",
+   "The OpenVPN and SSTP tunnel types can be enabled together on the same gateway.",
+   "A gateway that uses the Basic SKU supports RADIUS authentication."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Entra ID needs OpenVPN and the Azure VPN Client. OpenVPN and SSTP are mutually exclusive, and the Basic SKU lacks RADIUS and OpenVPN.",
+  "rationale": [
+   "Yes: Entra ID authentication is supported only for the OpenVPN protocol, and clients must use the Azure VPN Client.",
+   "No: OpenVPN and SSTP cannot be enabled together. Combine OpenVPN with IKEv2 instead if you need multiple tunnel types.",
+   "No: The Basic SKU supports IKEv2 with certificates but not RADIUS or OpenVPN. Use a higher SKU for RADIUS authentication."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-about"
+ },
+ {
+  "id": "2.3.4-07",
+  "obj": "2.3.4",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. has a virtual network with a gateway subnet. Employees must connect by using point-to-site VPN with Microsoft Entra ID authentication from Windows computers.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create a route-based VPN gateway in the gateway subnet.",
+   "Configure the address pool, the OpenVPN tunnel type, and Microsoft Entra ID authentication on the gateway.",
+   "Download the VPN client profile configuration package from the gateway.",
+   "Import the profile into the Azure VPN Client on the computers and connect.",
+   "Upload the public key of a trusted root certificate to the gateway.",
+   "Configure a RADIUS server IP address and secret on the gateway."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Order follows dependencies: gateway, then point-to-site settings, then the client profile that reflects those settings, and finally the client import.",
+  "rationale": [
+   "Step 1: the gateway is the resource that hosts point-to-site settings, so it must exist first. It must be route-based and use a SKU that supports Entra ID.",
+   "Step 2: the tunnel type and authentication settings define what the generated client profile contains, so configure them before downloading anything.",
+   "Step 3: the profile package is generated for the configured gateway, so it must be downloaded after the settings are saved.",
+   "Step 4: the Azure VPN Client uses the profile settings to build the connection. This is the last step because it needs the downloaded package.",
+   "Incorrect: a root certificate is used by Azure certificate authentication and has no role in Entra ID sign-in. Use it when clients authenticate with certificates.",
+   "Incorrect: RADIUS authentication points to an external server for sign-in. It is a different authentication type than Microsoft Entra ID."
+  ],
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-gateway"
+ },
+ {
+  "id": "2.3.4-08",
+  "obj": "2.3.4",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Fabrikam, Inc. configures the point-to-site settings of VPN gateway VNet1GW. Employees must sign in with Microsoft Entra ID credentials and multifactor authentication from the Azure VPN Client.\n\nHow should you complete the settings? To answer, select the appropriate options in the answer area.\n\n```text\nAddress pool:         172.16.201.0/24\nTunnel type:          [[1]]\nAuthentication type:  [[2]]\nTenant:               https://login.microsoftonline.com/[[3]]\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "OpenVPN (SSL)",
+     "IKEv2",
+     "SSTP (SSL)"
+    ],
+    "why": [
+     "Correct: OpenVPN is the only tunnel type that supports Microsoft Entra ID authentication and the Azure VPN Client.",
+     "Incorrect: IKEv2 supports certificate and RADIUS authentication. Use it for native macOS, iOS and Windows clients that do not use Entra ID.",
+     "Incorrect: SSTP supports certificate and RADIUS authentication, but not Microsoft Entra ID sign-in."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Microsoft Entra ID",
+     "Azure certificate",
+     "RADIUS authentication"
+    ],
+    "why": [
+     "Correct: Microsoft Entra ID authentication provides Entra sign-in with Conditional Access and MFA, which the requirement asks for.",
+     "Incorrect: Azure certificate authentication uses a trusted root certificate and client certificates, so there is no Entra sign-in or MFA from Entra.",
+     "Incorrect: RADIUS authentication delegates sign-in to a RADIUS server. Text-based MFA that requires entering a code in the VPN client is not supported through it."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "the Microsoft Entra tenant ID",
+     "the Azure subscription ID",
+     "the VPN gateway name"
+    ],
+    "why": [
+     "Correct: the tenant URL for Azure public cloud is https://login.microsoftonline.com/ followed by the tenant ID of the directory used for authentication.",
+     "Incorrect: the subscription ID identifies an Azure billing and resource container, not the directory that issues tokens, so authentication would fail.",
+     "Incorrect: the gateway name identifies an Azure resource, not a directory, so the issuer endpoint would not resolve to your tenant."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "Entra ID sign-in for P2S needs OpenVPN, the Microsoft Entra ID authentication type and a tenant URL that ends with the tenant ID.",
+  "ref": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-gateway"
+ },
+ {
+  "id": "2.3.5-01",
+  "obj": "2.3.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. wants to replace its VPN quickly with Microsoft Entra Private Access. Users must reach many internal resources through wide IP ranges and wildcard FQDNs, and per-application segmentation will come later.\n\nWhich Private Access configuration should you use first?",
+  "choices": [
+   "Quick Access",
+   "A per-app enterprise application for each resource",
+   "The Internet Access traffic forwarding profile",
+   "The Microsoft 365 traffic forwarding profile"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Quick Access is the VPN-replacement starting point of Private Access, and per-app access is the least-privilege next step once you know which segments users need.",
+  "rationale": [
+   "Correct: Quick Access is a single enterprise application that holds broad FQDNs, IP addresses and ranges. It is designed as a migration-friendly VPN replacement before you segment by application.",
+   "Incorrect: Per-app enterprise applications give precise segmentation, but they require you to define each app segment up front. The stem asks for a quick start with wide ranges, so per-app comes later.",
+   "Incorrect: The Internet Access profile forwards traffic to internet destinations through the service. It does not publish private resources that sit behind connectors.",
+   "Incorrect: The Microsoft 365 profile forwards Microsoft 365 traffic. It does not publish private IP ranges or internal FQDNs of your own network."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/how-to-configure-quick-access"
+ },
+ {
+  "id": "2.3.5-02",
+  "obj": "2.3.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has internal web apps in its datacenter. No inbound firewall ports may be opened. You must provide the component that brokers connections from Microsoft Entra Private Access to those apps.\n\nWhat should you install on a Windows server in the datacenter?",
+  "choices": [
+   "A Microsoft Entra private network connector",
+   "The Global Secure Access client",
+   "Microsoft Entra Connect Sync",
+   "The Private Access Sensor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Connectors run on Windows servers inside the network and initiate outbound connections only. Clients on user devices are a separate component.",
+  "rationale": [
+   "Correct: The private network connector is an agent that makes outbound connections to the service and reaches the internal apps, so no inbound ports are needed.",
+   "Incorrect: The Global Secure Access client runs on user devices and sends private traffic to the service. It does not broker connections from the service to datacenter resources.",
+   "Incorrect: Microsoft Entra Connect Sync synchronizes identities between Active Directory and Microsoft Entra ID. It does not publish or proxy applications.",
+   "Incorrect: The Private Access Sensor is installed on domain controllers for Active Directory scenarios. It does not publish general web apps, which need a connector."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/concept-connectors"
+ },
+ {
+  "id": "2.3.5-03",
+  "obj": "2.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank publishes all private resources through Quick Access, protected by a Conditional Access policy that requires multifactor authentication. A single HR app must additionally require a compliant device, and other resources must not be affected.\n\nWhat should you do?",
+  "choices": [
+   "Create a per-app enterprise application for the HR app segments and target it with its own Conditional Access policy",
+   "Add the compliant device requirement to the Quick Access Conditional Access policy",
+   "Create a second Quick Access application for the HR app",
+   "Create a second private network connector group for the HR app"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Quick Access shares one policy across all segments. To apply a different Conditional Access policy to a subset, create a per-app Global Secure Access application.",
+  "rationale": [
+   "Correct: A per-app enterprise application can have its own users and Conditional Access policies. Its segments take precedence over Quick Access, so only the HR app gets the extra control.",
+   "Incorrect: A policy on Quick Access applies to every segment in it, so all resources would require a compliant device. Use it only when the whole set has the same requirement.",
+   "Incorrect: Quick Access is a single application per tenant, so a second one is not available. The per-app model exists for different policies on subsets of resources.",
+   "Incorrect: A connector group controls which connectors serve an app. It does not change access policy, so the HR app would still be governed by the Quick Access policy."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/how-to-target-resource-private-access-apps"
+ },
+ {
+  "id": "2.3.5-04",
+  "obj": "2.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has Quick Access segments that include 10.0.0.0/8. A per-app enterprise application named HR has an application segment for 10.5.0.0/24. A user connects to a server at 10.5.0.10.\n\nWhich configuration should you expect to govern this connection?",
+  "choices": [
+   "The HR enterprise application, including its assignments and Conditional Access policies",
+   "The Quick Access application, including its Conditional Access policy",
+   "The most restrictive result of the HR application and Quick Access combined",
+   "No configuration, because overlapping segments block the traffic"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Per-app segments override overlapping Quick Access ranges. This lets you carve out resources for tighter control while the broad range stays in place.",
+  "rationale": [
+   "Correct: When an enterprise application segment overlaps Quick Access, the enterprise application takes precedence for that resource. The HR app assignments and policies therefore apply to 10.5.0.10.",
+   "Incorrect: Quick Access covers the broader range, but the more specific per-app segment wins for the overlapping resource, so its policy is not the one that applies here.",
+   "Incorrect: The two policies are not merged. One application takes precedence for the resource, so the result is not a combination of both.",
+   "Incorrect: Overlap is permitted and resolved by precedence of the enterprise application. Traffic is not blocked, and migrating segments out of Quick Access is a recommended step, not a requirement."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/tutorial-private-access-app-segmentation"
+ },
+ {
+  "id": "2.3.5-05",
+  "obj": "2.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. installs a private network connector on a server in a perimeter-restricted datacenter. A security engineer asks which firewall changes are required.\n\nWhich change should you make?",
+  "choices": [
+   "Allow outbound TCP 80 and 443 to the required Microsoft URLs and open no inbound ports",
+   "Allow inbound TCP 443 from the internet to the connector server",
+   "Allow inbound TCP 3389 from the Microsoft service ranges to the connector server",
+   "Route outbound connector traffic through a proxy that performs TLS inspection"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Connectors need outbound TCP 80 and 443 to documented URLs. They require no inbound ports, and the TLS traffic to the service must not be inspected or terminated.",
+  "rationale": [
+   "Correct: Connectors send only outbound requests. Port 443 carries service communication and port 80 is used for certificate revocation lists, so outbound access to the required URLs is enough.",
+   "Incorrect: Inbound access is not required because traffic flows both ways after the connector establishes an outbound session. Opening inbound 443 exposes the server without benefit.",
+   "Incorrect: RDP is an administration protocol and is not used by the service to reach the connector. Opening inbound ports is unnecessary for Private Access.",
+   "Incorrect: Inline inspection or termination of the outbound TLS traffic between connectors and the service breaks the two-way certificate authentication, so it must be avoided."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/how-to-configure-connectors"
+ },
+ {
+  "id": "2.3.5-06",
+  "obj": "2.3.5",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Tailspin Toys deploys Microsoft Entra Private Access with private network connectors.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A connector group should contain at least two connectors for high availability.",
+   "Conditional Access policies can target the Quick Access application.",
+   "The firewall of the connector server must allow inbound TCP 443 from the internet."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Use multiple connectors per group for availability, apply Conditional Access to Private Access apps, and keep inbound firewall ports closed.",
+  "rationale": [
+   "Yes: Connectors in a group act as one unit for load balancing and availability, and the guidance is to use at least two per group.",
+   "Yes: Conditional Access can be applied to both Quick Access and per-app Private Access applications, for example to require MFA.",
+   "No: Connectors make outbound connections only. No inbound ports are required, so the firewall change would add exposure with no benefit."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/concept-connectors"
+ },
+ {
+  "id": "2.3.5-07",
+  "obj": "2.3.5",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Fabrikam, Inc. uses Quick Access as a VPN replacement and wants to move to least-privilege per-app access in phases.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Use Application Discovery to see which segments users reach through Quick Access",
+   "Create enterprise applications that contain those segments and assign the right users",
+   "Disable the Private Access traffic forwarding profile for all users",
+   "Remove all connectors from the connector group",
+   "Disable Quick Access before any per-app application exists"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Migrate in phases: discover what is used, create per-app applications that take precedence, and retire Quick Access last.",
+  "rationale": [
+   "Correct: Application Discovery reports who accesses which FQDNs, IPs, ports and protocols through Quick Access, so you know which per-app applications to build first.",
+   "Correct: Per-app enterprise applications with assigned users and their own Conditional Access policies deliver least privilege. Because they take precedence, you can migrate segments in phases.",
+   "Incorrect: Disabling the traffic forwarding profile stops Private Access for all users and removes the traffic that discovery relies on. It is not a migration step.",
+   "Incorrect: Connectors are needed by both Quick Access and per-app applications to reach resources. Removing them breaks access instead of segmenting it.",
+   "Incorrect: Disabling Quick Access first removes access to segments that have no per-app application yet. Disable it only after every segment has moved."
+  ],
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/tutorial-private-access-app-segmentation"
+ },
+ {
+  "id": "2.3.5-08",
+  "obj": "2.3.5",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Contoso, Ltd. is deploying Microsoft Entra Private Access.\n\nWhich component should you use for each requirement? To answer, drag the appropriate components to the correct requirements. Each component may be used once, more than once, or not at all.",
+  "choices": [
+   "Private network connector",
+   "Global Secure Access client",
+   "Quick Access",
+   "Per-app access application"
+  ],
+  "targets": [
+   "Requirement 1: broker outbound connections from a datacenter to internal servers without inbound firewall ports",
+   "Requirement 2: capture private traffic on employee laptops and send it to the service",
+   "Requirement 3: apply a stricter Conditional Access policy to one internal app than to the rest"
+  ],
+  "answer": [
+   0,
+   1,
+   3
+  ],
+  "rationale": [
+   "The connector runs in the datacenter, initiates outbound sessions to the service and reaches the internal servers on its behalf.",
+   "The client runs on the device, acquires private traffic that matches published segments and forwards it to the service.",
+   "A per-app application has its own users and Conditional Access, so one app can be stricter. Quick Access shares one policy across all segments."
+  ],
+  "notes": [
+   "Agent on Windows servers that makes outbound connections to the service and reaches private resources. Use it in every network that hosts private apps.",
+   "Software on user devices that forwards matching traffic to Global Secure Access. Use it on every device that needs private access.",
+   "One application that holds broad FQDNs and ranges for VPN replacement. Use it as a starting point, not for per-app policy.",
+   "An enterprise application with its own segments, assignments and Conditional Access. Use it for least privilege and per-app controls."
+  ],
+  "explanation": "The connector reaches resources from inside the network, the client captures traffic on the device, and per-app applications carry app-specific policy.",
+  "ref": "https://learn.microsoft.com/entra/global-secure-access/concept-private-access"
+ },
+ {
+  "id": "2.3.6-01",
+  "obj": "2.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has an Azure Storage account that holds sensitive files. Clients in a virtual network must reach the account by using a private IP address from that virtual network.\n\nWhat should you create?",
+  "choices": [
+   "A private endpoint",
+   "A service endpoint on the subnet",
+   "An Azure Firewall application rule",
+   "A NAT gateway on the subnet"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A private endpoint gives a PaaS resource a private IP address in your virtual network, which is the key difference from service endpoints that keep using public addresses.",
+  "rationale": [
+   "Correct: A private endpoint places a network interface with a private IP address from your subnet in front of the storage subresource, so clients connect to a private address.",
+   "Incorrect: A service endpoint extends the virtual network identity to the service but traffic still targets the public IP address of the storage account. Use it when a private IP is not required.",
+   "Incorrect: An application rule filters outbound HTTP and HTTPS by FQDN. It does not give the storage account a private IP address in your network.",
+   "Incorrect: A NAT gateway provides outbound source address translation to the internet. It does not create private connectivity to a PaaS resource."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-endpoint-overview"
+ },
+ {
+  "id": "2.3.6-02",
+  "obj": "2.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. must let a virtual network reach both the blob service and the file service of one storage account by using private IP addresses.\n\nWhat should you create?",
+  "choices": [
+   "Two private endpoints, one for the blob subresource and one for the file subresource",
+   "One private endpoint that targets the storage account for all services",
+   "One private endpoint with two IP configurations",
+   "One private endpoint for blob and a service endpoint for file"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure Storage exposes each service, such as blob and file, as a separate private-link subresource, so you create one private endpoint per subresource.",
+  "rationale": [
+   "Correct: Each private endpoint targets one subresource of a service. To reach blob and file you need a separate private endpoint for each.",
+   "Incorrect: A private endpoint connects to a specific subresource, such as blob or file, not to the whole account. A single endpoint cannot cover both services.",
+   "Incorrect: A private endpoint targets one subresource, so adding IP configurations does not add a second service. IP configurations assign addresses for that one subresource.",
+   "Incorrect: Mixing a private endpoint with a service endpoint leaves the file traffic on the public address, so the requirement for private IP addresses is not met for file."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-endpoint-overview"
+ },
+ {
+  "id": "2.3.6-03",
+  "obj": "2.3.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank created a private endpoint for a storage account blob service. VMs in the virtual network still resolve mystorage.blob.core.windows.net to a public IP address. The virtual network uses Azure-provided DNS, and 300 VMs must work without local changes.\n\nWhat should you do?",
+  "choices": [
+   "Create the privatelink.blob.core.windows.net private DNS zone, link it to the virtual network, and add a DNS zone group to the endpoint",
+   "Add an entry to the hosts file on each VM",
+   "Create an A record in the public DNS zone of the company",
+   "Enable a service endpoint for Microsoft.Storage on the subnet"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A private endpoint needs matching DNS. A privatelink private DNS zone linked to the virtual network, with a DNS zone group on the endpoint, keeps records correct automatically.",
+  "rationale": [
+   "Correct: A private DNS zone with the privatelink name, linked to the virtual network, overrides resolution for the VMs. The zone group keeps the A record in sync with the private endpoint.",
+   "Incorrect: A hosts file overrides DNS only on one machine and is recommended for testing. Editing 300 VMs is the local change the stem rules out.",
+   "Incorrect: Public DNS records are visible to the whole internet and would expose the private address publicly. The VMs need a private zone linked to their network.",
+   "Incorrect: A service endpoint changes routing to the public address and has no effect on DNS resolution. It does not move clients to the private endpoint."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns-integration"
+ },
+ {
+  "id": "2.3.6-04",
+  "obj": "2.3.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has a subnet that hosts a private endpoint for Azure SQL Database. An NSG on the subnet denies inbound TCP 1433 from a test subnet, but test VMs still connect to the database through the private endpoint.\n\nWhat should you do?",
+  "choices": [
+   "Enable the network security group policy for private endpoints on the subnet",
+   "Associate the NSG with the private endpoint network interface",
+   "Create a service endpoint policy for Microsoft.Sql",
+   "Add an outbound deny rule on the subnet NSG for TCP 1433"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Private endpoints bypass NSGs and UDRs unless the subnet setting for private endpoint network policies is enabled for network security groups, route tables, or both.",
+  "rationale": [
+   "Correct: Network policies for private endpoints are disabled by default, so NSG rules are bypassed. Enabling the NSG option, for example NetworkSecurityGroupEnabled, makes the subnet NSG apply to private endpoint traffic.",
+   "Incorrect: The private endpoint network interface is managed by the platform and does not take its own NSG. NSG support comes from enabling network policies on the subnet.",
+   "Incorrect: Service endpoint policies filter which resources service endpoint traffic can reach. They do not influence private endpoint traffic.",
+   "Incorrect: An outbound rule on the private endpoint subnet does not apply to the inbound flow from test VMs. The inbound NSG rule is ignored until policies are enabled."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/disable-private-endpoint-network-policy"
+ },
+ {
+  "id": "2.3.6-05",
+  "obj": "2.3.6",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys uses Azure SQL Database. Clients in a virtual network must reach the logical server only by using a private IP address, and connections from the internet must fail.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Create a private endpoint for the logical server in the virtual network",
+   "Disable public network access on the logical server",
+   "Create a service endpoint for Microsoft.Sql on the subnet",
+   "Enable NSG network policies on the private endpoint subnet",
+   "Create an application security group for the private endpoint"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "A private endpoint provides the private path, but public access remains until you disable it or restrict it with the resource firewall. NSG policies and ASGs only refine filtering.",
+  "rationale": [
+   "Correct: The private endpoint provides the private IP address that clients use to reach the logical server from the virtual network.",
+   "Correct: A private endpoint does not restrict public access by itself. Disabling public network access makes private endpoints the only path, so internet connections fail.",
+   "Incorrect: A service endpoint keeps traffic on the public endpoint of the service with a virtual network rule. It does not give a private IP address.",
+   "Incorrect: Network policies add NSG filtering for traffic to the endpoint. They are useful extra control, but they do not create the private path or block internet access.",
+   "Incorrect: An application security group can be attached to a private endpoint to simplify NSG rules. It is optional and does not provide connectivity or block the internet."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-endpoint-overview"
+ },
+ {
+  "id": "2.3.6-06",
+  "obj": "2.3.6",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Relecloud has created a private endpoint for a web app in a virtual network that uses a private DNS zone group and a firewall for inspection.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Creating a private endpoint automatically disables public network access to the web app.",
+   "Deleting the private endpoint removes the DNS records that its DNS zone group created.",
+   "A user-defined route for 0.0.0.0/0 to the firewall overrides the /32 route of the private endpoint."
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "A private endpoint does not close public access, a DNS zone group manages its records, and a broad UDR cannot override its /32 route.",
+  "rationale": [
+   "No: A private endpoint provides a private IP address but does not restrict public network access by itself. Use the resource networking settings to disable or limit it.",
+   "Yes: The zone group links the endpoint to the private DNS zone and manages the records, including removing them when the endpoint is deleted.",
+   "No: The private endpoint /32 route wins by longest prefix match, so a default route does not override it. A more specific route and enabled network policies are needed."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/disable-private-endpoint-network-policy"
+ },
+ {
+  "id": "2.3.6-07",
+  "obj": "2.3.6",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Contoso, Ltd. is creating private DNS zones for private endpoints.\n\nWhich private DNS zone should you use for each private endpoint? To answer, drag the appropriate zones to the correct endpoints. Each zone may be used once, more than once, or not at all.",
+  "choices": [
+   "privatelink.blob.core.windows.net",
+   "privatelink.documents.azure.com",
+   "privatelink.azurewebsites.net",
+   "privatelink.vaultcore.azure.net"
+  ],
+  "targets": [
+   "Endpoint 1: blob subresource of a storage account",
+   "Endpoint 2: SQL API of an Azure Cosmos DB account",
+   "Endpoint 3: an Azure App Service web app"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "The blob service of Azure Storage uses the privatelink.blob.core.windows.net zone for its private endpoint records.",
+   "Azure Cosmos DB for the SQL API uses the privatelink.documents.azure.com zone for private endpoint records.",
+   "App Service web apps use the privatelink.azurewebsites.net zone for private endpoint records."
+  ],
+  "notes": [
+   "Zone for the blob service of Azure Storage. Use it for blob private endpoints.",
+   "Zone for Azure Cosmos DB SQL API private endpoints. Use it for the SQL API subresource of Cosmos DB accounts.",
+   "Zone for Azure App Service private endpoints. Use it for web apps and function apps that expose a private endpoint.",
+   "Zone for Azure Key Vault private endpoints. It is not needed for these three endpoints."
+  ],
+  "explanation": "Each Azure service has its own privatelink zone name. Do not share one zone between private endpoints of different services, because records can overwrite each other.",
+  "ref": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns"
+ },
+ {
+  "id": "2.3.6-08",
+  "obj": "2.3.6",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Fabrikam, Inc. has a private endpoint named private-endpoint for an App Service web app in vnet-1. NSG rules must apply to traffic to the endpoint, but route tables must not be affected. The private DNS zone must not register VM records automatically.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz network vnet subnet update --name default --resource-group test-rg --vnet-name vnet-1 [[1]]\n\naz network private-dns link vnet create --resource-group test-rg --zone-name \"privatelink.azurewebsites.net\" --name dns-link --virtual-network vnet-1 --registration-enabled [[2]]\n\naz network private-endpoint dns-zone-group create --resource-group test-rg --endpoint-name private-endpoint --name zone-group --private-dns-zone [[3]] --zone-name webapp\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "--private-endpoint-network-policies NetworkSecurityGroupEnabled",
+     "--private-endpoint-network-policies RouteTableEnabled",
+     "--private-endpoint-network-policies Disabled"
+    ],
+    "why": [
+     "Correct: NetworkSecurityGroupEnabled enables NSG support for private endpoints and leaves user-defined routes bypassed, matching the requirement.",
+     "Incorrect: RouteTableEnabled enables route table (UDR) support only, so NSG rules would still be bypassed. Use it when UDRs must steer traffic to a firewall.",
+     "Incorrect: Disabled is the default and bypasses both NSGs and route tables, so the NSG requirement is not met."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "false",
+     "true"
+    ],
+    "why": [
+     "Correct: false turns off auto-registration, which suits a privatelink zone that holds only private endpoint records, as the requirement states.",
+     "Incorrect: true would auto-register VM records in the zone. Use it only for a private zone dedicated to VM name registration, not for a privatelink zone."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "\"privatelink.azurewebsites.net\"",
+     "\"privatelink.blob.core.windows.net\"",
+     "\"azurewebsites.net\""
+    ],
+    "why": [
+     "Correct: privatelink.azurewebsites.net is the private DNS zone name that the App Service private endpoint uses, so the zone group writes its record there.",
+     "Incorrect: privatelink.blob.core.windows.net is the zone for Azure Storage blob endpoints, so a web app record would never be resolved from it.",
+     "Incorrect: azurewebsites.net is the public suffix of web apps. Overriding it would break resolution of public web apps, so the privatelink zone is used instead."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "The subnet policy enables NSG support, the virtual network link has registration off, and the DNS zone group points to the service-specific privatelink zone.",
+  "ref": "https://learn.microsoft.com/azure/private-link/create-private-endpoint-cli"
+ },
+ {
+  "id": "2.3.7-01",
+  "obj": "2.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. hosts a service on VMs behind a Standard Load Balancer. Customers in other Azure subscriptions must connect to the service privately from their virtual networks without peering and without the internet.\n\nWhich Azure resource should Contoso, Ltd. create on the service side?",
+  "choices": [
+   "A Private Link service",
+   "A private endpoint",
+   "A service endpoint",
+   "A virtual network gateway"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A Private Link service is the provider side of a private connection to your own service. Consumers use private endpoints in their virtual networks to reach it.",
+  "rationale": [
+   "Correct: A Private Link service exposes your own service behind a Standard Load Balancer. Consumers create private endpoints that connect to it, with no peering or overlap concerns.",
+   "Incorrect: A private endpoint is the consumer-side resource that connects to a Private Link service or Azure PaaS resource. The provider needs the service resource to connect to.",
+   "Incorrect: A service endpoint extends a subnet identity to Azure PaaS services over their public endpoints. It cannot expose a customer-hosted service to other subscriptions.",
+   "Incorrect: A virtual network gateway builds VPN or ExpressRoute connectivity. It does not publish a load-balanced service to other subscriptions privately."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-service-overview"
+ },
+ {
+  "id": "2.3.7-02",
+  "obj": "2.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. tries to create a Private Link service in front of a pair of VMs that sit behind a Basic Load Balancer. The creation cannot select the load balancer frontend.\n\nWhat should you do?",
+  "choices": [
+   "Replace the Basic load balancer with a Standard load balancer",
+   "Add a second NAT IP configuration to the service",
+   "Create a dedicated subnet for the Private Link service",
+   "Enable proxy protocol on the Basic load balancer"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A Private Link service requires the frontend of a Standard Load Balancer. NAT IP configuration, visibility and approval settings come after that dependency is met.",
+  "rationale": [
+   "Correct: Private Link service is tied to the frontend IP of a Standard Load Balancer. A Basic Load Balancer is not supported, so the load balancer must be replaced.",
+   "Incorrect: NAT IP configurations provide source address translation and connection scale, but they do not make a Basic load balancer usable as the service frontend.",
+   "Incorrect: A dedicated subnet is not required for a Private Link service. You can choose any subnet in the virtual network, so a new subnet would not fix the problem.",
+   "Incorrect: Proxy protocol is a Private Link service setting that passes consumer connection information to the backend. It does not change which load balancer SKU is supported."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-faq"
+ },
+ {
+  "id": "2.3.7-03",
+  "obj": "2.3.7",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank provides a service through a Private Link service. Only customers in subscriptions SubA, SubB and SubC may find the service and request a connection. Requests from SubC must be approved automatically, and the others must be approved by the provider.\n\nWhat should you configure?",
+  "choices": [
+   "Visibility for SubA, SubB and SubC, and auto-approval for SubC",
+   "Visibility set to all, and auto-approval for SubC",
+   "Visibility for SubC, and auto-approval for SubA, SubB and SubC",
+   "Visibility for SubA, SubB and SubC, and auto-approval for all three"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Use visibility to control exposure and auto-approval to control approval. Auto-approval is always a subset of the visibility list.",
+  "rationale": [
+   "Correct: Visibility limits who can locate the service, and auto-approval is a subset of it. SubA and SubB can request and wait for manual approval, while SubC is approved automatically.",
+   "Incorrect: Visibility set to all lets every subscription locate the service, which breaks the requirement that only three subscriptions can find it.",
+   "Incorrect: Auto-approval is a subset of visibility, so subscriptions outside the visibility list cannot be auto-approved. SubA and SubB would also not be able to request the connection.",
+   "Incorrect: Auto-approving all three removes the manual approval step for SubA and SubB, which the requirement keeps with the provider."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-service-overview"
+ },
+ {
+  "id": "2.3.7-04",
+  "obj": "2.3.7",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. consumes a Private Link service of a partner. The private endpoint in the Litware, Inc. virtual network shows the connection state Pending, and the Litware, Inc. subscription is not in the partner auto-approval list.\n\nWhat should the partner do?",
+  "choices": [
+   "Approve the pending connection on the Private Link service",
+   "Approve the connection on the private endpoint in the Litware, Inc. subscription",
+   "Add a DNS zone group to the private endpoint",
+   "Recreate the Private Link service with proxy protocol enabled"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The provider approves, rejects or deletes connection requests on the Private Link service. Auto-approval for listed subscriptions skips this manual step.",
+  "rationale": [
+   "Correct: Connections to a Private Link service arrive in the Pending state on the service object. Only the service provider can approve them, and only approved connections carry traffic.",
+   "Incorrect: The consumer cannot approve its own request. The approval decision is made on the target service, which is the Private Link service owned by the partner.",
+   "Incorrect: A DNS zone group manages DNS records for the endpoint. It does not affect the connection state, which stays Pending until the provider acts.",
+   "Incorrect: Proxy protocol passes connection details to the backend and does not influence approval. Recreating the service would also drop existing connections."
+  ],
+  "ref": "https://learn.microsoft.com/troubleshoot/azure/private-link/troubleshoot-private-endpoint-pending-approval"
+ },
+ {
+  "id": "2.3.7-05",
+  "obj": "2.3.7",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud runs a Private Link service whose backend serves very many concurrent TCP connections from consumers. New connections fail because the available source ports of the NAT IP are exhausted.\n\nWhat should you do?",
+  "choices": [
+   "Add NAT IP configurations to the Private Link service",
+   "Add a second frontend IP configuration to the load balancer",
+   "Set the visibility of the service to all subscriptions",
+   "Add the consumer subscriptions to the auto-approval list"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Private Link service performs destination-side NAT. Each NAT IP offers a limited number of ports, so scale by adding NAT IPs or backend VMs.",
+  "rationale": [
+   "Correct: Each NAT IP provides about 64 thousand TCP ports per backend VM. Adding NAT IPs, or backend VMs, increases the number of connections that the service can carry.",
+   "Incorrect: A frontend IP configuration of the load balancer is where traffic arrives. It does not add source ports for the destination-side NAT that Private Link performs.",
+   "Incorrect: Visibility controls who can locate the service. It does not change capacity, so connection failures from port exhaustion would remain.",
+   "Incorrect: Auto-approval only skips manual approval of connection requests. The failures occur on already approved connections and are caused by port exhaustion."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-faq"
+ },
+ {
+  "id": "2.3.7-06",
+  "obj": "2.3.7",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Tailspin Toys publishes a service through a Private Link service and manages connection requests.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "One private endpoint can connect to two different Private Link services.",
+   "One Private Link service can receive connections from multiple private endpoints.",
+   "The Private Link service requires a dedicated subnet in the provider virtual network."
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The relation is many private endpoints to one Private Link service, not the reverse, and no dedicated subnet is required.",
+  "rationale": [
+   "No: A private endpoint can connect to only one Private Link service. Create another private endpoint for each additional service.",
+   "Yes: A service can serve many consumers, each with its own private endpoint, and each connection has its own approval state.",
+   "No: A dedicated subnet is not required. You can choose any subnet in the virtual network that hosts the service for the NAT IP configuration."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-faq"
+ },
+ {
+  "id": "2.3.7-07",
+  "obj": "2.3.7",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Fabrikam, Inc. wants to publish an internal API from virtual network vnet-provider to a partner subscription. The partner must connect privately from its own virtual network, and the connection request must be approved by Fabrikam, Inc.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create an internal Standard load balancer with a frontend IP configuration for the API VMs.",
+   "Create a Private Link service that uses the load balancer frontend and a NAT IP configuration.",
+   "In the partner subscription, create a private endpoint that targets the Private Link service.",
+   "Approve the pending connection with `az network private-endpoint-connection approve --id <connection-id>`.",
+   "Create a service endpoint for Microsoft.Network on the provider subnet.",
+   "Create a VPN gateway connection between the two virtual networks."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "The dependency chain is load balancer, Private Link service, consumer private endpoint request, and provider approval.",
+  "rationale": [
+   "Step 1: the Private Link service is tied to a Standard Load Balancer frontend, so the load balancer must exist first.",
+   "Step 2: the service is created on top of the load balancer frontend and defines the NAT IP configuration, visibility and approval settings.",
+   "Step 3: the consumer needs the service resource ID or alias to request a connection, so the endpoint is created after the service exists. It starts in Pending state.",
+   "Step 4: the provider approves the pending request. Only approved connections can send traffic, so this step comes last.",
+   "Incorrect: Service endpoints extend a subnet identity to Azure PaaS services. They cannot publish your own load-balanced service to another subscription.",
+   "Incorrect: A VPN gateway would build a routed network connection and does not publish a single service privately. The requirement is service-level private access."
+  ],
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-service-overview"
+ },
+ {
+  "id": "2.3.7-08",
+  "obj": "2.3.7",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Contoso, Ltd. deploys a Private Link service by using an Azure Verified Module in Bicep. The service must use a load balancer frontend, partner subscription ptn-sub may find the service, and trusted subscription tst-sub must be approved automatically.\n\nHow should you complete the parameters? To answer, select the appropriate options in the answer area.\n\n```bicep\nparam name = 'pls1'\nparam ipConfigurations = [ { name: 'nat1', primary: true, privateIPAllocationMethod: 'Dynamic', subnetResourceId: '<subnetId>' } ]\nparam [[1]] = [ '<lbFrontendId>' ]\nparam [[2]] = [ '<ptn-sub-id>' ]\nparam [[3]] = [ '<tst-sub-id>' ]\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "loadBalancerFrontendIpConfigurationResourceIds",
+     "fqdns",
+     "enableProxyProtocol"
+    ],
+    "why": [
+     "Correct: this parameter references the Standard Load Balancer frontend IP configurations that the Private Link service is tied to.",
+     "Incorrect: fqdns lists FQDNs for the service, not the load balancer frontend that the service uses.",
+     "Incorrect: enableProxyProtocol is a boolean that enables proxy protocol and cannot take a list of frontend resource IDs."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "visibilitySubscriptionIds",
+     "autoApprovalSubscriptionIds"
+    ],
+    "why": [
+     "Correct: visibility lists the subscriptions that can locate the service and request a connection, which matches the partner subscription requirement.",
+     "Incorrect: autoApprovalSubscriptionIds lists subscriptions approved automatically. The partner only needs to find the service, with manual approval."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "autoApprovalSubscriptionIds",
+     "visibilitySubscriptionIds"
+    ],
+    "why": [
+     "Correct: auto-approval lists the subscriptions whose connection requests are approved automatically, as required for the trusted subscription.",
+     "Incorrect: visibilitySubscriptionIds only controls who can locate the service. It would not approve the trusted subscription connections automatically."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "Visibility decides who can find the service, auto-approval decides who needs no manual approval, and the load balancer frontend ties the service to the backend.",
+  "ref": "https://learn.microsoft.com/azure/private-link/private-link-service-overview"
+ },
+ {
+  "id": "2.3.8-01",
+  "obj": "2.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank must inspect outbound encrypted HTTPS traffic from its virtual networks for malware by using signature-based intrusion detection and TLS inspection.\n\nWhich Azure Firewall SKU should you deploy?",
+  "choices": [
+   "Premium",
+   "Standard",
+   "Basic",
+   "Azure Web Application Firewall on an Application Gateway"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "TLS inspection, IDPS and full URL filtering are Premium features. Standard and Basic cover rules, threat intelligence and web categories at lower tiers.",
+  "rationale": [
+   "Correct: Azure Firewall Premium adds TLS inspection, signature-based IDPS and URL filtering, which are needed to decrypt and inspect outbound encrypted traffic.",
+   "Incorrect: Azure Firewall Standard offers threat intelligence in alert and deny mode, DNS proxy and web categories, but it has no TLS inspection and no IDPS.",
+   "Incorrect: Azure Firewall Basic targets small workloads and has threat intelligence in alert mode only. It has neither TLS inspection nor IDPS.",
+   "Incorrect: Azure Web Application Firewall protects inbound web applications at an Application Gateway or Front Door. It does not inspect outbound traffic from virtual networks."
+  ],
+  "ref": "https://learn.microsoft.com/azure/networking/design-guide/azure-firewall"
+ },
+ {
+  "id": "2.3.8-02",
+  "obj": "2.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. must publish an internal web server on TCP 443 through the public IP address of Azure Firewall. Inbound internet clients must reach the server at its private IP address.\n\nWhich rule type should you create?",
+  "choices": [
+   "DNAT rule",
+   "Network rule",
+   "Application rule",
+   "Threat intelligence rule"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "DNAT rules publish internal services through firewall public IPs. Application rules are not applied to inbound traffic, so inbound HTTP/S filtering belongs to a web application firewall.",
+  "rationale": [
+   "Correct: A DNAT rule translates inbound traffic from a firewall public IP and port to a private IP and port, and it implicitly allows the translated traffic.",
+   "Incorrect: A network rule filters by source, destination, port and protocol. It does not translate the destination address, so clients could not reach the private server through the public IP.",
+   "Incorrect: Application rules filter outbound and east-west traffic by FQDN or URL. They are not applied to inbound connections, so they cannot publish a server.",
+   "Incorrect: Threat intelligence filtering alerts on or blocks traffic to and from known malicious addresses. It does not publish services."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall/rule-processing"
+ },
+ {
+  "id": "2.3.8-03",
+  "obj": "2.3.8",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. must let workload VMs reach only https://updates.contoso.example and block all other internet destinations. The IP addresses of the update site change frequently.\n\nWhat should you add to the Azure Firewall policy?",
+  "choices": [
+   "An application rule that allows the FQDN on HTTPS",
+   "A network rule that allows the current IP addresses on TCP 443",
+   "A DNAT rule that translates TCP 443 to the update site",
+   "An IDPS signature rule in Alert mode"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Use application rules for FQDN-based outbound filtering. Network rules work on IP, port and protocol, and the firewall denies traffic that no rule allows.",
+  "rationale": [
+   "Correct: Application rules filter outbound HTTP and HTTPS by FQDN, so the rule keeps working when the IP addresses of the site change. The default deny blocks other destinations.",
+   "Incorrect: A network rule matches IP addresses, so every address change breaks access and requires a rule update. Use it when destinations have stable addresses.",
+   "Incorrect: DNAT rules handle inbound connections to the firewall public IP. They do not control outbound access from VMs to an internet site.",
+   "Incorrect: IDPS signatures detect attack patterns in traffic. An Alert mode rule does not allow or block destinations, so it cannot enforce an allow list."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall/policy-rule-sets"
+ },
+ {
+  "id": "2.3.8-04",
+  "obj": "2.3.8",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has an Azure Firewall policy with a network rule collection at priority 500 that allows TCP 443 from the workload subnet to any destination. An application rule collection at priority 100 denies a web category, but users still reach sites in that category.\n\nWhat should you do?",
+  "choices": [
+   "Narrow the network rule so that it does not allow all HTTPS destinations",
+   "Lower the priority number of the application rule collection to 50",
+   "Move the application rule collection to a parent policy",
+   "Enable IDPS in Alert and deny mode"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure Firewall evaluates rule types in a fixed order: DNAT, network, then application. A broad network allow therefore hides later application deny rules.",
+  "rationale": [
+   "Correct: The firewall processes DNAT rules, then network rules, then application rules regardless of priority. The broad network allow matches first and ends processing, so the application deny is never reached.",
+   "Incorrect: Priority orders collections of the same rule type. Application rules are always processed after network rules, so a smaller number does not change the outcome.",
+   "Incorrect: Parent policy rule collection groups take precedence over child groups, but the processing order of rule types still applies. Application rules still come after network rules.",
+   "Incorrect: IDPS inspects traffic after rule matching to find attack signatures. It does not enforce web category policy, so the category would stay reachable."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall-manager/rule-processing"
+ },
+ {
+  "id": "2.3.8-05",
+  "obj": "2.3.8",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Contoso, Ltd. has an Azure Firewall Premium policy and must enable TLS inspection for outbound traffic from workload VMs.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Store an intermediate CA certificate in Azure Key Vault and give the firewall managed identity Get and List permissions on secrets",
+   "Deploy the CA certificate to the trusted certificate store of the workload VMs",
+   "Set threat intelligence to Alert and deny mode",
+   "Enable DNS proxy in the firewall policy",
+   "Create a DNAT rule for TCP 443"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "TLS inspection needs a CA certificate that the firewall can read from Key Vault and that clients trust. Other firewall features are independent settings.",
+  "rationale": [
+   "Correct: The firewall uses an intermediate CA certificate to generate certificates for inspected connections. It reads it through the Key Vault secret interface by using a managed identity.",
+   "Correct: Clients see certificates that the firewall generates with its CA. Without trust in that CA in their store, TLS connections show trust errors or fail.",
+   "Incorrect: Threat intelligence filters known malicious addresses and domains. It is a separate setting and is not needed to enable TLS inspection.",
+   "Incorrect: DNS proxy helps FQDN rule resolution. It is not a prerequisite for TLS inspection.",
+   "Incorrect: A DNAT rule publishes inbound services. TLS inspection applies to outbound and east-west traffic and is enabled on application rules."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall/premium-certificates"
+ },
+ {
+  "id": "2.3.8-06",
+  "obj": "2.3.8",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Tailspin Toys manages Azure Firewall through a firewall policy.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "DNAT rules are processed before network rules, and network rules before application rules.",
+   "Application rules filter inbound HTTP and HTTPS traffic from the internet.",
+   "Azure Firewall Basic supports threat intelligence in Alert and deny mode."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Rule types run DNAT, network, application. Application rules are for outbound and east-west traffic, and Basic supports only alert mode for threat intelligence.",
+  "rationale": [
+   "Yes: The firewall evaluates rule types in the order DNAT, network and application, regardless of the priority numbers of collections.",
+   "No: Application rules are not applied to inbound connections. Use a web application firewall to filter inbound HTTP/S traffic.",
+   "No: Basic supports threat intelligence in alert mode only. Alert and deny mode requires Standard or Premium."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall/rule-processing"
+ },
+ {
+  "id": "2.3.8-07",
+  "obj": "2.3.8",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Fabrikam, Inc. is configuring an Azure Firewall Premium policy.\n\nWhich feature should you use for each requirement? To answer, drag the appropriate features to the correct requirements. Each feature may be used once, more than once, or not at all.",
+  "choices": [
+   "Network rule",
+   "Application rule",
+   "IDPS",
+   "DNAT rule"
+  ],
+  "targets": [
+   "Requirement 1: allow UDP 123 from a subnet to the IP address of a time server",
+   "Requirement 2: allow outbound HTTPS to a list of FQDNs",
+   "Requirement 3: block traffic that matches known attack signatures"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "UDP 123 to a known IP address is a layer 3 and 4 decision, which a network rule expresses with source, destination, port and protocol.",
+   "Outbound HTTPS by FQDN is a layer 7 decision, which an application rule handles without tracking IP addresses.",
+   "Signature-based detection and blocking of attack patterns is done by the IDPS in Premium, in Alert and deny mode."
+  ],
+  "notes": [
+   "Filters by source and destination IP, port and protocol. Use it for non-HTTP traffic such as NTP or SQL between subnets.",
+   "Filters outbound and east-west traffic by FQDN, URL or web category. Use it when destination addresses change.",
+   "Signature-based intrusion detection and prevention in Premium. Use Alert and deny mode to block matching traffic.",
+   "Translates inbound traffic from a firewall public IP to a private address. Use it to publish internal services, not for these requirements."
+  ],
+  "explanation": "Choose by layer and purpose: network rules for IP, port and protocol, application rules for FQDNs and URLs, and IDPS for signature-based inspection.",
+  "ref": "https://learn.microsoft.com/azure/firewall/premium-features"
+ },
+ {
+  "id": "2.3.8-08",
+  "obj": "2.3.8",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Woodgrove Bank has an Azure Firewall Premium instance with a user-assigned managed identity, and a firewall policy. The company must inspect outbound HTTPS traffic of the workload subnet by using TLS inspection.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Store the intermediate CA certificate in an Azure Key Vault.",
+   "Grant the managed identity Get and List permissions on the secrets of the Key Vault.",
+   "Enable TLS inspection in the firewall policy and select the managed identity and the certificate.",
+   "Enable TLS inspection on the application rule that allows the outbound HTTPS traffic.",
+   "Set IDPS to Alert mode in the firewall policy.",
+   "Create a DNAT rule collection for TCP 443."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "TLS inspection is built from the certificate, then access for the identity, then policy-level configuration, and finally the application rules that opt in.",
+  "rationale": [
+   "Step 1: the certificate must exist in a vault before access can be granted or selected in the policy, so it is stored first.",
+   "Step 2: the firewall reads the certificate through the secret interface by using the managed identity, so the identity needs Get and List on secrets in the vault.",
+   "Step 3: the policy needs the identity and the certificate. With access granted, the firewall can retrieve it, and the setting is stored at policy level.",
+   "Step 4: TLS inspection is enabled per application rule, and the rule relies on the policy-level certificate configured in the previous step.",
+   "Incorrect: IDPS in Alert mode is an independent setting. It can use decrypted traffic later, but it is not a step to enable TLS inspection.",
+   "Incorrect: A DNAT rule collection publishes inbound services and does not enable inspection of outbound HTTPS traffic."
+  ],
+  "ref": "https://learn.microsoft.com/azure/firewall/premium-certificates"
+ },
+ {
+  "id": "2.3.9-01",
+  "obj": "2.3.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has VM1 with a network interface and a subnet that each have an NSG. An administrator must see the aggregate of all security rules that apply to the network interface of VM1.\n\nWhich Network Watcher tool should you use?",
+  "choices": [
+   "Effective security rules",
+   "Next hop",
+   "Packet capture",
+   "Connection troubleshoot"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Effective security rules gives the combined view of NIC-level and subnet-level NSG rules. Other Network Watcher tools target routing, capture or connectivity.",
+  "rationale": [
+   "Correct: Effective security rules shows all rules that apply to a network interface, including rules from the NIC NSG, the subnet NSG, and the aggregate of both.",
+   "Incorrect: Next hop reports the next hop type and IP address for a destination, which diagnoses routing problems. It does not list security rules.",
+   "Incorrect: Packet capture records packets on a VM for deep analysis. It does not show which security rules apply to the interface.",
+   "Incorrect: Connection troubleshoot runs a one-time connectivity and latency check between endpoints. It does not list the security rules in effect."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/network-watcher-overview"
+ },
+ {
+  "id": "2.3.9-02",
+  "obj": "2.3.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has users who cannot connect to VM1 by using RDP on TCP 3389. An administrator must find out whether a security rule denies the traffic and which rule does so.\n\nWhich Network Watcher tool should you use?",
+  "choices": [
+   "IP flow verify",
+   "Next hop",
+   "VPN troubleshoot",
+   "Connection monitor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "IP flow verify tests a specific flow against the security rules of a VM and names the rule that allows or denies it.",
+  "rationale": [
+   "Correct: IP flow verify checks whether a packet is allowed or denied to or from a VM and returns the name of the rule that made the decision, plus the NSG that contains it.",
+   "Incorrect: Next hop diagnoses routing by returning the next hop type and address. It does not evaluate security rules, so it would not name a denying rule.",
+   "Incorrect: VPN troubleshoot runs diagnostics on VPN gateways and connections. The problem here is a possible NSG rule on a VM, not a gateway.",
+   "Incorrect: Connection monitor tracks connectivity and latency over time between endpoints. It does not return the security rule that allows or denies a given flow."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/ip-flow-verify-overview"
+ },
+ {
+  "id": "2.3.9-03",
+  "obj": "2.3.9",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. runs an Application Gateway v2 and a virtual machine scale set. A network engineer must test whether ICMP traffic from the service tag VirtualNetwork is allowed to the scale set network interfaces, and be able to add a higher-priority rule from the same tool if needed.\n\nWhich Network Watcher tool should you use?",
+  "choices": [
+   "NSG diagnostics",
+   "IP flow verify",
+   "Effective security rules",
+   "Next hop"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "NSG diagnostics extends flow testing to scale sets, Application Gateway v2, ICMP, service tags and prefixes, while IP flow verify is limited to TCP and UDP on a VM NIC.",
+  "rationale": [
+   "Correct: NSG diagnostics supports virtual machines, scale set network interfaces and Application Gateway v2, accepts IP addresses, prefixes or service tags, tests ICMP, and can add a higher-priority rule.",
+   "Incorrect: IP flow verify tests TCP and UDP rules only and works on the network interface of a VM. It cannot test ICMP or scale set rules, so it does not meet the requirement.",
+   "Incorrect: Effective security rules lists the rules that apply to a NIC, but it does not simulate a specific flow with a result or offer to add a rule from the test.",
+   "Incorrect: Next hop is a routing tool. It reports where traffic goes and does not evaluate security rules for ICMP."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/nsg-diagnostics-overview"
+ },
+ {
+  "id": "2.3.9-04",
+  "obj": "2.3.9",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud uses Azure Virtual Network Manager. Traffic to VM1 on TCP 443 fails although the NSGs at the subnet and NIC level allow it. The team suspects a security admin rule that is applied to the virtual network.\n\nWhich Network Watcher tool should you use to identify the rule that denies a TCP flow to the network interface of VM1?",
+  "choices": [
+   "IP flow verify",
+   "Next hop",
+   "Packet capture",
+   "Connection monitor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "IP flow verify evaluates both NSG rules and Azure Virtual Network Manager security admin rules for a flow, so it can expose an admin Deny that NSGs do not show.",
+  "rationale": [
+   "Correct: IP flow verify checks the NSG rules on the network interface and the Azure Virtual Network Manager admin rules applied to the virtual network, and it returns the rule that allows or denies the flow.",
+   "Incorrect: Next hop returns routing information and does not evaluate any security rules, so it cannot name a denying security admin rule.",
+   "Incorrect: Packet capture shows packets on the VM and could confirm that traffic does not arrive, but it does not tell you which rule dropped it.",
+   "Incorrect: Connection monitor measures reachability and latency between endpoints over time. It shows that the connection fails but not which rule causes it."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/ip-flow-verify-overview"
+ },
+ {
+  "id": "2.3.9-05",
+  "obj": "2.3.9",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys must identify which security rule denies a specific TCP flow to VM1, and must also export all inbound and outbound rules that are in effect on the VM1 network interface to a CSV file for an audit.\n\nWhich two Network Watcher tools should you use? Each correct answer presents part of the solution.",
+  "choices": [
+   "IP flow verify",
+   "Effective security rules",
+   "Next hop",
+   "Packet capture",
+   "Connection troubleshoot"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Use IP flow verify to name the rule that decides a flow, and effective security rules to see and export the full set of rules in effect on a NIC.",
+  "rationale": [
+   "Correct: IP flow verify tests the TCP flow and returns the rule and NSG that deny it.",
+   "Correct: Effective security rules shows the rules in effect on the NIC and lets you download them as a CSV file for audit documentation.",
+   "Incorrect: Next hop reports routing information, which cannot identify a denying security rule or list rules for audit.",
+   "Incorrect: Packet capture records traffic for analysis, but it neither names the rule that denies a flow nor exports rules.",
+   "Incorrect: Connection troubleshoot checks connectivity and latency between endpoints. It does not export the rules or name the denying rule."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/secure-network-watcher"
+ },
+ {
+  "id": "2.3.9-06",
+  "obj": "2.3.9",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Woodgrove Bank troubleshoots traffic filtering in Azure by using Azure Network Watcher.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "IP flow verify can test ICMP rules.",
+   "NSG diagnostics can check security rules for a virtual machine scale set network interface.",
+   "IP flow verify returns the name of the security rule that allows or denies the traffic."
+  ],
+  "answer": [
+   1,
+   2
+  ],
+  "explanation": "IP flow verify covers TCP and UDP on a VM NIC and names the deciding rule. NSG diagnostics adds ICMP, scale sets and Application Gateway v2.",
+  "rationale": [
+   "No: IP flow verify tests only TCP and UDP rules. Use NSG diagnostics to test ICMP traffic rules.",
+   "Yes: NSG diagnostics supports virtual machines, network interfaces, scale set network interfaces and Application Gateway v2.",
+   "Yes: The result includes access allowed or denied, the rule name and the NSG, with a link unless a default rule decided."
+  ],
+  "ref": "https://learn.microsoft.com/azure/network-watcher/nsg-diagnostics-overview"
+ },
+ {
+  "id": "2.3.9-07",
+  "obj": "2.3.9",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Fabrikam, Inc. is troubleshooting network security rules in Azure.\n\nWhich Network Watcher tool should you use for each task? To answer, drag the appropriate tools to the correct tasks. Each tool may be used once, more than once, or not at all.",
+  "choices": [
+   "IP flow verify",
+   "NSG diagnostics",
+   "Effective security rules",
+   "Next hop"
+  ],
+  "targets": [
+   "Task 1: test a TCP flow with a specified local port and remote port against the rules of one VM network interface",
+   "Task 2: test ICMP traffic from an IP prefix to the network interfaces of a scale set",
+   "Task 3: view the aggregate of subnet NSG and NIC NSG rules on a network interface"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "IP flow verify takes direction, protocol, local and remote IP addresses and ports for one VM interface and returns the deciding rule.",
+   "NSG diagnostics supports ICMP, IP prefixes and scale set network interfaces, which IP flow verify does not.",
+   "Effective security rules lists the rules from both the subnet NSG and the NIC NSG and their aggregate for a network interface."
+  ],
+  "notes": [
+   "Checks a TCP or UDP flow with ports against a VM NIC and names the rule. Use it for quick per-VM allow or deny answers.",
+   "Simulates flows to VMs, NICs, scale set NICs and Application Gateway v2 with ICMP, prefixes and service tags. Use it for broader targets.",
+   "Shows all rules applied to a NIC, from NIC and subnet NSGs. Use it for audit and to spot conflicting NSGs.",
+   "Shows the routing next hop for a destination. Use it to diagnose routes, not security rules."
+  ],
+  "explanation": "Match by scope: IP flow verify for one VM flow with ports, NSG diagnostics for ICMP and wider targets, effective security rules for the combined rule list.",
+  "ref": "https://learn.microsoft.com/azure/network-watcher/network-watcher-overview"
+ },
+ {
+  "id": "2.3.9-08",
+  "obj": "2.3.9",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Contoso, Ltd. must test whether an RDP connection from 203.0.113.10 on source port 60000 to VM1 at 10.0.0.4 is allowed by the security rules of the VM1 network interface.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz network watcher test-ip-flow \\\n  --direction [[1]] \\\n  --protocol [[2]] \\\n  --local 10.0.0.4:[[3]] \\\n  --remote 203.0.113.10:60000 \\\n  --vm VM1 --resource-group rg1 --out table\n```",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Inbound",
+     "Outbound"
+    ],
+    "why": [
+     "Correct: the client connects to the VM from 203.0.113.10, so the packet is inbound to the VM and inbound security rules are tested.",
+     "Incorrect: Outbound would test rules for traffic that VM1 sends to 203.0.113.10, which is the reverse of the scenario."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "TCP",
+     "UDP"
+    ],
+    "why": [
+     "Correct: RDP uses TCP port 3389, and IP flow verify tests TCP and UDP rules, so TCP is the protocol to test.",
+     "Incorrect: UDP would test a different protocol than the RDP connection uses. Use it for flows such as DNS or NTP."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "3389",
+     "22",
+     "443"
+    ],
+    "why": [
+     "Correct: 3389 is the RDP port, and the local port is the port on VM1 that the client connects to.",
+     "Incorrect: 22 is the SSH port. Testing it would not show whether the RDP connection is allowed.",
+     "Incorrect: 443 is the HTTPS port and has no relation to the RDP connection that is being tested."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "IP flow verify takes the direction, protocol, local IP and port, and remote IP and port. For a client RDP connection, test inbound TCP with the VM port set to 3389.",
+  "ref": "https://learn.microsoft.com/troubleshoot/azure/virtual-network/virtual-network-troubleshoot-nsg-blocking-traffic"
+ }
+]

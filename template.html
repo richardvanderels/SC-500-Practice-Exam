@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__EXAM__ Exam Buddy</title>
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --text: #1b1f24; --muted: #5b6573; --line: #dde1e6;
+  --accent: #0b63ce; --accent-text: #ffffff; --ok: #1a7f37; --ok-bg: #e6f4ea; --bad: #c62828; --bad-bg: #fdecea;
+  --code-bg: #f0f2f5; --chip: #eef2f7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111418; --card: #1a1e24; --text: #e6e9ed; --muted: #9aa4b1; --line: #2c323a;
+    --accent: #4c9bff; --accent-text: #0b0d10; --ok: #4cc26a; --ok-bg: #16301e; --bad: #ff6b6b; --bad-bg: #3a1a1a;
+    --code-bg: #0c0f13; --chip: #242a32;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111418; --card: #1a1e24; --text: #e6e9ed; --muted: #9aa4b1; --line: #2c323a;
+  --accent: #4c9bff; --accent-text: #0b0d10; --ok: #4cc26a; --ok-bg: #16301e; --bad: #ff6b6b; --bad-bg: #3a1a1a;
+  --code-bg: #0c0f13; --chip: #242a32;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; overflow-wrap: anywhere; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+h1 { font-size: 1.4rem; margin: 0; }
+h2 { font-size: 1.1rem; margin: 0 0 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+.muted { color: var(--muted); font-size: .9rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+label.opt { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+fieldset { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
+legend { font-weight: 600; margin-bottom: 8px; }
+button, select { font: inherit; }
+button { background: var(--accent); color: var(--accent-text); border: 0; border-radius: 8px; padding: 10px 18px; cursor: pointer; font-weight: 600; }
+button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+button.sm { padding: 2px 9px; font-weight: 500; }
+button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, .choice:focus-within, select:focus-visible, .tile:focus-visible, .slot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select { padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); max-width: 100%; }
+pre select { font: inherit; padding: 0 4px; border-radius: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { background: var(--chip); border-radius: 999px; padding: 2px 10px; font-size: .8rem; color: var(--muted); }
+.chip.easy { color: var(--ok); } .chip.hard { color: var(--bad); } .chip.clock { color: var(--text); font-weight: 600; }
+.stem p { margin: 0 0 10px; }
+pre { background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; overflow-wrap: normal; font-size: .85rem; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: .9em; }
+.choice { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 8px 0; cursor: pointer; }
+.choice input { margin-top: 4px; }
+.correct { border-color: var(--ok) !important; background: var(--ok-bg) !important; }
+.wrong { border-color: var(--bad) !important; background: var(--bad-bg) !important; }
+.why { font-size: .9rem; color: var(--muted); margin-top: 4px; }
+.verdict { font-weight: 700; margin: 12px 0 4px; }
+.ok { color: var(--ok); } .bad { color: var(--bad); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+.bar > div { height: 100%; background: var(--accent); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td:first-child { min-width: 64px; }
+table.yn td:not(:first-child), table.yn th:not(:first-child) { text-align: center; width: 56px; }
+.big { font-size: 2.2rem; font-weight: 700; }
+a { color: var(--accent); }
+.lbl { font-weight: 600; margin: 14px 0 6px; }
+.dd { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .dd { grid-template-columns: 1fr; } }
+.zone { min-height: 60px; border: 1px dashed var(--line); border-radius: 10px; padding: 6px; background: var(--bg); }
+.pool.flat { display: flex; flex-wrap: wrap; gap: 6px; }
+.pool.flat .tile { margin: 0; }
+.tile { display: flex; gap: 8px; justify-content: space-between; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 6px 0; background: var(--card); cursor: grab; }
+.tile.sel { outline: 2px solid var(--accent); }
+.tile .num { font-weight: 600; flex: none; }
+.tile .txt { flex: 1; }
+.tools { display: flex; gap: 4px; flex: none; }
+.slot { min-height: 40px; border: 1px dashed var(--line); border-radius: 8px; padding: 8px; cursor: pointer; background: var(--bg); }
+.case { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; background: var(--bg); }
+.case summary { cursor: pointer; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.case-body { max-height: 55vh; overflow: auto; }
+.case-body p { margin: 0 0 10px; }
+.note { border-left: 4px solid var(--accent); padding: 8px 12px; background: var(--chip); border-radius: 6px; margin-bottom: 12px; font-size: .9rem; }
+.rv { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.rv button { text-align: left; font-weight: 500; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>__EXAM__ Exam Buddy</h1>
+    <button class="ghost" id="theme" type="button" aria-label="Toggle light/dark theme">Theme</button>
+  </header>
+  <div id="app"></div>
+  <p class="muted">Questions based on the official __EXAM__ study guide (__EXAM_TITLE__). Not real exam questions.</p>
+</main>
+<script>
+const DATA = /*__DATA__*/;
+const Q = DATA.questions, DOMAINS = DATA.domains, OBJ = DATA.objectives, CASES = DATA.cases || {};
+// per-exam storage prefix ("ai500" for AI-500), so several exams on one site keep separate progress
+const KEY = DATA.exam.id.toLowerCase().replace(/[^a-z0-9]/g, "");
+const $app = document.getElementById("app");
+const $$ = s => [...$app.querySelectorAll(s)];
+
+// ponytail: localStorage only for per-device history; app works without it.
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let history = store.get(KEY + ".history", {}); // id -> true/false (last result fully correct)
+
+const theme = store.get(KEY + ".theme", null);
+if (theme) document.documentElement.dataset.theme = theme;
+document.getElementById("theme").onclick = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  store.set(KEY + ".theme", next);
+};
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function md(s) {
+  return s.split(/```[a-zA-Z]*\n?/).map((part, i) => i % 2
+    ? `<pre><code>${esc(part.replace(/\n$/, ""))}</code></pre>`
+    : part.split(/\n{2,}/).filter(p => p.trim()).map(p => p.split("\n").every(l => l.startsWith("- "))
+      ? `<ul>${p.split("\n").map(l => `<li>${inline(l.slice(2))}</li>`).join("")}</ul>`
+      : "<p>" + inline(p).replace(/\n/g, "<br>") + "</p>").join("")
+  ).join("");
+}
+const inline = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+const why = s => `<div class="why">${inline(s)}</div>`;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const dom = q => q.obj.split(".")[0];
+const isStd = q => !q.case && !q.series;
+const SERIES_NOTE = "This question is one of a series that share the same scenario. Each question in the series offers a different solution that might or might not meet the goal. A series can have more than one correct solution, or none. After you answer a question in this series, you cannot return to it, and it does not appear on the review screen.";
+const HOW = {
+  multi: q => `Choose ${q.answer.length}`, order: q => `Arrange ${q.answer.length} in order`,
+  yesno: () => "Yes / No for each statement", dragdrop: () => "Drag and drop", dropdown: () => "Select from each list",
+};
+
+// ---------- answers ----------
+function blank(q) {
+  if (q.type === "yesno") return q.choices.map(() => null);
+  if (q.type === "dragdrop" || q.type === "dropdown") return q.targets.map(() => null);
+  return [];
+}
+function complete(q, p) {
+  if (q.type === "single") return p.length === 1;
+  if (q.type === "multi" || q.type === "order") return p.length === q.answer.length;
+  return p.every(v => v !== null);
+}
+const answered = it => it.picked.some(v => v !== null);
+// Partial credit per box/statement/selection, like the real exam; build lists are all-or-nothing.
+function grade(q, p) {
+  if (q.type === "single") return +(p[0] === q.answer[0]);
+  if (q.type === "multi") return p.filter(x => q.answer.includes(x)).length / q.answer.length;
+  if (q.type === "order") return +(p.length === q.answer.length && p.every((x, i) => x === q.answer[i]));
+  if (q.type === "yesno") return p.filter((v, i) => v === q.answer.includes(i)).length / p.length;
+  return p.filter((v, i) => v === q.answer[i]).length / p.length; // dragdrop, dropdown
+}
+const item = q => ({ q, order: !q.choices ? [] : q.series ? [0, 1] : shuffle(q.choices.map((_, i) => i)), picked: blank(q), checked: false, locked: false, mark: false });
+
+// ---------- home ----------
+let S = null, tick = null;
+window.onbeforeunload = () => (S && S.mode === "exam" && !S.done ? true : undefined);
+
+function home() {
+  clearInterval(tick); S = null;
+  const seen = Object.keys(history).length, wrong = Object.values(history).filter(v => !v).length;
+  const cfg = { d: Object.keys(DOMAINS), lv: ["easy", "medium", "hard"], n: "25", mode: "practice", pool: "all", ...store.get(KEY + ".cfg", {}) };
+  const types = Object.entries(Q.reduce((a, q) => (a[q.case ? "case" : q.series ? "series" : q.type] = (a[q.case ? "case" : q.series ? "series" : q.type] || 0) + 1, a), {}));
+  $app.innerHTML = `
+  <div class="card">
+    <h2>New session</h2>
+    <fieldset><legend>Mode</legend><select id="mode">
+      <option value="practice" ${cfg.mode === "practice" ? "selected" : ""}>Practice (instant feedback)</option>
+      <option value="exam" ${cfg.mode === "exam" ? "selected" : ""}>Exam (feedback at the end)</option>
+      <option value="sim" ${cfg.mode === "sim" ? "selected" : ""}>Exam simulation (50 questions, 100 minutes)</option>
+    </select>
+    <p class="muted" id="simnote">Exam simulation ignores the filters below: questions are weighted by the study-guide domain percentages and include a problem-solution series and a case study in their own sections. No objective or difficulty hints, a countdown timer, mark for review, and a review screen per section. Once you leave a section you cannot return to it.</p>
+    </fieldset>
+    <div id="filters">
+    <fieldset><legend>Domains</legend>
+      ${Object.entries(DOMAINS).map(([k, d]) => `<label class="opt"><input type="checkbox" name="d" value="${k}" ${cfg.d.includes(k) ? "checked" : ""}> <span>${esc(d.title)} <span class="muted">(${d.weight}, ${Q.filter(q => dom(q) === k).length} questions)</span></span></label>`).join("")}
+    </fieldset>
+    <fieldset><legend>Difficulty</legend><div class="row">
+      ${[["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(([v, t]) => `<label class="opt"><input type="checkbox" name="lv" value="${v}" ${cfg.lv.includes(v) ? "checked" : ""}> ${t}</label>`).join("")}
+    </div></fieldset>
+    <fieldset><legend>Question pool</legend><div class="row">
+      <label class="opt"><input type="radio" name="pool" value="all" ${cfg.pool === "all" ? "checked" : ""}> All</label>
+      <label class="opt"><input type="radio" name="pool" value="new" ${cfg.pool === "new" ? "checked" : ""}> Not seen yet</label>
+      <label class="opt"><input type="radio" name="pool" value="wrong" ${cfg.pool === "wrong" ? "checked" : ""}> Previously wrong (${wrong})</label>
+    </div></fieldset>
+    <fieldset><legend>Questions</legend><select id="n">${["10", "25", "50", "100", "all"].map(v => `<option ${cfg.n === v ? "selected" : ""} value="${v}">${v === "all" ? "All" : v}</option>`).join("")}</select></fieldset>
+    </div>
+    <div class="actions"><button id="start" type="button">Start</button></div>
+    <p class="muted" id="msg"></p>
+  </div>
+  <div class="card">
+    <h2>Progress on this device</h2>
+    <p>${seen} of ${Q.length} questions answered, ${seen - wrong} last correct, ${wrong} last wrong.</p>
+    ${statsTable()}
+    <p class="muted">Question types: ${types.map(([t, n]) => `${t} ${n}`).join(", ")}.</p>
+    <div class="actions"><button class="ghost" id="reset" type="button">Reset progress</button></div>
+  </div>`;
+  const mode = document.getElementById("mode"), sync = () => {
+    document.getElementById("filters").hidden = mode.value === "sim";
+    document.getElementById("simnote").hidden = mode.value !== "sim";
+  };
+  mode.onchange = sync; sync();
+  document.getElementById("start").onclick = start;
+  document.getElementById("reset").onclick = () => { if (confirm("Reset all progress?")) { history = {}; store.set(KEY + ".history", history); home(); } };
+}
+
+function statsTable() {
+  const rows = Object.entries(DOMAINS).map(([k, d]) => {
+    const qs = Q.filter(q => dom(q) === k), done = qs.filter(q => q.id in history), ok = done.filter(q => history[q.id]);
+    return `<tr><td>${esc(d.title)}</td><td>${done.length}/${qs.length}</td><td>${done.length ? Math.round(100 * ok.length / done.length) + "%" : "-"}</td></tr>`;
+  }).join("");
+  return `<table><tr><th>Domain</th><th>Done</th><th>Correct</th></tr>${rows}</table>`;
+}
+
+// keep case-study and series questions together, in id order, at the position of their first member
+function grouped(qs) {
+  const g = new Map();
+  qs.forEach(q => { const k = q.case || q.series || q.id; if (!g.has(k)) g.set(k, []); g.get(k).push(q); });
+  return [...g.values()].flatMap(xs => xs.sort((a, b) => a.id.localeCompare(b.id)));
+}
+
+function simSections() {
+  const caseIds = [...new Set(Q.filter(q => q.case).map(q => q.case))];
+  const seriesIds = [...new Set(Q.filter(q => q.series).map(q => q.series))];
+  const cs = caseIds.length ? grouped(Q.filter(q => q.case === pick(caseIds))) : [];
+  const sr = seriesIds.length ? grouped(Q.filter(q => q.series === pick(seriesIds))) : [];
+  const n = 50 - cs.length - sr.length;
+  // domain share = midpoint of the study-guide weight range, largest remainder rounding
+  const w = Object.entries(DOMAINS).map(([k, d]) => { const [a, b] = d.weight.match(/\d+/g).map(Number); return [k, (a + (b ?? a)) / 2]; });
+  const tot = w.reduce((s, [, x]) => s + x, 0);
+  const cnt = w.map(([k, x]) => ({ k, c: Math.floor(n * x / tot), r: (n * x / tot) % 1 }));
+  [...cnt].sort((a, b) => b.r - a.r).slice(0, n - cnt.reduce((s, x) => s + x.c, 0)).forEach(x => x.c++);
+  const std = shuffle(cnt.flatMap(({ k, c }) => shuffle(Q.filter(q => isStd(q) && dom(q) === k)).slice(0, c)));
+  return [["std", std], ["series", sr], ["case", cs]].filter(([, xs]) => xs.length);
+}
+
+function start() {
+  const mode = document.getElementById("mode").value;
+  let secs;
+  if (mode === "sim") {
+    store.set(KEY + ".cfg", { ...store.get(KEY + ".cfg", {}), mode });
+    secs = simSections();
+  } else {
+    const val = n => [...document.querySelectorAll(`input[name=${n}]:checked`)].map(i => i.value);
+    const cfg = { d: val("d"), lv: val("lv"), pool: val("pool")[0], n: document.getElementById("n").value, mode };
+    store.set(KEY + ".cfg", cfg);
+    let pool = Q.filter(q => cfg.d.includes(dom(q)) && cfg.lv.includes(q.difficulty));
+    if (cfg.pool === "new") pool = pool.filter(q => !(q.id in history));
+    if (cfg.pool === "wrong") pool = pool.filter(q => history[q.id] === false);
+    if (!pool.length) { document.getElementById("msg").textContent = "No questions match this selection."; return; }
+    secs = [["std", grouped(shuffle(pool).slice(0, cfg.n === "all" ? pool.length : +cfg.n))]];
+  }
+  const items = [], sections = [];
+  secs.forEach(([kind, qs]) => { sections.push({ kind, start: items.length, end: items.length + qs.length }); items.push(...qs.map(item)); });
+  S = { mode: mode === "practice" ? "practice" : "exam", sim: mode === "sim", items, secs: sections, sec: 0, i: 0, tab: 0, sel: null, t0: Date.now() };
+  if (S.sim) {
+    S.deadline = Date.now() + 100 * 60000;
+    tick = setInterval(() => {
+      const left = S.deadline - Date.now(), el = document.getElementById("clock");
+      if (left <= 0) { alert("Time is up. Your exam is submitted."); return finish(); }
+      if (el) el.textContent = clock(left);
+    }, 1000);
+    return intro();
+  }
+  show();
+}
+const clock = ms => { const s = Math.ceil(ms / 1000); return `Time left ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+const clockChip = () => S.deadline ? `<span class="chip clock" id="clock">${clock(S.deadline - Date.now())}</span>` : "";
+
+function intro() {
+  const sec = S.secs[S.sec], n = sec.end - sec.start;
+  const text = {
+    std: `This section contains ${n} questions. You can move back and forth, mark questions for review, and change your answers until you finish the section. When you finish it, you cannot return to it.`,
+    series: `This section contains a problem-solution series of ${n} questions. ${SERIES_NOTE}`,
+    case: `This section contains a case study with ${n} questions. Each question uses the same scenario; use the tabs to read the parts of the case study. You can move between the questions of this case study until you finish the section.`,
+  }[sec.kind];
+  $app.innerHTML = `<div class="card">
+    <div class="chips"><span class="chip">Section ${S.sec + 1} of ${S.secs.length}</span>${clockChip()}</div>
+    <h2>${{ std: "Questions", series: "Problem-solution series", case: "Case study" }[sec.kind]}</h2>
+    <p>${esc(text)}</p>
+    ${S.sec === 0 ? `<p class="muted">${S.items.length} questions in total, 100 minutes. Passing score: 700 on a scale of 1 to 1000.</p>` : ""}
+    <div class="actions"><button id="go" type="button">Start section</button></div></div>`;
+  document.getElementById("go").onclick = () => { S.i = sec.start; S.tab = 0; show(); };
+}
+
+// ---------- question ----------
+function casePanel(id) {
+  const c = CASES[id]; if (!c) return "";
+  const t = Math.min(S.tab, c.sections.length - 1);
+  return `<details class="case" ${S.caseClosed ? "" : "open"}><summary><strong>Case study: ${esc(c.title)}</strong></summary>
+    <div class="tabs">${c.sections.map(([h], k) => `<button type="button" class="ghost sm" data-tab="${k}" aria-pressed="${k === t}">${esc(h)}</button>`).join("")}</div>
+    <div class="case-body">${md(c.sections[t][1])}</div></details>`;
+}
+
+function sel(it, i, lock, reveal) {
+  const q = it.q, t = q.targets[i], p = it.picked;
+  const cls = reveal ? (p[i] === q.answer[i] ? "correct" : "wrong") : "";
+  return `<select data-t="${i}" class="${cls}" ${lock ? "disabled" : ""} aria-label="Box ${i + 1}"><option value="">Select...</option>${t.options.map((o, k) => `<option value="${k}" ${p[i] === k ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
+}
+
+function stemHTML(it, lock, reveal) {
+  const h = md(it.q.stem);
+  return it.q.type === "dropdown" ? h.replace(/\[\[(\d+)\]\]/g, (_, n) => sel(it, n - 1, lock, reveal)) : h;
+}
+
+function answerHTML(it, lock, reveal) {
+  const q = it.q, p = it.picked, dis = lock ? "disabled" : "", drag = !lock;
+  switch (q.type) {
+    case "single": case "multi": {
+      const multi = q.type === "multi";
+      return `<div>${it.order.map(ci => {
+        const cls = reveal ? (q.answer.includes(ci) ? "correct" : p.includes(ci) ? "wrong" : "") : "";
+        return `<label class="choice ${cls}"><input type="${multi ? "checkbox" : "radio"}" name="c" data-c="${ci}" ${dis} ${p.includes(ci) ? "checked" : ""}>
+          <span>${inline(q.choices[ci])}${reveal ? why(q.rationale[ci]) : ""}</span></label>`;
+      }).join("")}</div>`;
+    }
+    case "yesno":
+      return `<table class="yn"><tr><th>Statement</th><th>Yes</th><th>No</th></tr>${q.choices.map((s, i) => {
+        const cls = reveal ? (p[i] === q.answer.includes(i) ? "correct" : "wrong") : "";
+        return `<tr class="${cls}"><td>${inline(s)}${reveal ? why(q.rationale[i]) : ""}</td>${[1, 0].map(v => `<td><input type="radio" name="yn${i}" data-i="${i}" data-v="${v}" aria-label="${v ? "Yes" : "No"}: statement ${i + 1}" ${dis} ${p[i] === !!v ? "checked" : ""}></td>`).join("")}</tr>`;
+      }).join("")}</table>`;
+    case "order": {
+      const tile = (ci, k) => {
+        const cls = reveal ? (q.answer[k] === ci ? "correct" : "wrong") : "";
+        return `<div class="tile ${cls}" draggable="${drag}" data-c="${ci}" ${k === undefined && !lock ? `tabindex="0" role="button"` : ""}>
+          ${k === undefined ? "" : `<span class="num">${k + 1}.</span>`}<span class="txt">${inline(q.choices[ci])}</span>
+          ${k === undefined || lock ? "" : `<span class="tools"><button type="button" class="ghost sm" data-up="${k}" aria-label="Move up">&uarr;</button><button type="button" class="ghost sm" data-down="${k}" aria-label="Move down">&darr;</button><button type="button" class="ghost sm" data-rm="${k}" aria-label="Remove">&times;</button></span>`}</div>`;
+      };
+      return `<div class="dd">
+        <div><div class="lbl">Actions</div><div class="zone pool" data-zone="pool">${it.order.filter(ci => !p.includes(ci)).map(ci => tile(ci)).join("")}</div></div>
+        <div><div class="lbl">Answer area</div><div class="zone area" data-zone="area">${p.map((ci, k) => tile(ci, k)).join("")}</div></div></div>
+        ${lock ? "" : `<p class="muted">Click or drag an action into the answer area, then use the arrows to put it in order.</p>`}
+        ${reveal ? `<div class="lbl">Correct sequence</div><ol>${q.answer.map(ci => `<li>${inline(q.choices[ci])}${why(q.rationale[ci])}</li>`).join("")}</ol>
+          <div class="lbl">Not part of the sequence</div><ul>${q.choices.map((c, ci) => q.answer.includes(ci) ? "" : `<li>${inline(c)}${why(q.rationale[ci])}</li>`).join("")}</ul>` : ""}`;
+    }
+    case "dragdrop":
+      return `<div class="lbl">Values</div><div class="zone pool flat">${it.order.map(ci => `<div class="tile ${S.sel === ci ? "sel" : ""}" draggable="${drag}" data-c="${ci}" ${lock ? "" : `tabindex="0" role="button"`}><span class="txt">${inline(q.choices[ci])}</span></div>`).join("")}</div>
+        <div class="lbl">Answer area</div><table>${q.targets.map((t, i) => {
+          const ok = p[i] === q.answer[i], cls = reveal ? (ok ? "correct" : "wrong") : "";
+          return `<tr><td>${inline(t)}</td><td><div class="slot ${cls}" data-t="${i}" ${lock ? "" : `tabindex="0" role="button"`}>${p[i] === null ? `<span class="muted">${lock ? "(empty)" : "Click a value, then click here"}</span>` : inline(q.choices[p[i]])}</div>
+            ${reveal ? why((ok ? "" : `Answer: ${q.choices[q.answer[i]]}. `) + q.rationale[i]) : ""}</td></tr>`;
+        }).join("")}</table>
+        ${lock ? "" : `<p class="muted">Each value may be used once, more than once, or not at all.</p>`}
+        ${reveal ? `<div class="lbl">About each value</div><ul>${q.choices.map((c, ci) => `<li><strong>${inline(c)}</strong>${why(q.notes[ci])}</li>`).join("")}</ul>` : ""}`;
+    case "dropdown": {
+      const inStem = q.stem.includes("[[1]]");
+      if (inStem && !reveal) return "";
+      return `<table>${q.targets.map((t, i) => {
+        const ok = p[i] === q.answer[i];
+        return `<tr><td>${inStem ? `Box ${i + 1}` : inline(t.label)}</td><td>${inStem ? "" : sel(it, i, lock, reveal)}
+          ${reveal ? `<div class="why"><span class="${ok ? "ok" : "bad"}">${ok ? "Your answer is correct" : p[i] === null ? "No answer" : "Your answer is incorrect"}</span>
+            <ul>${t.options.map((o, k) => `<li class="${k === q.answer[i] ? "ok" : k === p[i] ? "bad" : ""}"><code>${esc(o)}</code>: ${inline(t.why[k])}</li>`).join("")}</ul></div>` : ""}</td></tr>`;
+      }).join("")}</table>`;
+    }
+  }
+  return "";
+}
+
+function bindAnswer(it, lock) {
+  if (lock) return;
+  const q = it.q, p = it.picked, redraw = () => show(true);
+  $$("input[data-c]").forEach(b => b.onchange = () => {
+    const ci = +b.dataset.c;
+    if (q.type === "single") it.picked = [ci];
+    else if (b.checked) { if (p.length < q.answer.length) p.push(ci); } else p.splice(p.indexOf(ci), 1);
+    redraw();
+  });
+  $$("input[data-i]").forEach(b => b.onchange = () => { p[+b.dataset.i] = b.dataset.v === "1"; redraw(); });
+  $$("select[data-t]").forEach(s => s.onchange = () => { p[+s.dataset.t] = s.value === "" ? null : +s.value; redraw(); });
+  $$(".tile[draggable=true]").forEach(t => t.ondragstart = e => e.dataTransfer.setData("text/plain", t.dataset.c));
+  $$("[tabindex][role=button]").forEach(el => el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); } });
+  const zone = (el, drop) => { el.ondragover = e => e.preventDefault(); el.ondrop = e => { e.preventDefault(); drop(+e.dataTransfer.getData("text/plain"), e); redraw(); }; };
+  if (q.type === "order") {
+    $$(".pool .tile").forEach(t => t.onclick = () => { if (p.length < q.answer.length) { p.push(+t.dataset.c); redraw(); } });
+    $$("[data-up]").forEach(b => b.onclick = () => { const k = +b.dataset.up; if (k > 0) [p[k - 1], p[k]] = [p[k], p[k - 1]]; redraw(); });
+    $$("[data-down]").forEach(b => b.onclick = () => { const k = +b.dataset.down; if (k < p.length - 1) [p[k + 1], p[k]] = [p[k], p[k + 1]]; redraw(); });
+    $$("[data-rm]").forEach(b => b.onclick = () => { p.splice(+b.dataset.rm, 1); redraw(); });
+    $$("[data-zone=area]").forEach(z => zone(z, (ci, e) => {
+      const from = p.indexOf(ci);
+      if (from >= 0) p.splice(from, 1); else if (p.length >= q.answer.length) return;
+      const li = e.target.closest(".tile[data-c]"), at = li ? p.indexOf(+li.dataset.c) : -1;
+      p.splice(at < 0 ? p.length : at, 0, ci);
+    }));
+    $$("[data-zone=pool]").forEach(z => zone(z, ci => { const k = p.indexOf(ci); if (k >= 0) p.splice(k, 1); }));
+  }
+  if (q.type === "dragdrop") {
+    $$(".pool .tile").forEach(t => t.onclick = () => { S.sel = S.sel === +t.dataset.c ? null : +t.dataset.c; redraw(); });
+    $$(".slot").forEach(s => {
+      s.onclick = () => { p[+s.dataset.t] = S.sel ?? null; S.sel = null; redraw(); };
+      zone(s, ci => { p[+s.dataset.t] = ci; S.sel = null; });
+    });
+  }
+}
+
+function show(keep) {
+  const it = S.items[S.i], q = it.q, sec = S.secs[S.sec], practice = S.mode === "practice";
+  const lock = practice ? it.checked : it.locked, reveal = practice && it.checked;
+  const levels = { easy: "Easy", medium: "Medium", hard: "Hard" };
+  const prog = practice ? S.i / S.items.length : S.items.filter(answered).length / S.items.length;
+  $app.innerHTML = `
+  <div class="bar"><div style="width:${100 * prog}%"></div></div>
+  <div class="card">
+    <div class="chips">
+      <span class="chip">Question ${S.i + 1} of ${S.items.length}</span>
+      ${S.sim ? "" : `<span class="chip">${q.obj} ${esc(OBJ[q.obj])}</span><span class="chip ${q.difficulty}">${levels[q.difficulty]}</span>`}
+      ${HOW[q.type] && !q.series ? `<span class="chip">${HOW[q.type](q)}</span>` : ""}
+      ${it.mark ? `<span class="chip">Marked for review</span>` : ""}
+      ${clockChip()}
+    </div>
+    ${q.case ? casePanel(q.case) : ""}
+    ${q.series ? `<div class="note">${esc(SERIES_NOTE)}</div>` : ""}
+    <div class="stem">${stemHTML(it, lock, reveal)}</div>
+    ${answerHTML(it, lock, reveal)}
+    ${reveal ? feedback(it) : ""}
+    <div class="actions">${practice ? navPractice(it) : navExam(it, sec)}</div>
+  </div>`;
+  bindAnswer(it, lock);
+  $$("[data-tab]").forEach(b => b.onclick = () => { S.tab = +b.dataset.tab; show(true); });
+  $$("details.case").forEach(d => d.ontoggle = () => { S.caseClosed = !d.open; });
+  const on = (id, f) => { const b = document.getElementById(id); if (b) b.onclick = f; };
+  on("prev", () => { S.i--; S.sel = null; show(); });
+  on("check", () => {
+    it.score = grade(q, it.picked); it.checked = true;
+    history[q.id] = it.score === 1; store.set(KEY + ".history", history);
+    show(true);
+  });
+  on("next", () => {
+    if (q.series && !practice) it.locked = true;
+    S.sel = null;
+    if (S.i + 1 < sec.end) { S.i++; return show(); }
+    if (practice) return result();
+    sec.kind === "series" ? endSection() : review();
+  });
+  on("mark", () => { it.mark = !it.mark; show(true); });
+  on("review", review);
+  on("quit", () => {
+    if (practice) return S.review || !S.items.some(x => x.checked) ? home() : result();
+    if (confirm("End the exam now? Unanswered questions count as incorrect.")) finish();
+  });
+  if (!keep) window.scrollTo(0, 0);
+}
+
+function navPractice(it) {
+  const last = S.i + 1 === S.items.length;
+  return `${S.i > 0 ? `<button class="ghost" id="prev" type="button">Previous</button>` : ""}
+    ${it.checked ? `<button id="next" type="button">${last ? (S.review ? "Done" : "Results") : "Next"}</button>`
+      : `<button id="check" type="button" ${complete(it.q, it.picked) ? "" : "disabled"}>Check</button><button class="ghost" id="next" type="button">Skip</button>`}
+    <button class="ghost" id="quit" type="button">${S.review ? "Close review" : "Stop"}</button>`;
+}
+
+function navExam(it, sec) {
+  const series = sec.kind === "series" || it.q.series, last = S.i + 1 === sec.end;
+  const prevOk = S.i > sec.start && !series && !S.items[S.i - 1].locked;
+  return `${prevOk ? `<button class="ghost" id="prev" type="button">Previous</button>` : ""}
+    <button id="next" type="button">${!last ? "Next" : series ? (S.sec + 1 < S.secs.length ? "Next section" : "Finish exam") : "Review"}</button>
+    ${series ? "" : `<button class="ghost" id="mark" type="button" aria-pressed="${it.mark}">Mark for review</button><button class="ghost" id="review" type="button">Review screen</button>`}
+    <button class="ghost" id="quit" type="button">End exam</button>`;
+}
+
+function review() {
+  const sec = S.secs[S.sec], idx = [];
+  for (let i = sec.start; i < sec.end; i++) if (!S.items[i].q.series) idx.push(i);
+  const open = idx.filter(i => !answered(S.items[i])).length, marked = idx.filter(i => S.items[i].mark).length;
+  const lastSec = S.sec + 1 === S.secs.length;
+  $app.innerHTML = `<div class="card">
+    <div class="chips"><span class="chip">Review screen${S.secs.length > 1 ? ` -- section ${S.sec + 1} of ${S.secs.length}` : ""}</span>${clockChip()}</div>
+    <p>${idx.length - open} answered, ${open} unanswered, ${marked} marked for review. Select a question to return to it.</p>
+    <div class="rv">${idx.map(i => { const x = S.items[i]; return `<button class="ghost" type="button" data-go="${i}">Question ${i + 1}<br><span class="muted">${answered(x) ? "Answered" : "Unanswered"}${x.mark ? ", marked" : ""}</span></button>`; }).join("")}</div>
+    <div class="actions">
+      <button id="endsec" type="button">${lastSec ? "Submit exam" : "Finish section"}</button>
+      <button class="ghost" id="back" type="button">Return to question ${S.i + 1}</button>
+    </div></div>`;
+  $$("[data-go]").forEach(b => b.onclick = () => { S.i = +b.dataset.go; S.tab = 0; show(); });
+  document.getElementById("back").onclick = () => show();
+  document.getElementById("endsec").onclick = () => {
+    const msg = (open ? `${open} question(s) are unanswered. ` : "") + (lastSec ? "Submit the exam?" : "After you finish this section, you cannot return to it. Continue?");
+    if (confirm(msg)) endSection();
+  };
+  window.scrollTo(0, 0);
+}
+
+function endSection() {
+  const sec = S.secs[S.sec];
+  for (let i = sec.start; i < sec.end; i++) S.items[i].locked = true;
+  if (++S.sec >= S.secs.length) return finish();
+  S.sim ? intro() : (S.i = S.secs[S.sec].start, show());
+}
+
+function finish() {
+  clearInterval(tick); S.done = true;
+  S.items.forEach(it => {
+    it.score = grade(it.q, it.picked); it.checked = true;
+    if (answered(it)) history[it.q.id] = it.score === 1;
+  });
+  store.set(KEY + ".history", history);
+  result();
+}
+
+function feedback(it) {
+  const q = it.q, s = it.score;
+  return `<p class="verdict ${s === 1 ? "ok" : "bad"}">${s === 1 ? "Correct!" : s > 0 ? `Partially correct (${Math.round(100 * s)}%).` : "Incorrect."}</p>
+    <div>${md(q.explanation)}</div>
+    <p class="muted">Source: <a href="${esc(q.ref)}" target="_blank" rel="noopener">${esc(q.ref.replace("https://", ""))}</a></p>`;
+}
+
+function result() {
+  clearInterval(tick);
+  const xs = S.mode === "practice" ? S.items.filter(x => x.checked) : S.items;
+  const pts = xs.reduce((s, x) => s + x.score, 0), pct = xs.length ? Math.round(100 * pts / xs.length) : 0;
+  const per = Object.entries(DOMAINS).map(([k, d]) => {
+    const ds = xs.filter(x => dom(x.q) === k); if (!ds.length) return "";
+    const g = ds.reduce((s, x) => s + x.score, 0);
+    return `<tr><td>${esc(d.title)}</td><td>${+g.toFixed(1)}/${ds.length}</td><td>${Math.round(100 * g / ds.length)}%</td></tr>`;
+  }).join("");
+  const wrong = xs.filter(x => x.score < 1), mins = Math.round((Date.now() - S.t0) / 60000);
+  $app.innerHTML = `
+  <div class="card">
+    <h2>Results</h2>
+    <div class="big">${pct}%</div>
+    <p>${+pts.toFixed(1)} of ${xs.length} points${S.sim ? `, ${mins} minutes used` : ""}. Multi-part questions earn partial credit.
+      ${pct >= 70 ? "Around passing level." : "Below passing level."} <span class="muted">The real exam reports a scaled score where 700 of 1000 passes; that is not exactly 70% correct.</span></p>
+    <table><tr><th>Domain</th><th>Points</th><th>%</th></tr>${per}</table>
+    <div class="actions">
+      ${wrong.length ? `<button id="rwrong" type="button">Review ${wrong.length} mistakes</button>` : ""}
+      <button class="ghost" id="rall" type="button">Review all</button>
+      <button class="ghost" id="home" type="button">New session</button>
+    </div>
+  </div>`;
+  const rev = list => { S = { mode: "practice", review: true, items: list, secs: [{ kind: "std", start: 0, end: list.length }], sec: 0, i: 0, tab: 0, sel: null }; show(); };
+  document.getElementById("home").onclick = home;
+  document.getElementById("rall").onclick = () => rev(xs);
+  const rw = document.getElementById("rwrong"); if (rw) rw.onclick = () => rev(wrong);
+}
+
+home();
+</script>
+</body>
+</html>

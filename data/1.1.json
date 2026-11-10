@@ -1,0 +1,987 @@
+[
+ {
+  "id": "1.1.1-01",
+  "obj": "1.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Privileged Identity Management (PIM) in Microsoft Entra ID. User1 needs the Exchange Administrator role a few times per month. The company requires that User1 has no standing privileges and can use the role on demand after completing multifactor authentication.\n\nWhich type of role assignment should you create for User1?",
+  "choices": [
+   "A permanent active assignment",
+   "A time-bound active assignment that ends in 12 months",
+   "An eligible assignment that User1 activates when needed",
+   "An access review of the current active assignment"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "An eligible assignment gives no access until the user activates the role, and the activation can require MFA, justification or approval. Active assignments, even time-bound ones, give access without any activation step.",
+  "rationale": [
+   "Incorrect: a permanent active assignment gives User1 the role at all times without any activation or MFA prompt, which is standing privilege. Use it only for emergency access accounts.",
+   "Incorrect: a time-bound active assignment still gives User1 the role for the whole period with no activation step, so it is standing access. Use it when someone needs continuous access for a fixed window.",
+   "Correct: an eligible assignment has no effect until User1 activates it. PIM can then require MFA, so User1 has no standing privilege and still gets the role on demand.",
+   "Incorrect: an access review is a periodic check that asks reviewers to confirm or remove an assignment. It does not change how User1 gets the role. Use it to recertify assignments that already exist."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-deployment-plan"
+ },
+ {
+  "id": "1.1.1-02",
+  "obj": "1.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. must make sure that every quarter the security team confirms whether each user who has a privileged Microsoft Entra role, either eligible or permanent, still needs it. Users who are not confirmed must lose the role automatically.\n\nWhat should you create?",
+  "choices": [
+   "An access review of the Microsoft Entra roles in PIM",
+   "A role setting that limits activation to one hour",
+   "A role setting that requires approval to activate",
+   "A PIM alert for roles that are activated outside business hours"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Access reviews in PIM let reviewers attest to eligible and permanent assignments on a recurring schedule and can remove assignments that are not approved. Role settings control how a role is activated, not whether the assignment should still exist.",
+  "rationale": [
+   "Correct: a recurring PIM access review covers permanent and eligible assignments for the selected roles, and its settings can remove users that reviewers do not approve.",
+   "Incorrect: the activation maximum duration only limits how long one activation lasts. It does not ask anyone to recertify the assignment. Use it to shorten each elevation window.",
+   "Incorrect: requiring approval adds a gate to each activation but does not review whether the assignment is still needed, and it removes nothing. Use it to control who may elevate and when.",
+   "Incorrect: an alert only notifies administrators about unusual activity. It does not recertify assignments or remove them. Use alerts to detect suspicious activations, not to enforce a review cycle."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-create-roles-and-resource-roles-review"
+ },
+ {
+  "id": "1.1.1-03",
+  "obj": "1.1.1",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Fabrikam, Inc. configures PIM role settings for Microsoft Entra roles. An administrator edits the role settings of the Security Administrator role to require MFA and a business justification on activation.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "The same role settings also apply to the Exchange Administrator role.",
+   "User1, who is eligible for the Security Administrator role, must activate the role before its permissions apply.",
+   "The setting Require multifactor authentication on active assignment makes the assigned user perform MFA each time the user uses the active role."
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "PIM role settings are defined per role, and an eligible user must activate before the role has any effect. The MFA setting for active assignments applies when an administrator creates the assignment, not each time the user uses it.",
+  "rationale": [
+   "No: role settings are defined per role, so each role has its own policy. Settings of one role do not carry over to another role, and you must configure Exchange Administrator separately.",
+   "Yes: an eligible assignment grants nothing until activation. The activation then applies the role settings, such as MFA and justification, and creates a time-bound active assignment.",
+   "No: PIM cannot enforce MFA when a user uses a role that is already active. The setting makes the administrator who creates the active assignment complete MFA, not the assigned user at each use."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings"
+ },
+ {
+  "id": "1.1.1-04",
+  "obj": "1.1.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank uses PIM for the Global Administrator role. User1 signs in to a managed workstation with Windows Hello for Business. The bank requires that, at the moment User1 activates the role, User1 completes a sign-in that satisfies the Phishing-resistant MFA authentication strength.\n\nWhat should you configure?",
+  "choices": [
+   "The On activation, require multifactor authentication setting in the role settings of Global Administrator",
+   "A Conditional Access policy that targets the Global Administrator directory role and requires the Phishing-resistant MFA strength",
+   "Approval by two approvers and a business justification in the role settings of Global Administrator",
+   "An authentication context in the role settings, and a Conditional Access policy for it that requires the Phishing-resistant MFA strength"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Activation requirements beyond plain MFA are enforced by linking a Conditional Access authentication context to the role setting. A policy that targets the directory role applies only after the user holds the role, so it cannot gate the activation itself.",
+  "rationale": [
+   "Incorrect: this setting asks for MFA, but it can be satisfied by an MFA claim already in the session and cannot demand a specific phishing-resistant method. Use it when any MFA is enough.",
+   "Incorrect: a user does not hold the role yet during activation, so a policy scoped to the directory role does not apply at that moment. Use such a policy to protect sign-ins after activation.",
+   "Incorrect: approval adds a human gate but does not control which authentication method User1 uses. Use approval when another person must authorize each elevation.",
+   "Correct: the authentication context is selected in the role settings, and the Conditional Access policy for that context enforces the Phishing-resistant MFA strength during activation."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings"
+ },
+ {
+  "id": "1.1.1-05",
+  "obj": "1.1.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys has five administrators with permanent active Global Administrator assignments, plus two emergency access accounts. The company requires that only the emergency access accounts keep standing Global Administrator access. Every other activation must include a justification and be approved by the security team lead.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Change the five administrators to eligible assignments and keep the emergency access accounts as permanent active assignments.",
+   "In the Global Administrator role settings, require justification and approval, and select the security team lead as approver.",
+   "Change the emergency access accounts to eligible assignments that require approval.",
+   "Change the five administrators to time-bound active assignments that expire after 30 days.",
+   "Create a monthly access review of the Global Administrator role and leave the assignments as they are."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Standing access is removed by converting assignments to eligible, while emergency accounts stay permanent so that they work when PIM or approvals are unavailable. Justification and approval are role settings that apply to every activation of the role.",
+  "rationale": [
+   "Correct: eligible assignments remove standing privilege, and the emergency access accounts stay permanent active so that they remain usable during an outage or an approval lockout.",
+   "Correct: justification and approval are role settings of Global Administrator, and naming the team lead as approver enforces the approval requirement for every activation.",
+   "Incorrect: making emergency accounts eligible with approval risks a tenant lockout if approvers or PIM are unavailable. Microsoft recommends these accounts stay permanent active.",
+   "Incorrect: time-bound active assignments still give standing access until they expire and do not require activation, justification or approval. Use them for fixed-window access.",
+   "Incorrect: an access review recertifies assignments but does not remove standing access or add approval to activation. Use it to detect users who no longer need a role."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-deployment-plan"
+ },
+ {
+  "id": "1.1.1-06",
+  "obj": "1.1.1",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Relecloud uses PIM for Microsoft Entra roles. You must meet four requirements by configuring role settings.\n\nWhich role setting should you configure for each requirement? To answer, drag the appropriate settings to the correct requirements. Each setting may be used once, more than once, or not at all.",
+  "choices": [
+   "Require approval to activate",
+   "Require ticket information on activation",
+   "Activation maximum duration",
+   "Expire eligible assignment after",
+   "Require justification on activation",
+   "Require multifactor authentication on active assignment"
+  ],
+  "targets": [
+   "Engineers must enter an incident number each time they activate a role; the number is stored but not validated.",
+   "A second person must authorize each activation before the role becomes active.",
+   "Activated access must end automatically after two hours.",
+   "The eligibility of contract engineers must end on a fixed date."
+  ],
+  "answer": [
+   1,
+   0,
+   2,
+   3
+  ],
+  "rationale": [
+   "Ticket information is a free-text field that PIM records on activation without checking it against a ticketing system, which matches an incident number that is stored but not validated.",
+   "Approval holds the activation request until a selected approver approves it, so a second person authorizes each elevation.",
+   "The activation maximum duration (1 to 24 hours) sets how long an activation stays active before it expires, so two hours ends access automatically.",
+   "Expire eligible assignment after gives eligible assignments a start and end date, so contract engineers lose the ability to activate on the fixed date."
+  ],
+  "notes": [
+   "Records a support ticket number on activation. It is information only and is not validated against any ticketing system. Use it to link elevations to incidents.",
+   "Holds activation until an approver approves it. Use it when another person must authorize every elevation of a sensitive role.",
+   "Sets how long an activation remains active, from 1 to 24 hours. Use it to limit exposure after the role is activated.",
+   "Forces eligible assignments to have an end date. Use it for contractors or temporary eligibility that must lapse automatically.",
+   "Asks the user for a business reason on activation, free text. Use it for audit context; it does not capture a ticket number as a dedicated field.",
+   "Makes an administrator complete MFA when creating an active assignment. It does not apply to activation of eligible roles and does not limit duration."
+  ],
+  "explanation": "Each PIM role setting answers a different control: ticket information for traceability, approval for a second authorizer, maximum duration for time-limited activation and assignment duration for eligibility windows.",
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings"
+ },
+ {
+  "id": "1.1.2-01",
+  "obj": "1.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants to stop sign-ins that use legacy protocols, because those protocols cannot perform multifactor authentication. You create a Conditional Access policy that uses the Block access grant control and targets all users and all resources.\n\nWhich condition should you configure in the policy?",
+  "choices": [
+   "Client apps: Exchange ActiveSync clients and Other clients",
+   "Device platforms: Android and iOS",
+   "Sign-in risk: High",
+   "Locations: any location except the corporate network"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Legacy authentication is identified by the client apps condition, specifically Exchange ActiveSync clients and Other clients. Platform, risk and location conditions target different signals and would not isolate legacy protocols.",
+  "rationale": [
+   "Correct: the client apps condition selects Exchange ActiveSync clients and Other clients, which covers the legacy protocols that cannot do MFA, so the Block access control stops them.",
+   "Incorrect: the device platforms condition matches the operating system of the device, and legacy protocols can run on any platform. Use it to apply controls to specific mobile platforms.",
+   "Incorrect: sign-in risk comes from Microsoft Entra ID Protection and targets suspicious sign-ins, not a protocol type. Use it to require MFA or block when a sign-in looks risky.",
+   "Incorrect: a location condition limits the policy by network or country, not by protocol, so legacy sign-ins from the corporate network would still be allowed. Use it to block untrusted regions."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/conditional-access/policy-block-legacy-authentication"
+ },
+ {
+  "id": "1.1.2-02",
+  "obj": "1.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. creates a Conditional Access policy that requires a compliant device for all users. Before enforcement, the security team must see which real sign-ins over the next week the policy would have blocked or challenged, without affecting any user.\n\nWhat should you do?",
+  "choices": [
+   "Set the policy state to Report-only",
+   "Set the policy state to On and assign it to a pilot group",
+   "Run the What If tool once for a test user",
+   "Set the policy state to Off and review the audit log"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Report-only mode evaluates a policy against real sign-ins and logs the result, but never enforces the controls. A pilot group still enforces the policy, and the What If tool simulates one scenario rather than tenant sign-ins.",
+  "rationale": [
+   "Correct: report-only mode evaluates the policy for every real sign-in and records the result in the sign-in logs and insights, with no impact on users.",
+   "Incorrect: turning the policy On for a pilot group enforces it for those users, which affects them. Use a pilot group after report-only results look right, to stage the rollout.",
+   "Incorrect: What If simulates a single sign-in that you describe, so it does not show the effect on a week of real sign-ins. Use it to troubleshoot one user or one scenario.",
+   "Incorrect: a policy that is Off is not evaluated, so no results are produced and the audit log records only configuration changes. Use Off to disable a policy temporarily."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/conditional-access/concept-conditional-access-report-only"
+ },
+ {
+  "id": "1.1.2-03",
+  "obj": "1.1.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. must make sure that users assigned to built-in administrator roles sign in only with a FIDO2 security key, Windows Hello for Business or certificate-based authentication. Passwords combined with SMS codes or Authenticator push approvals must not satisfy the requirement.\n\nWhich grant control should you configure in the Conditional Access policy?",
+  "choices": [
+   "Require multifactor authentication",
+   "Require authentication strength: Passwordless MFA strength",
+   "Require authentication strength: Phishing-resistant MFA strength",
+   "Require Microsoft Entra hybrid joined device"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "The built-in Phishing-resistant MFA strength allows Windows Hello for Business, FIDO2 security keys and certificate-based authentication only. The Multifactor authentication grant control accepts weaker combinations, and the Passwordless strength also allows phone sign-in.",
+  "rationale": [
+   "Incorrect: the Require multifactor authentication control accepts any MFA combination, including a password with an SMS code or a push approval. Use it when any second factor is enough.",
+   "Incorrect: the Passwordless MFA strength also allows Microsoft Authenticator phone sign-in, which is not phishing-resistant. Use it when passwordless is required but phishing resistance is not.",
+   "Correct: the Phishing-resistant MFA strength allows only Windows Hello for Business, FIDO2 security keys and certificate-based authentication, which matches the three methods in the requirement.",
+   "Incorrect: requiring a hybrid joined device checks the device state, not how the user authenticated, so passwords with SMS codes would still pass. Use it to restrict access to managed devices."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/authentication/concept-authentication-strengths"
+ },
+ {
+  "id": "1.1.2-04",
+  "obj": "1.1.2",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Woodgrove Bank is rolling out several Conditional Access policies. Policy1 requires multifactor authentication for all users. Policy2 requires a compliant device for all users. Both policies are enabled, and User1 is in scope of both. A third policy, Policy3, is in report-only mode and blocks access from outside the corporate network.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "User1 must satisfy the requirements of both Policy1 and Policy2 to sign in.",
+   "You can select Require multifactor authentication and Require authentication strength in the same policy.",
+   "You must exclude the emergency access accounts from Policy3 to prevent them from being blocked."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When several enabled policies apply, all of their requirements must be met. The MFA grant control and an authentication strength cannot be combined in one policy, and report-only policies do not enforce a block, so they need no emergency exclusion.",
+  "rationale": [
+   "Yes: when multiple policies apply to a sign-in, each applicable policy must be satisfied, so User1 must complete MFA and use a compliant device.",
+   "No: the built-in Multifactor authentication strength is equivalent to the MFA grant control, so the two controls cannot be used together in one policy. Choose one of them.",
+   "No: a report-only policy only logs what it would have done and never blocks. Emergency access accounts must be excluded from enabled policies that block or restrict sign-in, not from report-only ones."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/conditional-access/concept-conditional-access-policies"
+ },
+ {
+  "id": "1.1.2-05",
+  "obj": "1.1.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys has Workload Identities Premium licenses. App1 is a single-tenant app registration in the tenant, and its service principal calls Microsoft Graph from an automation server in the datacenter. The security team must block token requests for App1 that come from outside the datacenter IP ranges. A named location for the datacenter already exists.\n\nWhat should you do?",
+  "choices": [
+   "Create a Conditional Access policy that targets All users and blocks access from any location outside the named location.",
+   "Create a policy that targets App1 as a workload identity, blocks any location except the named location, and uses Block access.",
+   "Create a Conditional Access policy that targets App1 and requires a compliant device when it signs in from the named location.",
+   "Add the service principal of App1 to a security group, and target that group in a policy that blocks access outside the named location."
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Conditional Access for workload identities targets single-tenant service principals directly and supports location and risk conditions with Block access only. User-scoped policies, device controls and group targeting do not apply to service principals.",
+  "rationale": [
+   "Incorrect: a policy scoped to users is not applied to service principals, so calls made by App1 are not blocked. Use user-scoped policies to protect interactive user sign-ins.",
+   "Correct: the policy targets App1 directly as a workload identity, uses the locations condition to exclude the datacenter range, and Block access is the grant control available for service principals.",
+   "Incorrect: a service principal has no device state, and workload identity policies support only Block access as the grant control. Use compliant device requirements for user sign-ins.",
+   "Incorrect: a policy assigned to a group that contains a service principal is not enforced for it. The service principal must be assigned directly to the policy as a workload identity."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/conditional-access/workload-identity"
+ },
+ {
+  "id": "1.1.2-06",
+  "obj": "1.1.2",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. must block sign-ins from a list of countries by using Conditional Access. The company wants to verify the effect before enforcement and must not lock out emergency access accounts. A named location for the countries does not exist yet.\n\nWhich five actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create a named location that contains the blocked countries.",
+   "Create a policy that targets all users except the emergency access accounts, uses the named location as the locations condition, and uses Block access.",
+   "Set the policy state to Report-only.",
+   "Review the report-only results in the sign-in logs or the Conditional Access insights workbook.",
+   "Change the policy state to On.",
+   "Enable security defaults for the tenant.",
+   "Create a custom authentication strength that allows only FIDO2 security keys."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "explanation": "The policy references a named location, so that must exist first. Validating in report-only mode before turning the policy On avoids unexpected blocks, and emergency access accounts are excluded in the policy definition.",
+  "rationale": [
+   "Step 1: the locations condition refers to a named location, so the countries must be defined as a named location before any policy can use them.",
+   "Step 2: the policy ties together the user scope (all users except emergency accounts), the named location condition and the Block access grant control.",
+   "Step 3: report-only mode evaluates the policy against real sign-ins without enforcing it, so you can test the effect safely.",
+   "Step 4: reviewing the report-only results shows which sign-ins would have been blocked, so you can correct the scope before enforcement.",
+   "Step 5: after the results are as intended, switching the policy to On enforces the block for the countries.",
+   "Incorrect: security defaults and Conditional Access policies are mutually exclusive, and security defaults do not block by country. Use security defaults only in tenants without Conditional Access.",
+   "Incorrect: an authentication strength is a grant requirement for allowed access and plays no role in blocking countries. Use it when specific MFA methods must be required."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/conditional-access/policy-block-by-location"
+ },
+ {
+  "id": "1.1.3-01",
+  "obj": "1.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank users report that they sometimes approve Microsoft Authenticator push notifications by reflex, including prompts they did not start. The bank must keep using Authenticator push notifications for MFA but reduce accidental approvals.\n\nWhich capability should you rely on?",
+  "choices": [
+   "Number matching in Authenticator push notifications",
+   "A registration campaign for Microsoft Authenticator",
+   "Temporary Access Pass",
+   "FIDO2 security keys"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Number matching makes the user type the number shown on the sign-in screen into Authenticator, so a prompt that the user did not start cannot be approved by reflex. It is enabled for all Authenticator push notifications.",
+  "rationale": [
+   "Correct: number matching requires the user to enter the number from the sign-in screen, which stops blind approvals while keeping Authenticator push as the second factor.",
+   "Incorrect: a registration campaign only nudges users to set up Authenticator. It does not change how push approvals work. Use it to raise Authenticator adoption.",
+   "Incorrect: a Temporary Access Pass is a time-limited code for onboarding or recovery, not an approval prompt. Use it to bootstrap passwordless methods.",
+   "Incorrect: FIDO2 security keys replace push approvals instead of protecting them, which breaks the stated requirement to keep Authenticator push. Use them for phishing-resistant sign-in."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/authentication/how-to-mfa-number-match"
+ },
+ {
+  "id": "1.1.3-02",
+  "obj": "1.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. has warehouse employees who share a pool of Windows PCs and do not carry company phones. The company wants a phishing-resistant, passwordless credential that each employee can carry and use on any of the shared PCs.\n\nWhich authentication method should you deploy?",
+  "choices": [
+   "Windows Hello for Business",
+   "FIDO2 security keys",
+   "Microsoft Authenticator phone sign-in",
+   "SMS text message"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "FIDO2 security keys are portable, hardware-based and phishing-resistant, which suits shared devices without phones. Windows Hello for Business credentials are tied to a single device.",
+  "rationale": [
+   "Incorrect: Windows Hello for Business credentials are bound to one device and must be set up on each PC, so they do not follow an employee across a pool of shared PCs. Use it on dedicated devices.",
+   "Correct: a FIDO2 security key is a portable, phishing-resistant credential that works on any shared PC and needs no phone.",
+   "Incorrect: phone sign-in needs a mobile device, which these employees do not carry, and it is not considered phishing-resistant. Use it for staff with phones when phishing resistance is not required.",
+   "Incorrect: SMS needs a phone, is not passwordless on its own and is not phishing-resistant. Use it only as a weaker second factor where nothing better is available."
+  ],
+  "ref": "https://learn.microsoft.com/windows-365/enterprise/choosing-authentication-method"
+ },
+ {
+  "id": "1.1.3-03",
+  "obj": "1.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. hires a new employee, User1, who has no password, no registered authentication methods and no company phone. On the first day, User1 must be able to register a FIDO2 security key without anyone creating a password for the account.\n\nWhat should you do?",
+  "choices": [
+   "Enable the Temporary Access Pass method in the authentication methods policy and issue a pass to User1.",
+   "Enable SMS sign-in for User1 and send a one-time code to a personal phone.",
+   "Create a temporary password for User1 and require a password change at first sign-in.",
+   "Register the FIDO2 security key for User1 from the Microsoft Authenticator app of an administrator."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A Temporary Access Pass is a time-limited passcode that lets a user with no registered methods sign in and register passwordless methods such as a FIDO2 key. The method must be enabled for the user in the authentication methods policy.",
+  "rationale": [
+   "Correct: a Temporary Access Pass lets User1 sign in without a password, and User1 can then register the FIDO2 key at Security info. The pass method must be enabled in the policy for User1.",
+   "Incorrect: SMS needs a registered phone number and a company phone is not available, and it does not solve onboarding without a password. Use SMS only where phone numbers are already registered.",
+   "Incorrect: a temporary password still creates a password for the account, which the requirement forbids. Use it only when password-based onboarding is acceptable.",
+   "Incorrect: Authenticator on an administrator device cannot register a FIDO2 key for another user, and User1 still needs a way to sign in. Use on-behalf-of registration flows only where the platform supports them."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/authentication/howto-authentication-temporary-access-pass"
+ },
+ {
+  "id": "1.1.3-04",
+  "obj": "1.1.3",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Fabrikam, Inc. is planning a passwordless rollout for four groups of users.\n\nWhich authentication method should you use for each group? To answer, drag the appropriate methods to the correct groups. Each method may be used once, more than once, or not at all.",
+  "choices": [
+   "Windows Hello for Business",
+   "Passkey in Microsoft Authenticator",
+   "FIDO2 security key",
+   "Temporary Access Pass",
+   "Certificate-based authentication",
+   "SMS text message"
+  ],
+  "targets": [
+   "Sales agents who each use one dedicated Windows 11 laptop and want biometric sign-in with a credential bound to the device",
+   "Field staff who own a personal phone and need a phishing-resistant sign-in that works on other devices",
+   "Reception staff who share kiosks and need a portable hardware credential",
+   "A new user on day one who has no registered authentication methods"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "Windows Hello for Business is tied to a device and its TPM and uses a biometric or PIN, which fits a dedicated laptop.",
+   "A passkey in Microsoft Authenticator lives on the user phone and can be used to sign in on other devices, and it is phishing-resistant.",
+   "A FIDO2 security key is a portable hardware credential that works on shared kiosks without needing a phone.",
+   "A Temporary Access Pass lets a user with no methods sign in once to register a permanent passwordless method."
+  ],
+  "notes": [
+   "Device-bound, hardware-protected credential unlocked by biometric or PIN. Use it on dedicated Windows devices; it must be set up on each device.",
+   "A passkey stored in the Authenticator app on iOS or Android. Use it for phishing-resistant, passwordless sign-in for users who carry a phone.",
+   "A physical key over USB, NFC or Bluetooth with a PIN or biometric. Use it for shared devices and users without phones.",
+   "A time-limited passcode, single use or multiple use. Use it for onboarding and recovery, not as a permanent method.",
+   "Sign-in with an X.509 certificate from a PKI. Use it when the organization already runs a PKI and smart cards; none of these groups has one.",
+   "A code sent by text message. It is not passwordless and not phishing-resistant, so use it only as a weaker second factor."
+  ],
+  "explanation": "Match the method to the device situation: device-bound credentials for dedicated PCs, phone passkeys for mobile users, portable keys for shared devices and a Temporary Access Pass for bootstrapping.",
+  "ref": "https://learn.microsoft.com/entra/identity/authentication/how-to-plan-prerequisites-phishing-resistant-passwordless-authentication"
+ },
+ {
+  "id": "1.1.3-05",
+  "obj": "1.1.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. protects a finance app with Conditional Access. Only FIDO2 security keys and Windows Hello for Business may satisfy the sign-in requirement. Certificate-based authentication must not be accepted because the company does not trust its internal PKI for this app.\n\nWhich grant control should you configure?",
+  "choices": [
+   "The built-in Phishing-resistant MFA authentication strength",
+   "The built-in Passwordless MFA authentication strength",
+   "A custom authentication strength that lists the two methods",
+   "The built-in Multifactor authentication (MFA) strength for sign-in"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "The built-in Phishing-resistant MFA strength includes certificate-based authentication and cannot be modified. A custom authentication strength lets you select exactly the combinations that you accept.",
+  "rationale": [
+   "Incorrect: this built-in strength also allows Microsoft Entra certificate-based authentication, which the requirement excludes, and built-in strengths cannot be modified. Use it when all three phishing-resistant methods are acceptable.",
+   "Incorrect: the Passwordless MFA strength allows Authenticator phone sign-in as well, which is not on the allowed list. Use it when any passwordless method is acceptable.",
+   "Correct: a custom authentication strength lets you allow FIDO2 security keys and Windows Hello for Business and leave out certificate-based authentication and every other method.",
+   "Incorrect: the Multifactor authentication strength accepts passwords with SMS, voice or push approvals, which are far weaker than required. Use it as a baseline MFA requirement."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/authentication/concept-authentication-strengths"
+ },
+ {
+  "id": "1.1.3-06",
+  "obj": "1.1.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Litware, Inc. wants the members of Group1 to sign in with FIDO2 security keys. The users already have Microsoft Authenticator push notifications registered. The company does not need to enforce the keys through Conditional Access yet.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "In the authentication methods policy, enable Passkey (FIDO2) and target Group1.",
+   "Have each user in Group1 register a security key at Security info.",
+   "Enable the Temporary Access Pass method for Group1.",
+   "Create a custom authentication strength that allows only FIDO2 security keys.",
+   "Create a Conditional Access policy that requires the Phishing-resistant MFA strength for Group1."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "A method must be enabled for the user in the authentication methods policy, and the user must then register a credential. Authentication strengths, Conditional Access and Temporary Access Pass are needed only to enforce or bootstrap, which this scenario does not require.",
+  "rationale": [
+   "Correct: the Passkey (FIDO2) method must be enabled and targeted at Group1 in the authentication methods policy before users can register or sign in with a key.",
+   "Correct: each user registers a security key as a credential at Security info. The existing Authenticator registration lets the users complete the MFA needed to add it.",
+   "Incorrect: Temporary Access Pass bootstraps users who have no method. These users already have Authenticator push, so it is not needed. Use it for day-one onboarding.",
+   "Incorrect: a custom authentication strength only defines what a Conditional Access policy accepts and does not enable keys for users. Use it when you enforce specific methods.",
+   "Incorrect: the requirement is to allow FIDO2 sign-in, not to enforce it, and the policy would also fail for users who have not registered a key yet. Add it later to enforce phishing-resistant sign-in."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/hybrid/connect/how-to-connect-passwordless-authentication"
+ },
+ {
+  "id": "1.1.4-01",
+  "obj": "1.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. registered App1 in Microsoft Entra ID. The security team must make sure that only users who are assigned to App1 can obtain a token for it.\n\nWhich configuration should you use?",
+  "choices": [
+   "On the enterprise application of App1, by setting Assignment required to Yes",
+   "On the app registration of App1, in the Certificates & secrets blade",
+   "On the app registration of App1, in the Manifest",
+   "On the app registration of App1, in the Expose an API blade"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Who can obtain a token is a tenant-level setting on the enterprise application, which is the service principal. The app registration defines the application itself, such as credentials, manifest and exposed scopes.",
+  "rationale": [
+   "Correct: the Assignment required setting on the enterprise application limits token issuance to users and applications that are assigned to it.",
+   "Incorrect: Certificates & secrets holds the credentials that App1 uses to authenticate itself. It does not control which users can sign in. Use it to add certificates, secrets or federated credentials.",
+   "Incorrect: the manifest defines application properties such as roles and sign-in audience for the app registration. It does not restrict users per tenant. Use it for advanced registration settings.",
+   "Incorrect: Expose an API defines scopes that clients can request from App1, not which users may sign in. Use it when App1 is a web API that other apps call."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/enterprise-apps/application-properties"
+ },
+ {
+  "id": "1.1.4-02",
+  "obj": "1.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs App1, a confidential client daemon app, on an on-premises physical server. App1 currently authenticates to Microsoft Entra ID by using a client secret. No external identity provider issues tokens for App1. Before production, the company wants a more secure credential type, as Microsoft recommends.\n\nWhich credential should you configure on the app registration?",
+  "choices": [
+   "A client secret with a 24-month expiry",
+   "A certificate",
+   "A federated identity credential",
+   "A user-assigned managed identity"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Microsoft recommends certificates over client secrets for confidential clients in production. Federated credentials need an external identity provider token, and managed identities are available only to Azure resources.",
+  "rationale": [
+   "Incorrect: a client secret is the credential Microsoft advises against in production, and a longer expiry only extends the exposure of a leaked secret. Use secrets for short-lived testing.",
+   "Correct: a certificate is the recommended credential for a confidential client in production, and it fits an on-premises server without any external identity provider.",
+   "Incorrect: a federated identity credential trusts tokens from an external identity provider such as GitHub, and none exists here. Use it for GitHub Actions or Kubernetes workloads.",
+   "Incorrect: managed identities are available only to Azure resources, and this app runs on a physical server outside Azure. Use them for workloads on Azure VMs or app services."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity-platform/how-to-add-credentials"
+ },
+ {
+  "id": "1.1.4-03",
+  "obj": "1.1.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys publishes App1 as a multitenant app with one app registration in the Tailspin Toys tenant. A user from the Fabrikam, Inc. tenant signs in to App1 for the first time and consents.\n\nWhich object should an administrator of the Fabrikam, Inc. tenant manage to control how App1 works in that tenant?",
+  "choices": [
+   "A service principal, shown as an enterprise application",
+   "A copy of the app registration in the tenant",
+   "A system-assigned managed identity for the app",
+   "A guest user account for the Fabrikam user"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A multitenant app has one application object in its home tenant and a service principal in every tenant that uses it. The service principal is what administrators see as an enterprise application.",
+  "rationale": [
+   "Correct: Microsoft Entra ID creates a service principal, which appears under Enterprise applications, in the Fabrikam tenant so that its administrators can control how App1 works there.",
+   "Incorrect: there is only one application object, and it stays in the home tenant of the publisher. Other tenants get a service principal that links to it, not a copy of the registration.",
+   "Incorrect: a managed identity belongs to an Azure resource and is not created when a user signs in to an app. Use managed identities for workloads on Azure resources.",
+   "Incorrect: the signing-in user already has an account in the Fabrikam tenant, and no guest object is needed. Guest accounts are for inviting external users into your own tenant."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity-platform/app-objects-and-service-principals"
+ },
+ {
+  "id": "1.1.4-04",
+  "obj": "1.1.4",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Contoso, Ltd. has App1, a single-tenant app. App1 has an app registration and a service principal in the Contoso tenant. An administrator is planning a cleanup and sets Assignment required to Yes on the enterprise application of App1.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Deleting the app registration of App1 also deletes its service principal in the Contoso tenant.",
+   "Restoring the deleted app registration also restores its service principal automatically.",
+   "A user with the Global Administrator role who is not assigned to App1 is blocked from signing in to App1."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The service principal in the home tenant is removed with the app registration, but restoring the registration does not bring it back. The assignment requirement does not apply to Global Administrators.",
+  "rationale": [
+   "Yes: changes to the application object are reflected in the service principal of the home tenant, and deleting the application object also deletes that service principal.",
+   "No: restoring an app registration from the portal does not restore its service principal, so you must create the service principal again. Deactivate an app instead when you only need a temporary stop.",
+   "No: users with the Global Administrator role can sign in to apps regardless of the Assignment required setting. Use Conditional Access or deactivation to restrict those accounts."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity-platform/app-objects-and-service-principals"
+ },
+ {
+  "id": "1.1.4-05",
+  "obj": "1.1.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Relecloud runs a workload in an on-premises Kubernetes cluster that is not part of Azure. The workload must call Microsoft Graph by using an app registration. Company policy forbids storing any client secret or certificate in the cluster, and the cluster exposes an OpenID Connect issuer.\n\nWhat should you do?",
+  "choices": [
+   "Add a federated identity credential to the app registration that trusts the cluster issuer.",
+   "Upload a certificate to the app registration and store its private key in a Kubernetes secret.",
+   "Assign a user-assigned managed identity to the nodes of the on-premises cluster.",
+   "Create a client secret with a 90-day expiry and rotate it by using a pipeline."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Workload identity federation lets a workload outside Azure exchange a trusted token from its own identity provider for a Microsoft Entra access token, so no secret or certificate is stored. Managed identities are limited to Azure resources.",
+  "rationale": [
+   "Correct: a federated identity credential trusts tokens from the cluster OIDC issuer, so the workload exchanges its service account token for an access token and stores no secret or certificate.",
+   "Incorrect: a certificate private key in a Kubernetes secret is still a stored credential, which the policy forbids. Use certificates for confidential clients that can protect the key in a vault.",
+   "Incorrect: managed identities can be assigned only to supported Azure resources, so on-premises nodes cannot receive one. Use them for workloads that run on Azure compute.",
+   "Incorrect: a client secret, even a rotated one, is a stored secret in the cluster, which the policy forbids. Use secrets only for testing, as Microsoft recommends certificates or federation."
+  ],
+  "ref": "https://learn.microsoft.com/entra/workload-id/workload-identity-federation"
+ },
+ {
+  "id": "1.1.4-06",
+  "obj": "1.1.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Woodgrove Bank uses a GitHub Actions workflow to deploy to Azure. The app registration for the workflow has a federated identity credential with the subject repo:woodgrove/app1:ref:refs/heads/Main. The workflow runs on the branch main, and the token exchange fails because no matching federated identity credential is found. The company forbids adding secrets or certificates to the app registration.\n\nWhat should you do?",
+  "choices": [
+   "Correct the subject of the federated credential so that it matches the token subject exactly, including case.",
+   "Upload a certificate to the app registration as an additional credential for the workflow to use.",
+   "Grant tenant-wide admin consent to the Microsoft Graph permissions that the app registration requests.",
+   "Set Assignment required to No on the enterprise application that belongs to the app registration."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The issuer, subject and audience of a federated identity credential are matched against the incoming token and the comparison is case-sensitive. A subject that differs in case, such as Main and main, does not match.",
+  "rationale": [
+   "Correct: the federated credential values must match the issuer, subject and audience in the GitHub token exactly, so the mismatch between Main and main causes the failure.",
+   "Incorrect: a certificate is a different credential type and is forbidden here, and it does not fix the subject mismatch of the federated credential. Use certificates when federation is not possible.",
+   "Incorrect: admin consent grants API permissions and has no bearing on whether a federated credential matches the token. Use it when the app needs permissions that require administrator approval.",
+   "Incorrect: Assignment required controls which users or apps can obtain tokens for the app and does not influence federated credential matching. Use it to limit who can sign in."
+  ],
+  "ref": "https://learn.microsoft.com/graph/api/resources/federatedidentitycredentials-overview?view=graph-rest-1.0"
+ },
+ {
+  "id": "1.1.5-01",
+  "obj": "1.1.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank wants users to consent only to apps from verified publishers, and only for permissions that administrators have classified as low impact.\n\nWhich user consent setting should you select?",
+  "choices": [
+   "Allow user consent for apps from verified publishers, for selected permissions",
+   "Do not allow user consent",
+   "Allow user consent for apps",
+   "Do not allow user consent, and enable the admin consent workflow"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The built-in policy microsoft-user-default-low allows limited user consent for verified publishers and permissions classified as low impact. The other settings are either fully open or fully closed.",
+  "rationale": [
+   "Correct: this setting maps to the microsoft-user-default-low policy, which allows consent only for verified publishers and for permissions that you classify as low impact.",
+   "Incorrect: this setting blocks all user consent, so users could not consent even to low-impact permissions of verified apps. Use it when administrators must approve every app.",
+   "Incorrect: this legacy setting lets users consent to any permission that does not require admin consent, for any app. Use it only when you accept the consent phishing risk.",
+   "Incorrect: this blocks all user consent and only adds a request path to administrators, so low-impact consent by users stops. Use it when every app must be reviewed first."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/enterprise-apps/configure-user-consent"
+ },
+ {
+  "id": "1.1.5-02",
+  "obj": "1.1.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. disabled user consent. Users who try to sign in to a new app now see an error, and they need a way to ask an administrator to approve the app.\n\nWhat should you configure?",
+  "choices": [
+   "The admin consent workflow",
+   "Permission classifications for low-impact permissions",
+   "User consent for apps from verified publishers",
+   "Assignment required on the enterprise application"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The admin consent workflow shows users an approval-required prompt where they enter a justification, and it routes the request to designated reviewers. Classifications and assignment settings do not create a request path.",
+  "rationale": [
+   "Correct: with the workflow enabled, users send a justified request that designated reviewers can approve, deny or block, and the user is notified of the outcome.",
+   "Incorrect: classifying permissions as low impact defines what users may consent to under a limiting policy. It gives no way to request approval. Use it with the verified-publisher consent policy.",
+   "Incorrect: this re-enables user consent for some apps, which goes against the decision to disable it, and it still creates no request path. Use it to relax the policy, not to add approvals.",
+   "Incorrect: Assignment required limits who can sign in to one app and has no effect on how consent is requested. Use it to restrict an app to assigned users and groups."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+ },
+ {
+  "id": "1.1.5-03",
+  "obj": "1.1.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "A user at Fabrikam, Inc. was phished and consented to App2, an external app that now reads the user mailbox. The security team already reset the user password and required MFA, and the access continues. The user must be able to keep signing in and working.\n\nWhat should you do?",
+  "choices": [
+   "Revoke the OAuth permission grant of App2",
+   "Reset the user password again and revoke the user sessions",
+   "Create a Conditional Access policy that requires MFA for the user",
+   "Block sign-in for the user account"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A consent grant gives the app its own access to the data, independent of the user password or MFA. The remedy is to remove the permission grant or the app assignment for the user.",
+  "rationale": [
+   "Correct: revoking the OAuth permission grant, for example with Remove-MgOauth2PermissionGrant, removes the access that App2 received, and the user can keep working.",
+   "Incorrect: the app holds its own consent grant, so resetting the password or revoking sessions does not remove it. These steps are effective only against stolen credentials.",
+   "Incorrect: MFA protects the sign-in of the user, not an app that already has delegated access through consent, so the access would continue. Use it to harden sign-ins.",
+   "Incorrect: blocking sign-in is a short-term containment that stops the user from working, which the scenario forbids. Use it for a quick response when the user must not have access."
+  ],
+  "ref": "https://learn.microsoft.com/defender-office-365/detect-and-remediate-illicit-consent-grants"
+ },
+ {
+  "id": "1.1.5-04",
+  "obj": "1.1.5",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Fabrikam, Inc. must change the tenant so that users can consent only to apps from verified publishers for permissions classified as low impact. The existing managePermissionGrantsForOwnedResource policies must stay in place. You use Microsoft Graph PowerShell.\n\nHow should you complete the script? To answer, select the appropriate options in the answer area.\n\n```powershell\nConnect-MgGraph -Scopes \"Policy.ReadWrite.Authorization\"\n$body = @{\n    \"permissionGrantPolicyIdsAssignedToDefaultUserRole\" = @(\n        \"managePermissionGrantsForSelf.[[1]]\",\n        \"managePermissionGrantsForOwnedResource.{other-current-policies}\"\n    )\n}\n[[2]] -BodyParameter $body\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "microsoft-user-default-low",
+     "microsoft-user-default-legacy"
+    ],
+    "why": [
+     "Correct: microsoft-user-default-low allows user consent only for verified publishers and for permissions that you classify as low impact.",
+     "Incorrect: microsoft-user-default-legacy lets users consent to any permission that does not require admin consent, for any app. Use it only when broad user consent is acceptable."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Update-MgPolicyAuthorizationPolicy",
+     "Get-MgPolicyAuthorizationPolicy",
+     "New-MgPolicyPermissionGrantPolicy"
+    ],
+    "why": [
+     "Correct: Update-MgPolicyAuthorizationPolicy changes the authorization policy, including the permission grant policies that are assigned to the default user role.",
+     "Incorrect: Get-MgPolicyAuthorizationPolicy only reads the policy and does not accept a body that changes it. Use it first to see which policies are currently assigned.",
+     "Incorrect: New-MgPolicyPermissionGrantPolicy creates a new custom permission grant policy and does not assign anything to users. Use it when the built-in policies do not fit."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "User consent is controlled by the permission grant policies that the authorization policy assigns to the default user role. Keep the owned-resource policies in the list so that existing developer consent behavior is not removed.",
+  "ref": "https://learn.microsoft.com/entra/identity/enterprise-apps/configure-user-consent"
+ },
+ {
+  "id": "1.1.5-05",
+  "obj": "1.1.5",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Contoso, Ltd. allows user consent for verified publishers and low-impact permissions. App1 requires user assignment, and Group1 is assigned to it. Group1 users who sign in to App1 for the first time see a message that administrator approval is required, although App1 requests only low-impact permissions from a verified publisher. Only Group1 members may use App1.\n\nWhat should you do?",
+  "choices": [
+   "Grant tenant-wide admin consent to the permissions of App1",
+   "Change the user consent setting to Allow user consent for apps",
+   "Set Assignment required to No on the enterprise application of App1",
+   "Classify the permissions of App1 as low impact again"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When an application requires user assignment, its permissions must be consented by an administrator, even if the user consent policy would otherwise allow users to consent. Granting tenant-wide admin consent resolves the prompt and keeps the assignment restriction.",
+  "rationale": [
+   "Correct: apps that require user assignment need administrator consent regardless of the user consent policy, so granting tenant-wide admin consent removes the prompt and keeps only Group1 members in.",
+   "Incorrect: the legacy setting does not change the rule that assignment-required apps need admin consent, and it would weaken consent for every app. Use it only when broad user consent is accepted.",
+   "Incorrect: this removes the user restriction, so any user could sign in, which breaks the requirement that only Group1 may use App1. Use it when the app should be open to all users.",
+   "Incorrect: the permissions are already low impact, and classification does not override the assignment rule. Use classification to define what users may consent to for apps that allow user consent."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity-platform/howto-restrict-your-app-to-a-set-of-users"
+ },
+ {
+  "id": "1.1.5-06",
+  "obj": "1.1.5",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Tailspin Toys is tightening how OAuth consent works in Microsoft Entra ID. Four situations must be handled.\n\nWhich action should you use for each situation? To answer, drag the appropriate actions to the correct situations. Each action may be used once, more than once, or not at all.",
+  "choices": [
+   "Revoke the OAuth permission grant",
+   "Classify permissions as low impact",
+   "Enable the admin consent workflow",
+   "Grant tenant-wide admin consent",
+   "Allow user consent for apps",
+   "Set Assignment required to Yes"
+  ],
+  "targets": [
+   "A user consented to a phishing app last week, and the existing grant must be removed.",
+   "Users may consent to specific permissions only, and administrators must choose which permissions count as safe.",
+   "Users who are blocked from consenting must be able to ask an administrator for approval.",
+   "An app requests Microsoft Graph application permissions, which users can never grant themselves."
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "An existing consent is not undone by changing settings. Revoking the OAuth permission grant removes the access that the app already has.",
+   "Permission classification defines which permissions count as low impact, which the verified-publisher consent policy uses to limit what users may grant.",
+   "The admin consent workflow gives blocked users an approval-required prompt, so they can send a justified request to reviewers.",
+   "Application permissions always need tenant administrator consent, so an administrator must grant tenant-wide admin consent."
+  ],
+  "notes": [
+   "Removes the delegated access that an app received through consent. Use it to remediate illicit consent grants; changing consent settings does not do this.",
+   "Marks selected permissions as low impact so that limited user consent can allow them. Use it with the verified-publisher consent policy.",
+   "Lets users request admin approval for apps they cannot consent to. Use it when user consent is restricted but business needs remain.",
+   "An administrator approves the requested permissions for the entire tenant. Use it for application permissions or for apps that require assignment.",
+   "The legacy setting that lets users consent to any permission that does not require admin consent. It widens exposure and fits none of these situations.",
+   "Limits sign-in to assigned users and groups. It does not remove existing grants, classify permissions or request approval."
+  ],
+  "explanation": "Consent control has distinct tools: settings and classifications limit future consent, the workflow routes requests, admin consent covers high-impact permissions and revoking a grant cleans up existing consent.",
+  "ref": "https://learn.microsoft.com/entra/identity/enterprise-apps/user-admin-consent-overview"
+ },
+ {
+  "id": "1.1.6-01",
+  "obj": "1.1.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. runs App1 on a single Azure virtual machine named VM1. App1 must read blobs from a storage account without any stored credentials. The identity must be deleted automatically when VM1 is deleted and does not need to be shared.\n\nWhich identity should you use?",
+  "choices": [
+   "A system-assigned managed identity",
+   "A user-assigned managed identity",
+   "A service principal with a client secret",
+   "An app registration with a certificate"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A system-assigned managed identity is created with the Azure resource, shares its lifecycle and cannot be shared. A user-assigned identity is a separate resource with its own lifecycle.",
+  "rationale": [
+   "Correct: a system-assigned managed identity is tied to VM1, is deleted with it, and needs no stored credentials, which matches all three requirements.",
+   "Incorrect: a user-assigned identity is a standalone resource that must be deleted explicitly, so it would remain after VM1 is deleted. Use it when several resources share an identity.",
+   "Incorrect: a service principal with a secret requires storing and rotating a credential, and it is not removed with VM1. Use it only for workloads that cannot use managed identities.",
+   "Incorrect: an app registration with a certificate still needs a stored credential and a separate lifecycle. Use it for apps that run outside Azure and cannot use federation or managed identities."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview"
+ },
+ {
+  "id": "1.1.6-02",
+  "obj": "1.1.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs twelve Azure virtual machines that all need the same access to one key vault. The administrators want to create the role assignment once, and want the access to survive when VMs are deleted and recreated.\n\nWhich identity type should you use?",
+  "choices": [
+   "A user-assigned managed identity that is attached to all twelve VMs",
+   "A system-assigned managed identity on each VM",
+   "A separate service principal with a secret for each VM",
+   "A shared client secret stored in each VM"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A user-assigned managed identity can be attached to many resources and has an independent lifecycle, so one role assignment serves all of them and survives VM recreation.",
+  "rationale": [
+   "Correct: one user-assigned identity with one role assignment can be attached to all twelve VMs, and it persists when VMs are deleted and recreated.",
+   "Incorrect: each system-assigned identity is unique to one VM and is deleted with it, so you would need twelve role assignments that are lost on recreation. Use it for per-resource identities.",
+   "Incorrect: twelve service principals mean twelve secrets to store and rotate and twelve role assignments, which is the opposite of the goal. Use them only when managed identities are unsupported.",
+   "Incorrect: a shared secret must be stored on each VM and rotated, which is a credential risk and not a managed identity. Prefer managed identities for Azure-hosted workloads."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/managed-identity-best-practice-recommendations"
+ },
+ {
+  "id": "1.1.6-03",
+  "obj": "1.1.6",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Litware, Inc. uses a key vault named Vault1 that is set to the Azure role-based access control permission model. You must create a virtual machine named VM1 and let App1 on VM1 read secrets from Vault1 by using a system-assigned managed identity.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az vm create --resource-group RG1 --name VM1 --image <image>`",
+   "`az vm identity assign --resource-group RG1 --name VM1`",
+   "`az role assignment create --role \"Key Vault Secrets User\" --assignee <systemAssignedIdentity> --scope <Vault1-resource-id>`",
+   "`az identity create --resource-group RG1 --name Id1`",
+   "`az keyvault set-policy --name Vault1 --object-id <principalId> --secret-permissions get`",
+   "`az ad sp create-for-rbac --name App1`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The VM must exist before it can have an identity, and the identity must exist before it can receive a role assignment. Vault1 uses Azure RBAC, so the access is granted with a role assignment such as Key Vault Secrets User.",
+  "rationale": [
+   "Step 1: the VM must exist first, because a system-assigned identity is enabled on an existing resource and has no meaning without VM1.",
+   "Step 2: az vm identity assign enables the system-assigned managed identity on VM1 and returns the identity that you need for the role assignment.",
+   "Step 3: the role assignment grants that identity the Key Vault Secrets User role on Vault1, which lets App1 read secrets under the RBAC permission model.",
+   "Incorrect: this creates a user-assigned identity, which the requirement does not ask for, because a system-assigned identity is specified. Use it when several resources must share one identity.",
+   "Incorrect: access policies apply only to vaults that use the access policy permission model, and Vault1 uses Azure RBAC. Use set-policy for vaults that are not RBAC-enabled.",
+   "Incorrect: this creates a service principal with a credential for RBAC use, which is not a managed identity and brings a secret to manage. Use it only for workloads that cannot use managed identities."
+  ],
+  "ref": "https://learn.microsoft.com/azure/key-vault/general/tutorial-javascript-virtual-machine"
+ },
+ {
+  "id": "1.1.6-04",
+  "obj": "1.1.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank has a deployment pipeline account that already holds the Virtual Machine Contributor role. The pipeline creates VMs and must attach an existing user-assigned managed identity, Id1, to them. The account must not be able to create or delete managed identities.\n\nWhich additional role should you assign to the pipeline account on Id1?",
+  "choices": [
+   "Managed Identity Operator",
+   "Managed Identity Contributor",
+   "User Access Administrator",
+   "Reader"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Assigning an existing user-assigned identity to a VM needs the Managed Identity Operator role on the identity, together with Virtual Machine Contributor on the VM. Managed Identity Contributor can also create and delete identities.",
+  "rationale": [
+   "Correct: Managed Identity Operator lets the account read and assign Id1 to resources without being able to create or delete identities.",
+   "Incorrect: Managed Identity Contributor includes create and delete rights on identities, which the requirement forbids. Use it for teams that must manage the identity lifecycle.",
+   "Incorrect: User Access Administrator manages role assignments, not the assignment of an identity to a VM, and it is far broader than needed. Use it when someone must delegate Azure roles.",
+   "Incorrect: Reader allows only reading the identity and does not allow attaching it to a VM. Use it for read-only inventory or audit access."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/how-to-configure-managed-identities"
+ },
+ {
+  "id": "1.1.6-05",
+  "obj": "1.1.6",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. deploys VMs by using a template. The template enables a system-assigned managed identity on each VM and also creates a role assignment for that identity on a storage account. The deployment fails with an authorization error, because the deployment account has the Contributor role but cannot create role assignments. The deployment must stay fully automated, and the deployment account must not get role assignment or Entra group membership rights.\n\nWhat should you do?",
+  "choices": [
+   "Create a user-assigned managed identity with its role assignment in advance, and attach it to the VMs in the template.",
+   "Assign the User Access Administrator role to the deployment account at subscription scope.",
+   "Keep the system-assigned identity and add dependsOn to the role assignment resource in the template.",
+   "Add the system-assigned identity of each VM to a security group that already has the role assignment."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A system-assigned identity exists only after its resource is created, so its role assignment cannot be prepared in advance. A user-assigned identity and its role assignments can be set up beforehand, so the pipeline needs only the right to attach it.",
+  "rationale": [
+   "Correct: the identity and its role assignment are prepared by an administrator in advance, and the template only attaches the identity, which needs no role assignment rights for the pipeline.",
+   "Incorrect: User Access Administrator would let the pipeline create role assignments, which the scenario explicitly forbids. Use it when automation is trusted to grant access.",
+   "Incorrect: dependsOn fixes the ordering but not the missing permission, so the role assignment still fails for the deployment account. Use dependsOn when resources must be created in a specific order.",
+   "Incorrect: adding an identity to a group needs group membership rights that the deployment account does not have, and the identity must exist first. Groups reduce role assignments but need an administrator."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/managed-identity-best-practice-recommendations"
+ },
+ {
+  "id": "1.1.6-06",
+  "obj": "1.1.6",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Contoso, Ltd. must create a user-assigned managed identity named Id1 in RG2, attach it to an existing VM named VM1 in RG1, and let App1 read secrets from a key vault that uses Azure RBAC. App1 must have no permission to manage the vault.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz [[1]] create --resource-group RG2 --name Id1\naz vm [[2]] assign --resource-group RG1 --name VM1 --identities <resource-ID-of-Id1>\naz role assignment create --assignee <principalId-of-Id1> --role \"[[3]]\" --scope <vault-resource-id>\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "identity",
+     "ad sp",
+     "keyvault"
+    ],
+    "why": [
+     "Correct: az identity create creates a user-assigned managed identity as a standalone Azure resource in the given resource group.",
+     "Incorrect: az ad sp manages Microsoft Entra service principals, which are not managed identities and are not created with this resource-group syntax. Use it for app service principals.",
+     "Incorrect: az keyvault manages key vaults and has no create command for identities. Use it to deploy or configure the vault itself."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "identity",
+     "extension",
+     "update"
+    ],
+    "why": [
+     "Correct: az vm identity assign attaches a managed identity to a VM, and --identities takes the resource ID of the user-assigned identity.",
+     "Incorrect: az vm extension manages VM extensions, which are agents or scripts, not identities. Use it to install extensions on a VM.",
+     "Incorrect: az vm update changes VM properties and does not provide an identity assign verb, so the command line would not parse. Use it for settings such as size or tags."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "Key Vault Secrets User",
+     "Key Vault Administrator",
+     "Key Vault Contributor"
+    ],
+    "why": [
+     "Correct: Key Vault Secrets User grants read access to secret contents, which is all App1 needs and gives no vault management rights.",
+     "Incorrect: Key Vault Administrator allows full data-plane management of keys, secrets and certificates, which exceeds the need. Use it for vault administrators.",
+     "Incorrect: Key Vault Contributor manages the vault resource itself but does not grant access to secret data, so App1 could not read secrets. Use it for vault management tasks."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "A user-assigned identity is created with az identity create, attached to a VM with az vm identity assign, and then granted the least-privilege data role, which for reading secrets is Key Vault Secrets User.",
+  "ref": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/manage-user-assigned-managed-identities-azure-cli"
+ }
+]

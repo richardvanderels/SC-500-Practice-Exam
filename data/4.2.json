@@ -1,0 +1,1643 @@
+[
+ {
+  "id": "4.2.1-01",
+  "obj": "4.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a Log Analytics workspace named Workspace1. User1 has the Microsoft Sentinel Contributor role on the resource group that contains Workspace1. User1 must add Microsoft Sentinel to Workspace1 but receives an authorization error.\n\nWhich additional role should you assign to User1?",
+  "explanation": "Enabling Microsoft Sentinel on a workspace needs Contributor permissions on the subscription in which the workspace resides. Microsoft Sentinel Contributor and Reader roles apply to using Sentinel after it is enabled.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/quickstart-onboard",
+  "choices": [
+   "Contributor on the subscription that contains Workspace1",
+   "Microsoft Sentinel Automation Contributor on the resource group",
+   "Log Analytics Reader on Workspace1",
+   "Security Reader on the subscription"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Enabling Microsoft Sentinel on a workspace requires Contributor on the subscription. The Microsoft Sentinel Contributor role that User1 already has covers day-to-day use of Sentinel on the resource group, not the deployment step.",
+   "Incorrect: This is a service role that lets Microsoft Sentinel add playbooks to automation rules. It is not assigned to users and grants no right to enable Sentinel. Use it on the playbook resource group.",
+   "Incorrect: Log Analytics Reader gives read access to workspace data and settings, so it cannot deploy the Sentinel solution onto the workspace. It suits an analyst who only needs to run queries.",
+   "Incorrect: Security Reader gives read access to security information such as Defender for Cloud data, but it does not allow deploying resources. It suits an auditor who reviews posture without changing anything."
+  ]
+ },
+ {
+  "id": "4.2.1-02",
+  "obj": "4.2.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Microsoft Defender for Cloud, which created a default Log Analytics workspace named DefaultWorkspace1. An administrator tries to add Microsoft Sentinel to DefaultWorkspace1, but the workspace is not listed.\n\nWhat should you do to deploy Microsoft Sentinel?",
+  "explanation": "Default workspaces that Defender for Cloud creates are not shown in the Sentinel onboarding list, and Sentinel cannot be installed on them. You create or select a different Log Analytics workspace and add Sentinel to that one.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/quickstart-onboard",
+  "choices": [
+   "Move DefaultWorkspace1 to a different resource group and add Microsoft Sentinel",
+   "Register the Microsoft.SecurityInsights resource provider on the subscription",
+   "Assign the Owner role on DefaultWorkspace1 to the administrator",
+   "Create a new Log Analytics workspace and add Microsoft Sentinel to it"
+  ],
+  "answer": [
+   3
+  ],
+  "rationale": [
+   "Incorrect: Moving the workspace does not change the fact that it is a Defender for Cloud default workspace, and a workspace with Sentinel deployed cannot be moved later. Moves are only a layout change, not a fix.",
+   "Incorrect: Registering the resource provider is a valid prerequisite step on a new subscription, but it does not make a default workspace eligible. Use it when deployment fails with a provider not registered error.",
+   "Incorrect: Owner rights remove permission problems, but the workspace is hidden by design, not because of missing rights. Owner would help if the administrator saw the workspace but could not add Sentinel.",
+   "Correct: A dedicated workspace is the supported path. Sentinel can run on any regular Log Analytics workspace, so you create one in the region you need and add Sentinel to it."
+  ]
+ },
+ {
+  "id": "4.2.1-03",
+  "obj": "4.2.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank has two Microsoft Entra tenants named Tenant1 and Tenant2. One security operations team must collect Microsoft Entra ID sign-in logs and Azure Activity logs from both tenants by using the built-in data connectors.\n\nWhat should you deploy?",
+  "explanation": "Service-to-service connectors that rely on diagnostic settings work only inside their own Microsoft Entra tenant, so each tenant needs its own Sentinel workspace. The team then uses multiple-workspace views to work across them.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/prepare-multiple-workspaces",
+  "choices": [
+   "One workspace in Tenant1 with diagnostic settings in Tenant2 that point to it",
+   "One workspace in Tenant1 with Azure Lighthouse delegation from Tenant2",
+   "One Log Analytics workspace with Microsoft Sentinel in each tenant",
+   "One workspace in Tenant1 configured as the parent workspace for workspace manager"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Diagnostic settings cannot send logs to a workspace that is in a different tenant than the resource, and tenant-level Entra ID logs cannot be redirected that way. This pattern fits resources inside one tenant.",
+   "Incorrect: Azure Lighthouse delegates management of resources across tenants, which helps run a SOC centrally, but diagnostic settings-based connectors such as Azure Activity and Entra ID still cannot write across the tenant boundary.",
+   "Correct: Connectors for Entra ID and Azure Activity work only within their own tenant, so at least one workspace per tenant is the recommended design. Incidents can still be viewed centrally across workspaces.",
+   "Incorrect: Workspace manager publishes content such as rules and workbooks from a central workspace to member workspaces. It does not collect data, so it cannot replace per-tenant data connectors."
+  ]
+ },
+ {
+  "id": "4.2.1-04",
+  "obj": "4.2.1",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys has Microsoft Sentinel enabled on Workspace1. User1 has the Microsoft Sentinel Contributor role on the resource group that contains Workspace1 and must connect Workspace1 to the Microsoft Defender portal. Workspace1 does not appear on the SIEM workspaces page for User1. User1 must not receive the Owner role.\n\nWhich additional role should you assign to User1 at the subscription scope?",
+  "explanation": "Onboarding a workspace to the Defender portal needs either Owner on the subscription, or User Access Administrator at subscription scope combined with Microsoft Sentinel Contributor at subscription or resource group scope. Workspaces you lack the roles for are not listed.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/isv/sentinel-data-lake-onboarding",
+  "choices": [
+   "Log Analytics Contributor",
+   "User Access Administrator",
+   "Monitoring Contributor",
+   "Microsoft Entra Security Administrator"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Log Analytics Contributor manages workspace settings and data but does not include the role-assignment permissions that onboarding uses. It suits someone who manages tables and retention.",
+   "Correct: User Access Administrator at the subscription plus the Microsoft Sentinel Contributor that User1 already holds is the least-privilege alternative to Owner for connecting a workspace to the Defender portal.",
+   "Incorrect: Monitoring Contributor manages Azure Monitor resources such as data collection rules and alerts. It does not satisfy the onboarding prerequisite. Use it for people who create DCRs.",
+   "Incorrect: This Entra role is needed to onboard a tenant to the Sentinel data lake, not to connect a workspace to the Defender portal. It is an Entra directory role, not an Azure subscription role."
+  ]
+ },
+ {
+  "id": "4.2.1-05",
+  "obj": "4.2.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Fabrikam, Inc. has two Microsoft Sentinel workspaces in the same Microsoft Entra tenant: WorkspaceEU in West Europe and WorkspaceUS in East US. Data residency rules prevent copying data between the regions. The security operations team must triage incidents from both workspaces in the Microsoft Defender portal.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "explanation": "The Defender portal supports one Microsoft Entra tenant with one primary workspace and multiple secondary workspaces. Connecting each workspace from SIEM workspaces keeps data in its own region while giving one incident queue.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/microsoft-sentinel-onboard",
+  "choices": [
+   "Export the WorkspaceUS tables to WorkspaceEU by using data export rules",
+   "Connect both workspaces from the SIEM workspaces page in the Defender portal settings",
+   "Move WorkspaceUS to the resource group that contains WorkspaceEU",
+   "Designate one of the connected workspaces as the primary workspace",
+   "Create a second Microsoft Entra tenant that hosts WorkspaceUS"
+  ],
+  "answer": [
+   1,
+   3
+  ],
+  "rationale": [
+   "Incorrect: Exporting tables copies data across regions, which the residency rules forbid. Use export rules when you need an archive copy inside an allowed region.",
+   "Correct: Each workspace is connected from System > Settings > Microsoft Sentinel > SIEM workspaces. Data stays in its home region, and incidents appear together in the Defender portal.",
+   "Incorrect: Once Microsoft Sentinel is deployed, the workspace cannot be moved to another resource group or subscription, and moving would not address the Defender portal requirement anyway.",
+   "Correct: One connected workspace is the primary, and the others are secondary. With two workspaces you must decide which one is primary when you connect them.",
+   "Incorrect: The Defender portal supports a single Microsoft Entra tenant, so a second tenant splits the view instead of unifying it. Multiple tenants need multitenant management, a different scenario."
+  ]
+ },
+ {
+  "id": "4.2.1-06",
+  "obj": "4.2.1",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Litware, Inc. must deploy Microsoft Sentinel on a new workspace in the West Europe region and make the workspace available in the Microsoft Defender portal.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "explanation": "Sentinel is a layer on top of a Log Analytics workspace, so the workspace must exist first. Only a workspace with Sentinel enabled can then be connected to the Defender portal.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/quickstart-onboard",
+  "choices": [
+   "Create a data collection endpoint in West Europe.",
+   "Add Microsoft Sentinel to the workspace.",
+   "Create the workspace by running `az monitor log-analytics workspace create` with the West Europe location.",
+   "Install the Azure Monitor Agent on the on-premises servers.",
+   "In the Defender portal, connect the workspace from the SIEM workspaces page.",
+   "Assign the Microsoft Sentinel Automation Contributor role on the workspace."
+  ],
+  "answer": [
+   2,
+   1,
+   4
+  ],
+  "rationale": [
+   "Incorrect: A data collection endpoint is needed for some ingestion scenarios such as the Logs ingestion API with private link. It is not part of enabling Sentinel. Create one when a connector requires it.",
+   "Step 2: With the workspace in place, you add Microsoft Sentinel to it. This enables the SIEM features on that Log Analytics workspace.",
+   "Step 1: The Log Analytics workspace comes first because Sentinel is added to an existing workspace, and the workspace region fixes where the data is stored.",
+   "Incorrect: Agents are a data collection step that follows onboarding. They are not required to enable Sentinel or connect it to the Defender portal. Install them when you start collecting server logs.",
+   "Step 3: After Sentinel is enabled, you connect the workspace from the SIEM workspaces page. This makes the workspace's incidents and data available in the Defender portal.",
+   "Incorrect: Automation Contributor is a service role on the playbook resource group that lets Sentinel run playbooks. It does not apply to the workspace and is not an onboarding step."
+  ]
+ },
+ {
+  "id": "4.2.2-01",
+  "obj": "4.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Adatum Corporation has an internal auditor named User1. User1 must view incidents, workbooks, and ingested data in Microsoft Sentinel but must not change incidents or any configuration.\n\nWhich role should you assign to User1 on the resource group that contains the workspace?",
+  "explanation": "Microsoft Sentinel Reader lets a user view data, incidents, workbooks, and other resources. Responder adds incident management, and Contributor adds the ability to create and edit resources.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/roles",
+  "choices": [
+   "Microsoft Sentinel Responder",
+   "Microsoft Sentinel Reader",
+   "Microsoft Sentinel Contributor",
+   "Microsoft Sentinel Playbook Operator"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Responder includes all Reader permissions and adds managing incidents, such as assigning and closing them. It is the right pick for a triage analyst, but User1 must not change incidents.",
+   "Correct: Reader provides view-only access to Sentinel data, incidents, workbooks, and other resources, which matches an auditor who must not change anything.",
+   "Incorrect: Contributor includes Responder permissions and adds creating and editing resources and installing solutions. That is far more than a view-only auditor needs.",
+   "Incorrect: Playbook Operator lists, views, and manually runs playbooks. It does not grant read access to incidents and data in the workspace, so it does not fit a general auditor."
+  ]
+ },
+ {
+  "id": "4.2.2-02",
+  "obj": "4.2.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. has an analyst named User1 who has the Microsoft Sentinel Responder role. User1 must run an existing playbook manually on incidents. The playbook is in a resource group named RG-Playbooks.\n\nWhich role should you assign to User1 on RG-Playbooks?",
+  "explanation": "Responder lets a user access an incident, but running a playbook manually needs Microsoft Sentinel Playbook Operator on the resource group that holds the playbook.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/roles",
+  "choices": [
+   "Microsoft Sentinel Automation Contributor",
+   "Microsoft Sentinel Contributor",
+   "Microsoft Sentinel Playbook Operator",
+   "Logic App Contributor"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: This role is used by Microsoft Sentinel itself so that automation rules can run playbooks. It is not meant for user accounts and does not let a user run playbooks manually.",
+   "Incorrect: Microsoft Sentinel Contributor lets a user attach a playbook to an automation rule or analytics rule and manage resources. It is broader than needed for running a playbook by hand.",
+   "Correct: Playbook Operator lists, views, and manually runs playbooks. Combined with Responder for incident access, it lets User1 run the playbook on incidents.",
+   "Incorrect: Logic App Contributor edits and manages the logic apps that implement playbooks. It is for authors who build playbooks, not for analysts who only run them."
+  ]
+ },
+ {
+  "id": "4.2.2-03",
+  "obj": "4.2.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a Microsoft Sentinel workspace. User1 has the Microsoft Sentinel Contributor role and creates an automation rule that must run Playbook1. Playbook1 resides in RG-Playbooks, but Playbook1 is unavailable in the Run playbook list of the rule.\n\nWhat should you do?",
+  "explanation": "Microsoft Sentinel runs playbooks from automation rules by using its own service account, which needs the Microsoft Sentinel Automation Contributor role on the playbook resource group. The Manage playbook permissions option grants it, and you need Owner or User Access Administrator to do so.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automation/run-playbooks",
+  "choices": [
+   "Assign User1 the Microsoft Sentinel Playbook Operator role on RG-Playbooks",
+   "Grant Microsoft Sentinel permissions on RG-Playbooks by using Manage playbook permissions",
+   "Assign User1 the Microsoft Sentinel Responder role on the workspace",
+   "Assign the Logic App Operator role on Playbook1 to the Microsoft Sentinel service account"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Playbook Operator lets a user run a playbook manually. The playbook is hidden because Sentinel itself lacks access to the resource group, not because User1 lacks a user role.",
+   "Correct: Manage playbook permissions assigns Automation Contributor to the Sentinel service account on RG-Playbooks. After that, any automation rule can run any playbook in that resource group.",
+   "Incorrect: Responder grants incident access, which User1 already has through Contributor. It does not change whether the Sentinel service account can reach the playbook resource group.",
+   "Incorrect: Logic App Operator is a Logic Apps role that reads, enables, and disables logic apps. The Sentinel service account needs the Sentinel Automation Contributor role instead, so this assignment would not make the playbook appear."
+  ]
+ },
+ {
+  "id": "4.2.2-04",
+  "obj": "4.2.2",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Relecloud assigns Microsoft Sentinel built-in roles at the resource group level that contains its workspace. The security team plans these assignments.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "explanation": "Reader views, Responder manages incidents, Contributor creates and edits resources and installs solutions, and Playbook Operator only runs playbooks. Authoring playbooks needs Logic Apps roles.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/roles",
+  "choices": [
+   "A user who has the Microsoft Sentinel Reader role can view incidents and workbooks.",
+   "A user who has the Microsoft Sentinel Responder role can install and update solutions from the content hub.",
+   "A user who has the Microsoft Sentinel Contributor role on the resource group can install solutions from the content hub.",
+   "A user who has the Microsoft Sentinel Playbook Operator role can create and edit playbooks."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "rationale": [
+   "Yes: Reader is the view-only role for data, incidents, workbooks, and other resources, so this statement is true.",
+   "No: Installing or updating solutions needs Microsoft Sentinel Contributor at the resource group level. Responder only adds incident management on top of Reader.",
+   "Yes: Managing content hub solutions needs Microsoft Sentinel Contributor on the resource group that the workspace belongs to, so this statement is true.",
+   "No: Playbook Operator lists, views, and manually runs playbooks. Creating or editing playbooks needs a Logic Apps role such as Logic App Contributor."
+  ]
+ },
+ {
+  "id": "4.2.2-05",
+  "obj": "4.2.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has one Microsoft Sentinel workspace. The owners of the Azure virtual machines in each business unit must query only the logs that their own VMs send to the workspace. The company does not want to create more workspaces.\n\nWhich access model should you use?",
+  "explanation": "Resource-context RBAC gives users access to log data pertaining to the Azure resources they already have permissions on, without extra workspaces. Table-level RBAC restricts by table, not by resource owner.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/prepare-multiple-workspaces",
+  "choices": [
+   "Microsoft Sentinel Reader at the resource group of the workspace",
+   "Table-level Azure RBAC on the SecurityEvent and Syslog tables",
+   "Resource-context Azure RBAC based on the Azure permissions on each VM",
+   "Microsoft Sentinel Responder at the subscription of each business unit"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Reader at the workspace resource group exposes all data in the workspace to every owner. It fits a SOC analyst who must see everything.",
+   "Incorrect: Table-level RBAC limits access to named tables, but each owner would then see the rows of every business unit in those tables. It fits a team such as Operations that needs two specific tables.",
+   "Correct: With resource-context RBAC, resource owners see only the data from resources they have access to, which meets the per-business-unit requirement within one workspace.",
+   "Incorrect: Responder is a Sentinel role scoped to the incidents and workspace; assigning it elsewhere does not filter log rows by resource and adds incident management rights that are not needed."
+  ]
+ },
+ {
+  "id": "4.2.2-06",
+  "obj": "4.2.2",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Adatum Corporation must assign Microsoft Sentinel roles at the resource group rg-sentinel. User1 must install solutions from the content hub and create analytics rules. User2 must triage incidents, including assigning owners and closing them, but must not change rules.\n\nHow should you complete the commands? To answer, select the appropriate options in the answer area.\n\n```\naz role assignment create --assignee user1@adatum.com --role \"[[1]]\" --scope /subscriptions/<subscription-id>/resourceGroups/rg-sentinel\naz role assignment create --assignee user2@adatum.com --role \"[[2]]\" --scope /subscriptions/<subscription-id>/resourceGroups/rg-sentinel\n```",
+  "explanation": "Match the role to the task: Contributor installs solutions and edits resources, Responder manages incidents, Reader views, Playbook Operator runs playbooks, and Automation Contributor belongs to the Sentinel service account.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/roles",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Microsoft Sentinel Reader",
+     "Microsoft Sentinel Responder",
+     "Microsoft Sentinel Contributor",
+     "Microsoft Sentinel Playbook Operator"
+    ],
+    "why": [
+     "Incorrect: Reader is view-only, so User1 could not install solutions or create rules. Use it for auditors.",
+     "Incorrect: Responder manages incidents but cannot install solutions or create analytics rules. Use it for triage analysts, as for User2.",
+     "Correct: Contributor includes Responder rights and adds creating and editing resources, including installing solutions from the content hub at resource group scope.",
+     "Incorrect: Playbook Operator only lists and runs playbooks, which is unrelated to installing solutions or authoring rules."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Microsoft Sentinel Reader",
+     "Microsoft Sentinel Responder",
+     "Microsoft Sentinel Contributor",
+     "Microsoft Sentinel Automation Contributor"
+    ],
+    "why": [
+     "Incorrect: Reader can view incidents but cannot assign owners or close them. Use it when only visibility is needed.",
+     "Correct: Responder includes Reader rights and adds managing incidents, such as assigning owners and closing them, without rights to change rules.",
+     "Incorrect: Contributor would let User2 create and edit rules and install solutions, which the requirement forbids.",
+     "Incorrect: Automation Contributor is a service role for Sentinel to run playbooks from automation rules. It is not assigned to analysts."
+    ]
+   }
+  ],
+  "answer": [
+   2,
+   1
+  ]
+ },
+ {
+  "id": "4.2.3-01",
+  "obj": "4.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs a third-party firewall and wants the data connector, analytics rule templates, hunting queries, and workbooks for that product in its Microsoft Sentinel workspace. The team wants to deploy the whole package in one step.\n\nWhat should you use?",
+  "explanation": "Content hub solutions are packaged integrations that bundle connectors, rules, queries, and workbooks for a product or scenario, and you deploy them in a single step.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "A repository connection to a GitHub repository",
+   "A solution from the content hub",
+   "The analytics rule template gallery",
+   "An ARM template that you export from another workspace"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Repositories deploy custom content that you maintain in source control by using CI/CD. They do not offer prepackaged vendor content. Use them for your own rules and workbooks.",
+   "Correct: A solution packages the connector, rule templates, hunting queries, and workbooks for the product, and installing it deploys all of them together from the content hub.",
+   "Incorrect: Rule templates cover only one content type and no connector or workbook. Use them when you need only detections for data that is already ingested.",
+   "Incorrect: An exported ARM template could clone content, but it is a manual process that is not maintained by the vendor and does not receive updates from the content hub."
+  ]
+ },
+ {
+  "id": "4.2.3-02",
+  "obj": "4.2.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys wants a single community hunting query for a known threat in its Microsoft Sentinel workspace. The query must stay up to date automatically as the community improves it, without installing a full product package.\n\nWhich type of content hub item should you install?",
+  "explanation": "Standalone content items in the content hub install a single item such as a hunting query, and they are kept up to date automatically. Solutions are bundles that you update yourself.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "A solution",
+   "A custom repository item",
+   "A standalone content item",
+   "A cloned rule template"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: A solution is a bundle for a product or scenario, and solution updates are applied when you update the solution. It is more than needed for one query.",
+   "Incorrect: Items in a repository are custom content that you author and deploy through your own CI/CD. They are not updated by the content hub.",
+   "Correct: Standalone content installs one item and is updated automatically. Active or custom items created from it are left untouched.",
+   "Incorrect: A cloned copy becomes custom content, so it no longer follows the upstream template. Use cloning when you want to diverge from the original."
+  ]
+ },
+ {
+  "id": "4.2.3-03",
+  "obj": "4.2.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. installed the Azure Activity solution from the content hub in a Microsoft Sentinel workspace. Two hours later no Azure Activity data is in the workspace and the data connector status is Not connected.\n\nWhat should you do next?",
+  "explanation": "Installing a solution makes its data connector available but does not connect it. You still open the connector page and complete the configuration, such as connecting the subscriptions, before data flows.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "Update the Azure Activity solution to the latest version",
+   "Configure the Azure Activity data connector from the Data connectors page",
+   "Create a new data collection rule for the AzureActivity table",
+   "Install the Azure Monitor Agent on a virtual machine in the subscription"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Updating applies a newer solution version, but it does not connect any subscription. Use it when the content hub reports an available update.",
+   "Correct: The solution only adds the connector to the gallery. Opening the connector page and completing its configuration is what starts ingestion and moves the status to Connected.",
+   "Incorrect: The AzureActivity table is fed through the diagnostic settings pipeline, and the table does not support DCR-based ingestion, so a new DCR is not the right tool here.",
+   "Incorrect: Azure Monitor Agent collects data from machines, not subscription-level activity logs, so installing it does not help the Azure Activity connector."
+  ]
+ },
+ {
+  "id": "4.2.3-04",
+  "obj": "4.2.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. is onboarding Microsoft Sentinel and must install eight solutions and update three installed solutions in one pass. The user has the Microsoft Sentinel Contributor role on the resource group.\n\nWhat should you use in the content hub?",
+  "explanation": "The content hub list view supports selecting multiple solutions and standalone items and installing or updating them in bulk with the Install/Update button.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "The list view, select the items, and select Install/Update",
+   "The card view, opening each solution and selecting Install",
+   "The Repositories page to connect a GitHub repository",
+   "The Analytics page to enable the rule templates of each solution"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: The list view is built for bulk work. You can select several solutions and standalone items and run Install/Update, and items that are already current are skipped without affecting the others.",
+   "Incorrect: Opening each solution works, but it is a one-at-a-time process. Use it when you need to review details of a single solution before installing.",
+   "Incorrect: Repositories deploy custom content from source control. They do not install or update content hub solutions.",
+   "Incorrect: The Analytics page enables rules from templates after content exists. It does not install solutions or update them."
+  ]
+ },
+ {
+  "id": "4.2.3-05",
+  "obj": "4.2.3",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Woodgrove Bank manages Microsoft Sentinel content in three ways. You must choose the mechanism for each requirement.\n\nWhich mechanism should you use for each requirement? To answer, drag the appropriate mechanisms to the correct requirements. Each mechanism may be used once, more than once, or not at all.",
+  "explanation": "Match the delivery model to the content: solutions for packaged vendor value, standalone items for single maintained items, repositories for your own content under source control.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "Content hub solution",
+   "Content hub standalone item",
+   "Repositories connection",
+   "Workspace manager"
+  ],
+  "targets": [
+   "Requirement 1: deploy a vendor package that includes a data connector, analytics rule templates, and workbooks",
+   "Requirement 2: add one hunting query that the community maintains and that updates automatically",
+   "Requirement 3: deploy the company's own analytics rules from a GitHub repository after each commit"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "A solution bundles the connector, rule templates, and workbooks for a product, so the whole package installs together.",
+   "A standalone item is a single content item that is kept up to date automatically, which matches one community query.",
+   "A repository connection links source control to the workspace so custom content is deployed by CI/CD on each commit."
+  ],
+  "notes": [
+   "Packaged integration for a product or scenario. Use it when you want connectors, rules, queries, and workbooks together; you update it from the content hub.",
+   "A single item such as a hunting query, analytics rule template, or workbook. Use it for one piece of content; it updates automatically.",
+   "Connects a GitHub or Azure DevOps repository so custom content is deployed from source control. Use it for content you author yourself.",
+   "Publishes content from a central workspace to member workspaces at scale. Use it to manage many workspaces; it does not link source control or install vendor packages."
+  ]
+ },
+ {
+  "id": "4.2.3-06",
+  "obj": "4.2.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation installed a solution from the content hub and customized three of the analytics rules that were created from its templates. The content hub now shows an update for the solution. The team wants the new templates, and must keep the customized rules unchanged with the least administrative effort.\n\nWhat should you do?",
+  "explanation": "Updating a solution refreshes its templates and content, while active or custom items that were created from the solution remain untouched. No backup or recreate step is needed.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy",
+  "choices": [
+   "Update the solution in the content hub and keep the active rules as they are",
+   "Delete the three customized rules, update the solution, and recreate the rules",
+   "Uninstall the solution and install it again to refresh the templates",
+   "Export the three rules to ARM templates and import them after the update"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: The update touches the solution content and templates. Active rules created from earlier templates remain untouched, so the customizations survive without extra steps.",
+   "Incorrect: Deleting the rules is unnecessary because updates do not overwrite active items. It costs effort and risks losing rule history and settings.",
+   "Incorrect: Uninstalling and reinstalling is heavier than an update and is not needed to get new templates. Use uninstall when you want to remove the content entirely.",
+   "Incorrect: Exporting rules protects against overwrites, but updates do not overwrite active rules, so this adds work. It fits a case where you move rules between workspaces."
+  ]
+ },
+ {
+  "id": "4.2.4-01",
+  "obj": "4.2.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. must ingest subscription-level events such as resource write operations and service health events into Microsoft Sentinel for one Azure subscription.\n\nWhich data connector should you enable?",
+  "explanation": "The Azure Activity connector streams the subscription activity log, which holds Resource Manager operations, write operations, and service health events, into the AzureActivity table.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/data-connectors-reference",
+  "choices": [
+   "Microsoft Entra ID",
+   "Azure Activity",
+   "Microsoft Defender for Cloud",
+   "Azure Storage Account"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: The Entra ID connector sends tenant-level sign-in, audit, and provisioning logs. It does not carry subscription control-plane events. Use it for identity activity.",
+   "Correct: The Azure Activity connector ingests the subscription activity log into the AzureActivity table, which covers resource operations and service health events.",
+   "Incorrect: The Defender for Cloud connector brings in security alerts and recommendations, not the raw activity log. Use it to see Defender alerts as Sentinel incidents.",
+   "Incorrect: The Storage Account connector collects diagnostics and metrics of storage accounts. It does not collect subscription activity logs. Use it for data-plane logging of storage."
+  ]
+ },
+ {
+  "id": "4.2.4-02",
+  "obj": "4.2.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a Microsoft Entra tenant with only Microsoft Entra ID Free licenses. The security team wants the interactive user sign-in logs in the SigninLogs table of Microsoft Sentinel.\n\nWhat should the company obtain?",
+  "explanation": "A Microsoft Entra ID P1 or P2 license is required to ingest sign-in logs into Microsoft Sentinel, while other log types such as audit logs work with any Entra ID license.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-azure-active-directory",
+  "choices": [
+   "Microsoft Entra ID P1 or P2 licenses",
+   "Microsoft Entra Workload ID Premium licenses",
+   "Microsoft Defender for Cloud Apps licenses",
+   "Microsoft Sentinel Contributor assignments"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: Sign-in logs require Entra ID P1 or P2 in the tenant. Audit logs and several other log types need no premium license, but SigninLogs do.",
+   "Incorrect: Workload ID Premium is required for risky service principal and service principal risk event logs, not for interactive user sign-in logs.",
+   "Incorrect: Defender for Cloud Apps adds cloud app discovery and protection and is not a prerequisite for the Entra ID connector. Use it to monitor SaaS app activity.",
+   "Incorrect: Sentinel Contributor is a role on the workspace that the user needs to enable the connector, not a license. It does not remove the licensing requirement for sign-in logs."
+  ]
+ },
+ {
+  "id": "4.2.4-03",
+  "obj": "4.2.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. has 30 Azure Batch accounts in a subscription, and new Batch accounts are created every week. The diagnostic logs of all current and future Batch accounts must stream to a Microsoft Sentinel workspace without per-resource configuration.\n\nWhat should you do?",
+  "explanation": "The Azure Batch Account connector is a diagnostic settings-based connector managed by Azure Policy. Assigning the policy at subscription scope covers new resources, and a remediation task covers existing ones.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-diagnostic-setting-based",
+  "choices": [
+   "Create a diagnostic setting on each Batch account that sends logs to the workspace",
+   "Install the Azure Monitor Agent on the compute nodes and create a data collection rule",
+   "Launch the Azure Policy assignment wizard from the connector page and create a remediation task",
+   "Enable the Azure Activity connector for the subscription"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: A manual diagnostic setting works for each existing account, but it does not cover accounts created later and requires per-resource work. Use it for a single resource.",
+   "Incorrect: The Azure Monitor Agent collects data from machines, such as OS logs, not the service diagnostic logs of a Batch account. Use it for VM logs.",
+   "Correct: The connector wizard assigns a policy that applies the diagnostic setting to new resources, and the remediation task applies it to existing ones. The assigner needs the Owner role at that scope.",
+   "Incorrect: The Azure Activity connector ingests subscription control-plane events, not the diagnostic logs of a specific resource type."
+  ]
+ },
+ {
+  "id": "4.2.4-04",
+  "obj": "4.2.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has subscriptions that were connected to Microsoft Sentinel by using the legacy Azure Activity connection method. An administrator starts to set up the new Azure Activity connector that uses diagnostic settings, but the setup is blocked.\n\nWhat should you do first?",
+  "explanation": "The new Azure Activity connector uses the diagnostic settings pipeline. Subscriptions that are connected through the legacy method must be disconnected first, and the connector page offers a Disconnect All button.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-diagnostic-setting-based",
+  "choices": [
+   "Delete the AzureActivity table from the workspace",
+   "Assign the Owner role on the workspace to the administrator",
+   "Install the Azure Monitor Agent on a virtual machine in each subscription",
+   "Disconnect the subscriptions from the legacy method by using Disconnect All on the connector page"
+  ],
+  "answer": [
+   3
+  ],
+  "rationale": [
+   "Incorrect: Deleting the table would not remove the legacy connections and would risk losing ingested data. Tables are not the source of this block.",
+   "Incorrect: Owner on the workspace does not remove the legacy connection. Policy-based connectors need Owner at the policy assignment scope, a different requirement.",
+   "Incorrect: Azure Monitor Agent collects data from machines and is unrelated to the subscription activity log pipeline. Use it for VM-based collection.",
+   "Correct: Disconnect All removes the legacy subscription connections so that you can continue with the new diagnostic settings-based connector."
+  ]
+ },
+ {
+  "id": "4.2.4-05",
+  "obj": "4.2.4",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Woodgrove Bank enables the Microsoft Sentinel Microsoft Entra ID data connector for one workspace. The tenant has Microsoft Entra ID P2 licenses. An engineer who has the Microsoft Sentinel Contributor role on the workspace and the Security Administrator role on the tenant configures the connector.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "explanation": "The Entra ID connector writes each log type to its own table, needs Sentinel Contributor on the workspace plus Security Administrator on the tenant, and works within a single tenant. Sign-in logs need P1 or P2.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-azure-active-directory",
+  "choices": [
+   "Non-interactive user sign-in logs are stored in the AADNonInteractiveUserSignInLogs table.",
+   "The engineer needs both the Sentinel Contributor and the Security Administrator roles to enable the connector.",
+   "The connector can stream logs from a second Microsoft Entra tenant into the same workspace.",
+   "Microsoft Entra ID Free licenses are enough to ingest the SigninLogs table."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "rationale": [
+   "Yes: The connector lists non-interactive user sign-ins as a data type that is stored in the AADNonInteractiveUserSignInLogs table.",
+   "Yes: The user needs Microsoft Sentinel Contributor on the workspace and Security Administrator (or equivalent permissions) on the tenant that streams the logs.",
+   "No: Diagnostic settings-based connectors work only within the tenant where the resource lives, so a second tenant needs its own workspace.",
+   "No: Ingesting sign-in logs requires Entra ID P1 or P2. Other log types such as audit logs work with any license."
+  ]
+ },
+ {
+  "id": "4.2.4-06",
+  "obj": "4.2.4",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys must stream the diagnostics of the storage account Storage1 to Microsoft Sentinel by using the standalone diagnostic settings-based Azure Storage Account connector. Storage1 contains blob, file, queue, and table services.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "explanation": "For storage accounts, the parent account resource exports the Transaction metric, and each child resource for blobs, files, queues, and tables exports all its logs and metrics. You see only the storage types that exist.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-diagnostic-setting-based",
+  "choices": [
+   "Configure a diagnostic setting on the parent storage account resource that exports the Transaction metric",
+   "Install the Azure Monitor Agent on Storage1 and create a data collection rule",
+   "Enable the Azure Activity connector for the subscription that contains Storage1",
+   "Configure a diagnostic setting on the parent account that exports the logs of the blob service",
+   "Configure a diagnostic setting on each child storage-type resource that exports all logs and metrics"
+  ],
+  "answer": [
+   0,
+   4
+  ],
+  "rationale": [
+   "Correct: The parent storage account resource is configured to export the Transaction metric, which the connector expects at account level.",
+   "Incorrect: Azure Monitor Agent runs on machines and storage accounts are PaaS resources, so there is nothing to install. Use the agent for VM log collection.",
+   "Incorrect: The Azure Activity connector ingests control-plane events of the subscription. It does not deliver the service logs of the storage account.",
+   "Incorrect: Blob service logs are produced by the child blob resource, not by the parent account resource, so this setting would not deliver them.",
+   "Correct: Each child storage-type resource, such as blob, file, queue, and table, gets its own diagnostic setting that exports its logs and metrics to the workspace."
+  ]
+ },
+ {
+  "id": "4.2.5-01",
+  "obj": "4.2.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. has security appliances that send events in Common Event Format (CEF) over TCP port 514. The events must land in the CommonSecurityLog table of Microsoft Sentinel.\n\nWhich data connector should you use?",
+  "explanation": "The Common Event Format (CEF) via AMA connector collects CEF messages through a Linux log forwarder and writes them to CommonSecurityLog. Syslog via AMA writes plain syslog to the Syslog table.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-overview",
+  "choices": [
+   "Syslog via AMA",
+   "Windows Security Events via AMA",
+   "Common Event Format (CEF) via AMA",
+   "Custom Logs via AMA"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Syslog via AMA collects plain syslog messages into the Syslog table. Use it for Linux machines or devices that do not send CEF-formatted events.",
+   "Incorrect: Windows Security Events via AMA collects Windows Security log events into the SecurityEvent table. It does not receive CEF messages from appliances.",
+   "Correct: This connector parses CEF messages that arrive at the forwarder and stores them in CommonSecurityLog, which is the stated destination.",
+   "Incorrect: Custom Logs via AMA reads text log files into a custom _CL table. It would not parse CEF fields into CommonSecurityLog."
+  ]
+ },
+ {
+  "id": "4.2.5-02",
+  "obj": "4.2.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has network firewalls that cannot run agents but can send syslog and CEF messages over the network to a collector. The messages must reach Microsoft Sentinel through the Azure Monitor Agent.\n\nWhat should you deploy?",
+  "explanation": "Devices that cannot host an agent send their messages to a dedicated Linux VM, the log forwarder. Its rsyslog or syslog-ng daemon receives the messages, and the Azure Monitor Agent forwards them to the workspace.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-overview",
+  "choices": [
+   "A Windows Event Collector server that has the Azure Monitor Agent",
+   "A dedicated Linux log forwarder with a syslog daemon and the Azure Monitor Agent",
+   "The Azure Monitor Agent directly on each firewall",
+   "A Logic Apps playbook that polls each firewall"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: A Windows Event Collector gathers Windows events through Windows Event Forwarding. It does not receive syslog or CEF messages from network devices.",
+   "Correct: The log forwarder is a Linux VM, which can be in Azure, on-premises, or in another cloud, running rsyslog or syslog-ng plus the Azure Monitor Agent. The firewalls send to its syslog daemon.",
+   "Incorrect: The firewalls are closed appliances that cannot host the agent, which is the stated constraint. Direct AMA installs fit machines that you manage, such as Linux VMs.",
+   "Incorrect: Playbooks react to incidents and alerts after data is already in Sentinel. They do not collect device logs, and firewalls push syslog rather than being polled."
+  ]
+ },
+ {
+  "id": "4.2.5-03",
+  "obj": "4.2.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. collects CEF and Syslog messages through the same log forwarder. Both streams use the same facility, and the source devices cannot change that facility. The team now sees the same events in the CommonSecurityLog and Syslog tables.\n\nWhat should you do to stop the duplication?",
+  "explanation": "When the facility cannot be changed at the source, add a transformKql filter to the Syslog DCR that drops messages whose ProcessName or SyslogMessage indicates CEF. Otherwise remove the CEF facilities from the Syslog configuration.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-overview",
+  "choices": [
+   "Add an ingestion-time transformation to the Syslog data collection rule that filters out CEF messages",
+   "Change the forwarder to use UDP instead of TCP for incoming messages",
+   "Raise the minimum severity of the facility in both data collection rules",
+   "Switch the Syslog table to the Basic table plan"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: A KQL transformation such as filtering on ProcessName and SyslogMessage removes CEF messages from the Syslog stream, so they are stored only in CommonSecurityLog.",
+   "Incorrect: The transport protocol does not decide which table receives a message. Switching to UDP would only change delivery behavior, and the same message would still match both rules.",
+   "Incorrect: A higher minimum severity drops lower-severity messages from both streams, but messages above the threshold would still be duplicated. It is a volume control, not a de-duplication.",
+   "Incorrect: The table plan changes cost and query features, not what is ingested, so the same events would still be written twice."
+  ]
+ },
+ {
+  "id": "4.2.5-04",
+  "obj": "4.2.5",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank must stop CEF messages from being written to the Syslog table. The company edits the transformKql of the Syslog data collection rule so that messages whose ProcessName contains CEF, or whose SyslogMessage contains the CEF header, are dropped.\n\nHow should you complete the transformation? To answer, select the appropriate options in the answer area.\n\n```\n\"transformKql\": \"source | where ProcessName [[1]] \\\"CEF\\\" [[2]] SyslogMessage [[3]] \\\"CEF:0\\\"\"\n```",
+  "explanation": "A negated contains test on both ProcessName and SyslogMessage, joined with and, removes CEF messages from the Syslog stream while keeping every other syslog message.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-overview",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "contains",
+     "!contains",
+     "=="
+    ],
+    "why": [
+     "Incorrect: contains keeps only the CEF messages, the opposite of the goal. Use it to select a message type to keep.",
+     "Correct: !contains keeps rows whose ProcessName does not contain CEF, which removes CEF messages from the Syslog stream.",
+     "Incorrect: An equality test keeps only rows whose ProcessName is exactly CEF, which selects the opposite of what you need and is not a contains test."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "and",
+     "or"
+    ],
+    "why": [
+     "Correct: and keeps a row only when both tests pass, so a message is dropped when either field shows CEF. This is the behavior required.",
+     "Incorrect: or keeps a row when at least one negated test passes, so a CEF message would survive whenever the other field lacks the CEF marker, and duplicates would remain."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "contains",
+     "!contains",
+     "=="
+    ],
+    "why": [
+     "Incorrect: contains would keep only messages with the CEF header and discard normal syslog. Use it to select CEF rows.",
+     "Correct: !contains keeps messages whose SyslogMessage lacks the CEF:0 header, which together with Box 1 removes CEF messages from the Syslog stream.",
+     "Incorrect: An equality test keeps only messages that are exactly CEF:0, which no real message is, so it would drop all syslog data and is not a contains test."
+    ]
+   }
+  ],
+  "answer": [
+   1,
+   0,
+   1
+  ]
+ },
+ {
+  "id": "4.2.5-05",
+  "obj": "4.2.5",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Litware, Inc. has a Linux log forwarder in Azure with rsyslog and Azure Monitor Agent version 1.35. Network devices send CEF messages to port 514. A packet capture on the forwarder shows the messages arriving on port 514, but no rows appear in CommonSecurityLog after 30 minutes. The data collection rule is associated with the forwarder.\n\nWhat should you do first?",
+  "explanation": "With Azure Monitor Agent 1.28.11 and later, rsyslog or syslog-ng receives messages on port 514 and passes them to the agent on local TCP port 28330. If messages reach 514 but not the workspace, check the rsyslog forwarding configuration and the agent listener.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-troubleshooting",
+  "choices": [
+   "Reconfigure the devices to send the messages to TCP port 28330",
+   "Open TCP port 28330 on the network security group for traffic from the devices",
+   "Verify that rsyslog forwards messages to the agent on local TCP port 28330 and that the agent listens there",
+   "Reinstall the Log Analytics agent on the forwarder"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Devices must send to the syslog daemon on port 514. Port 28330 is the local hand-off between the daemon and the agent, so devices sending there would bypass the daemon.",
+   "Incorrect: Port 28330 is used on the forwarder itself between rsyslog and the agent. External devices do not connect to it, so changing the NSG does not fix a local forwarding problem.",
+   "Correct: Because the packets already arrive on 514, the next hop to verify is rsyslog to the agent on 28330. Check the omfwd configuration for the agent and that the agent process listens on that port.",
+   "Incorrect: The Log Analytics agent is the legacy agent that has been replaced by Azure Monitor Agent. Installing it would not repair the local hand-off and could cause duplicate ingestion."
+  ]
+ },
+ {
+  "id": "4.2.5-06",
+  "obj": "4.2.5",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Adatum Corporation must collect CEF messages from firewalls through a new Linux log forwarder in Azure into Microsoft Sentinel. The forwarder VM already exists and has a syslog daemon.\n\nWhich five actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "explanation": "You first install the solution that brings the CEF via AMA connector, create the DCR (which installs the agent on the forwarder), run the script that configures the syslog daemon, point the devices at the forwarder, and then verify in CommonSecurityLog.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-cef-syslog-ama",
+  "choices": [
+   "Install the Microsoft Monitoring Agent on the forwarder.",
+   "Configure the firewalls to send CEF messages to the forwarder on port 514.",
+   "Install the Common Event Format solution from the content hub.",
+   "Create a data collection rule from the CEF via AMA connector page and select the forwarder VM.",
+   "Query the CommonSecurityLog table to verify that events arrive.",
+   "Create a data collection endpoint for the Windows Event Forwarding connector.",
+   "Run the installation script on the forwarder to configure the syslog daemon."
+  ],
+  "answer": [
+   2,
+   3,
+   6,
+   1,
+   4
+  ],
+  "rationale": [
+   "Incorrect: The Microsoft Monitoring Agent is the legacy agent and is not used with the CEF via AMA connector. Using both agent types would also cause duplicate ingestion.",
+   "Step 4: Once the forwarder listens on port 514 and the agent is in place, you point the firewalls at the forwarder so that messages flow.",
+   "Step 1: The solution from the content hub installs the CEF via AMA data connector, which you need before you can create a DCR.",
+   "Step 2: Creating the DCR from the connector page selects the forwarder and installs the Azure Monitor Agent on it automatically.",
+   "Step 5: Last, query CommonSecurityLog to confirm the events from the firewalls arrive; this can take up to about 20 minutes.",
+   "Incorrect: A data collection endpoint for the Windows Event Forwarding connector belongs to a Windows scenario and is not part of CEF via AMA setup.",
+   "Step 3: After the DCR and agent exist, the installation script configures rsyslog or syslog-ng to listen on port 514 and forward to the agent."
+  ]
+ },
+ {
+  "id": "4.2.6-01",
+  "obj": "4.2.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. wants to collect Windows security events into Microsoft Sentinel from physical servers in its datacenter. The servers are not Azure virtual machines and will use the Windows Security Events via AMA connector.\n\nWhat should you do on the servers before you enable the connector?",
+  "explanation": "Systems that are not Azure VMs must have Azure Arc installed and enabled before you enable an Azure Monitor Agent-based connector, so that the agent and the data collection rule can be deployed to them.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based",
+  "choices": [
+   "Install the Microsoft Monitoring Agent",
+   "Enable Windows Event Forwarding to a collector",
+   "Install the Azure Arc Connected Machine agent",
+   "Create a data collection endpoint on each server"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: The Microsoft Monitoring Agent is the legacy agent. The AMA-based connector installs the Azure Monitor Agent instead, and running both causes duplicate ingestion.",
+   "Incorrect: Windows Event Forwarding is an alternative design that uses a Windows Event Collector. It is not a prerequisite for the AMA-based connector on each server.",
+   "Correct: Azure Arc represents the physical servers in Azure so that Azure Monitor Agent and a data collection rule can be deployed to them. It must be in place before you enable the connector.",
+   "Incorrect: A data collection endpoint is a network ingestion construct for some scenarios and is not created on servers. The DCR is what targets machines."
+  ]
+ },
+ {
+  "id": "4.2.6-02",
+  "obj": "4.2.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. needs a full user audit trail from Windows servers in Microsoft Sentinel, including both sign-in and sign-out events (event IDs 4624 and 4634), but wants to reduce the volume compared with collecting every event.\n\nWhich Windows Security Events event set should you select?",
+  "explanation": "The Common set is designed to reduce volume while keeping a full audit trail, including sign-in and sign-out events. Minimal omits sign-out events, and All events does not reduce volume.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/windows-security-event-id-reference",
+  "choices": [
+   "All events",
+   "Minimal",
+   "Custom",
+   "Common"
+  ],
+  "answer": [
+   3
+  ],
+  "rationale": [
+   "Incorrect: All events collects the full unfiltered Security and AppLocker logs, so it meets the audit need but does not reduce volume. Use it when completeness matters more than cost.",
+   "Incorrect: Minimal contains sign-in events such as 4624 and 4625 but not sign-out events such as 4634, so it lacks a full audit trail. Use it when only breach indicators are needed.",
+   "Incorrect: Custom lets you define XPath queries yourself. It could work but requires building the list of events, and the built-in set already matches the requirement.",
+   "Correct: Common includes both 4624 and 4634 and other audit actions, with fewer events than All events, which matches the stated need."
+  ]
+ },
+ {
+  "id": "4.2.6-03",
+  "obj": "4.2.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank has 2,000 workstations on which the security team cannot install agents. The workstations already forward events to a Windows Event Collector server named WEC1 through Windows Event Forwarding. The team wants these events in Microsoft Sentinel.\n\nWhich machine should you install the Azure Monitor Agent on?",
+  "explanation": "For the Windows Forwarded Events connector, Windows Event Collection must be running and the Azure Monitor Agent must be installed on the WEC machine. The forwarded events then land in the WindowsEvent table.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based",
+  "choices": [
+   "On each workstation",
+   "On WEC1",
+   "On a Linux log forwarder",
+   "On the domain controllers"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Installing agents on 2,000 workstations is the approach that the stem rules out. Direct agents fit endpoints that you can manage.",
+   "Correct: The collector receives the forwarded events, so the agent on WEC1 reads them and sends them to the workspace through the Windows Forwarded Events connector.",
+   "Incorrect: A Linux log forwarder receives syslog and CEF. It does not receive Windows Event Forwarding subscriptions.",
+   "Incorrect: Domain controllers do not hold the forwarded workstation events unless they are the collector. Installing there collects only their own security log."
+  ]
+ },
+ {
+  "id": "4.2.6-04",
+  "obj": "4.2.6",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Windows Event Forwarding and the Windows Forwarded Events connector for its member servers. Built-in Microsoft Sentinel analytics rules for Windows security events do not trigger on the forwarded events. The security team must keep Windows Event Forwarding.\n\nWhat should you do?",
+  "explanation": "Events collected through Windows Event Forwarding are written to the WindowsEvent table, not SecurityEvent, and many built-in rules query SecurityEvent. Adapt the rules to WindowsEvent or ASIM parsers, or use the Security Events via AMA connector.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based",
+  "choices": [
+   "Adapt the rule queries to use the WindowsEvent table or supported ASIM parsers",
+   "Move the WindowsEvent table to the Basic table plan",
+   "Switch the connector to Security Events via the legacy agent",
+   "Select the Common event set on the Windows Forwarded Events connector"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: The forwarded events are stored in WindowsEvent, so the rules must query that table or use ASIM parsers that normalize it. This keeps Windows Event Forwarding in place.",
+   "Incorrect: WindowsEvent does not support the Basic plan, and Basic tables lack analytics rule support anyway. A cheaper plan would not make the rules match.",
+   "Incorrect: The legacy agent connector collects local security events from machines, not events forwarded to a collector, and it is being replaced by AMA. It would not fix the table mismatch.",
+   "Incorrect: Event sets such as Common apply to the Windows Security Events connector. They do not exist on the Forwarded Events connector and would not change the target table."
+  ]
+ },
+ {
+  "id": "4.2.6-05",
+  "obj": "4.2.6",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Tailspin Toys must collect only successful logons and failed logons from the Windows Security log into the SecurityEvent table by using a custom XPath query in a data collection rule. The engineer then tests the XPath expression on a server.\n\nHow should you complete the XPath query and the test command? To answer, select the appropriate options in the answer area.\n\n```\nSecurity!*[System[(EventID=[[1]]) or (EventID=[[2]])]]\n\nGet-WinEvent -LogName 'Security' -[[3]] $XPath\n```",
+  "explanation": "DCR XPath filters use the Event ID values of the events you want, such as 4624 and 4625, and you can validate an XPath string with Get-WinEvent -FilterXPath before deploying the rule.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "4624",
+     "4634",
+     "4688"
+    ],
+    "why": [
+     "Correct: 4624 is the event ID for a successful logon, which the requirement asks for.",
+     "Incorrect: 4634 is a logoff (sign-out) event. It is useful for audit trails but is not a logon.",
+     "Incorrect: 4688 is a process creation event, which is unrelated to logons."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "4625",
+     "4647",
+     "4720"
+    ],
+    "why": [
+     "Correct: 4625 is the event ID for a failed logon, which the requirement asks for.",
+     "Incorrect: 4647 is a user-initiated logoff event, not a failed logon.",
+     "Incorrect: 4720 records the creation of a user account, which is an account management event."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "FilterXPath",
+     "FilterXml",
+     "FilterHashtable"
+    ],
+    "why": [
+     "Correct: FilterXPath accepts an XPath 1.0 query string, which is how you test a DCR XPath expression before using it.",
+     "Incorrect: FilterXml expects a structured query XML document, not a bare XPath string, so the expression would be rejected.",
+     "Incorrect: FilterHashtable takes a hashtable of keys such as ProviderName and Id, so it cannot consume an XPath string."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "id": "4.2.6-06",
+  "obj": "4.2.6",
+  "difficulty": "medium",
+  "type": "multi",
+  "stem": "Relecloud has 300 Azure Arc-enabled Windows servers. The Windows Security Events solution is already installed in the Microsoft Sentinel workspace. The security events must flow into the SecurityEvent table.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "explanation": "Non-Azure servers need Azure Arc before an AMA-based connector. The connector's data collection rule then targets the servers and installs the Azure Monitor Agent, and events go to SecurityEvent.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based",
+  "choices": [
+   "Deploy a Windows Event Collector server and create subscriptions on the servers",
+   "Create a data collection rule from the Windows Security Events via AMA connector and select the servers",
+   "Install the Log Analytics (Microsoft Monitoring) agent on the servers",
+   "Enable the Windows Forwarded Events data connector",
+   "Confirm that the Azure Arc Connected Machine agent is installed and enabled on the servers"
+  ],
+  "answer": [
+   1,
+   4
+  ],
+  "rationale": [
+   "Incorrect: A collector server and subscriptions implement Windows Event Forwarding, which writes to WindowsEvent. It is a different design from the AMA connector.",
+   "Correct: The DCR created from the connector defines which events to collect and which servers it applies to. The Azure Monitor Agent is installed on the selected machines when it is created.",
+   "Incorrect: The Microsoft Monitoring Agent is the legacy collection method. Running it together with AMA for the same events causes duplicate ingestion.",
+   "Incorrect: The Windows Forwarded Events connector reads from a Windows Event Collector and writes to WindowsEvent. It does not collect security events directly from the servers into SecurityEvent.",
+   "Correct: Azure Arc must be installed and enabled before enabling the AMA-based connector on machines that are not Azure VMs, so the DCR and agent can be deployed to them."
+  ]
+ },
+ {
+  "id": "4.2.7-01",
+  "obj": "4.2.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. must create a custom log table in the Log Analytics workspace of Microsoft Sentinel to store logs from an inventory application. The table is named App1.\n\nWhich table name should you use?",
+  "explanation": "Custom log tables end with the _CL suffix. Other suffixes mark different table types, such as _CF for custom fields, _SRCH for search job results, and _RST for restored data.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/create-custom-table",
+  "choices": [
+   "App1_CF",
+   "App1_SRCH",
+   "App1_CL",
+   "App1_RST"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: A _CF suffix marks a custom field that you add to an existing table, not a custom table. Use it when you extend the schema of a built-in table.",
+   "Incorrect: _SRCH is the suffix of a table that holds search job results. It is created by the search job, not by you for ingestion.",
+   "Correct: The _CL suffix identifies a custom log table. The portal adds it automatically when you create a DCR-based custom table.",
+   "Incorrect: _RST is the suffix of a table that holds restored data from long-term retention. It is a temporary view created by a restore operation."
+  ]
+ },
+ {
+  "id": "4.2.7-02",
+  "obj": "4.2.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. has an in-house application that can send JSON events over HTTPS. The events must be stored in a custom table in the Microsoft Sentinel workspace, and the solution must use a supported, current ingestion method that can transform data before storage.\n\nWhat should you use?",
+  "explanation": "The Logs ingestion API accepts JSON over REST, uses a DCR to define the target table and an optional transformation, and can send data to custom tables you create.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/logs-ingestion-api-overview",
+  "choices": [
+   "The HTTP Data Collector API",
+   "The Syslog via AMA connector",
+   "The Logs ingestion API with a data collection rule",
+   "The Windows Security Events via AMA connector"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: The HTTP Data Collector API is deprecated and works with classic custom log tables, which cannot be used with DCRs or transformations.",
+   "Incorrect: Syslog via AMA collects syslog messages through an agent into the Syslog table. It does not accept JSON over HTTPS from an application.",
+   "Correct: The Logs ingestion API is the current method for custom-format data, and the DCR describes the stream, the transformation, and the destination table.",
+   "Incorrect: Windows Security Events via AMA collects Windows Security log events through an agent into SecurityEvent. It does not receive application JSON."
+  ]
+ },
+ {
+  "id": "4.2.7-03",
+  "obj": "4.2.7",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Contoso, Ltd. has an Azure Arc-enabled Linux server that writes application logs to text files under /var/log/app1/. The logs must be ingested into a custom table named App1_CL in a Microsoft Sentinel workspace by using the Custom Logs via AMA connector. The server hosts the application and no log forwarder is used.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "explanation": "The destination _CL table with TimeGenerated and RawData must exist first. The DCR then points at the table and the log files and installs the agent, and the last step is to verify that data arrives.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-custom-logs-ama",
+  "choices": [
+   "Run the forwarder installation script on the server to open port 514.",
+   "Query the App1_CL table in the workspace to verify that rows arrive.",
+   "Create the table by running `az monitor log-analytics workspace table create` with the columns TimeGenerated and RawData.",
+   "Create the table by using the New custom log (DCR based) wizard in the Azure portal.",
+   "Create a data collection rule from the Custom Logs via AMA connector with the file pattern and select the server.",
+   "Create a data collection endpoint in a different region from the workspace."
+  ],
+  "answer": [
+   2,
+   4,
+   1
+  ],
+  "rationale": [
+   "Incorrect: The forwarder script configures a syslog daemon for appliances that send over the network. Here the application is on the server and the logs are files, so it does not apply.",
+   "Step 3: Verification comes last, after the table, DCR, and agent exist and the file has new content to collect.",
+   "Step 1: The table must exist before the DCR can send data to it. The CLI creates a table with TimeGenerated and RawData, which the connector requires for text logs.",
+   "Incorrect: The DCR-based custom log wizard is meant for Logs ingestion API data. It cannot create a table for agent text logs, so use the CLI or a template instead.",
+   "Step 2: The DCR carries the file pattern, the transformation, and the destination table, and creating it installs the Azure Monitor Agent on the selected server.",
+   "Incorrect: A data collection endpoint is not required for AMA text collection, and it must be in the same region as the workspace if used. A different region would break the scenario."
+  ]
+ },
+ {
+  "id": "4.2.7-04",
+  "obj": "4.2.7",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Adatum Corporation must create a custom table for text logs that are collected directly from an application host by Azure Monitor Agent. Sentinel analytics rules must run on the table.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\naz monitor log-analytics workspace table create --resource-group rg1 --workspace-name ws1 --name [[1]] --plan [[2]] --columns TimeGenerated=datetime [[3]]=string\n```",
+  "explanation": "Custom text log tables end with _CL and contain TimeGenerated plus RawData, or Message when a log forwarder is used. Choose the Analytics plan when analytics rules must run on the data.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/connect-custom-logs-ama",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "AppLog_CL",
+     "AppLog",
+     "AppLog_CF"
+    ],
+    "why": [
+     "Correct: The _CL suffix is required for a custom log table, and the portal and CLI flows expect it.",
+     "Incorrect: A name without the _CL suffix does not identify a custom log table, and the connector expects the _CL naming for custom tables.",
+     "Incorrect: _CF marks a custom field on an existing table, not a custom table."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Analytics",
+     "Basic",
+     "Auxiliary"
+    ],
+    "why": [
+     "Correct: The Analytics plan supports the full feature set, including analytics rules and alerts, which the requirement needs.",
+     "Incorrect: The Basic plan has discounted ingestion for troubleshooting, with limited query features and no alert support. It does not meet the analytics rule requirement.",
+     "Incorrect: The Auxiliary plan is low cost for low-touch data and stops alerts from working on the table. Use it for verbose or compliance data."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "RawData",
+     "Message",
+     "Body"
+    ],
+    "why": [
+     "Correct: RawData holds the entire log message when the logs come directly from the host that runs the application.",
+     "Incorrect: Message is the column name used when logs arrive through a log forwarder, which is not the case here.",
+     "Incorrect: Body is a column used by other pipelines such as OpenTelemetry logs. The text log connector expects RawData or Message."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "id": "4.2.7-05",
+  "obj": "4.2.7",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Woodgrove Bank has an application that uses a Microsoft Entra app registration to send data to a DCR-based custom table through the Logs ingestion API. The application receives an authorization error when it posts data.\n\nWhich role should you assign to the app registration on the data collection rule?",
+  "explanation": "The application that calls the Logs ingestion API must be granted the Monitoring Metrics Publisher role on the data collection rule.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/logs-ingestion-api-overview",
+  "choices": [
+   "Monitoring Contributor",
+   "Microsoft Sentinel Contributor",
+   "Monitoring Metrics Publisher",
+   "Log Analytics Contributor"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Monitoring Contributor lets a user create and edit monitoring settings such as DCRs and alerts, but it is not the role that authorizes sending data through the API.",
+   "Incorrect: Microsoft Sentinel Contributor manages Sentinel resources such as rules and solutions. It does not authorize data submission to a DCR.",
+   "Correct: Monitoring Metrics Publisher on the DCR is the documented role that allows the application to send data to the DCR endpoint.",
+   "Incorrect: Log Analytics Contributor manages workspaces and tables and can read keys, but ingestion through the API is authorized on the DCR with a different role."
+  ]
+ },
+ {
+  "id": "4.2.7-06",
+  "obj": "4.2.7",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Tailspin Toys uses the Logs ingestion API to send application events to a custom table in a Log Analytics workspace that has Microsoft Sentinel enabled. The portal wizard created the table and the data collection rule, and a data collection endpoint is used.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "explanation": "The DCR can reshape data with a transformation. The DCE must be in the same region as the workspace or DCR. For Analytics tables in a Sentinel-enabled workspace, filtering transformations are exempt from the filtering charge.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/data-transformation",
+  "choices": [
+   "A transformation in the DCR can convert incoming data so that it matches the schema of the target table.",
+   "The data collection endpoint must be in the same region as the workspace.",
+   "The incoming data must exactly match the structure of the target table, because a DCR cannot change it.",
+   "A transformation that drops rows from an Analytics table in this workspace incurs the Azure Monitor filtering ingestion charge."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "rationale": [
+   "Yes: The DCR defines the stream structure and can include a transformation that converts the source data to the table schema, filters rows, or masks fields.",
+   "Yes: The DCE must be in the same region as the Log Analytics workspace or the DCR, so a DCE in another region cannot be used.",
+   "No: The data does not need to match the table because the DCR transformation converts it. The stream declaration describes the incoming structure.",
+   "No: When Microsoft Sentinel is enabled on the workspace, transformations on Analytics tables are not subject to the filtering ingestion charge. The exception applies to Basic tables."
+  ]
+ },
+ {
+  "id": "4.2.8-01",
+  "obj": "4.2.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants every new Microsoft Sentinel incident that has High severity to be assigned automatically to the user Analyst2. No external systems are involved, and the team does not want to write code.\n\nWhat should you create?",
+  "explanation": "Automation rules run when an incident is created or updated, check conditions such as severity, and apply actions such as Assign owner, Change status, and Add tags without code.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules",
+  "choices": [
+   "A playbook that has an entity trigger",
+   "A scheduled analytics rule",
+   "An automation rule that assigns an owner when an incident is created",
+   "A workbook that lists High severity incidents"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: A playbook with an entity trigger runs on an entity and needs a Logic Apps workflow. It is more complex than needed and is not triggered by incident creation.",
+   "Incorrect: A scheduled analytics rule creates alerts and incidents from a query. It detects threats but does not assign incidents after they exist.",
+   "Correct: An automation rule with the incident-created trigger, a High severity condition, and the Assign owner action meets the requirement without code.",
+   "Incorrect: A workbook visualizes data and does not change incidents. It would show High severity incidents but would not assign them."
+  ]
+ },
+ {
+  "id": "4.2.8-02",
+  "obj": "4.2.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. wants a response that runs when a Microsoft Sentinel incident is created. The response must block a compromised Microsoft Entra user and open a ticket in an external IT service management system.\n\nWhat should you create to implement the response workflow?",
+  "explanation": "Playbooks are Azure Logic Apps workflows that Sentinel can run on incidents, alerts, and entities. They can call Entra ID and external systems, and an automation rule can start them automatically.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automation/automate-responses-with-playbooks",
+  "choices": [
+   "A playbook based on Azure Logic Apps",
+   "An incident task list",
+   "A hunting query",
+   "A watchlist of compromised users"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: A playbook implements complex multi-step actions, including calls to Microsoft Entra ID and external systems, and an automation rule can run it when an incident is created.",
+   "Incorrect: Incident tasks are a checklist for analysts to follow manually during triage and remediation. They do not call external systems or block users.",
+   "Incorrect: A hunting query searches data proactively and returns rows. It does not take response actions.",
+   "Incorrect: A watchlist stores reference data that queries and rules can use for enrichment. It holds data but does not perform actions."
+  ]
+ },
+ {
+  "id": "4.2.8-03",
+  "obj": "4.2.8",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has two Microsoft Sentinel automation rules that use the incident-created trigger. Rule A lowers the severity of incidents from Medium to Low for a specific analytics rule. Rule B runs a playbook only for incidents with Medium or higher severity. Rule A has order 1 and Rule B has order 2, and Rule B no longer runs for those incidents.\n\nWhat should you do so that Rule B runs without changing its conditions?",
+  "explanation": "Automation rules run in order, and each rule evaluates the incident as it is after earlier rules acted on it. Running Rule B before Rule A lets Rule B see the original Medium severity.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules",
+  "choices": [
+   "Change the trigger of Rule B to When incident is updated",
+   "Set an expiration date on Rule A",
+   "Change the order of Rule B to 1 and the order of Rule A to 2",
+   "Convert Rule B to use the alert-created trigger"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Update-trigger rules have their own queue and run after the create-trigger rules. The severity is already lowered by then, so Rule B would still not match.",
+   "Incorrect: An expiration date disables Rule A after a date. It does not affect the order of evaluation and would remove the severity change for incidents after expiry.",
+   "Correct: Rule B evaluates the incident after Rule A changed severity to Low. Giving Rule B a lower order number makes it run first, while the incident is still Medium.",
+   "Incorrect: Alert-trigger rules only support the Run playbook action and evaluate alerts, not incident severity, so this would change the design rather than fix the order."
+  ]
+ },
+ {
+  "id": "4.2.8-04",
+  "obj": "4.2.8",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys runs a planned penetration test for two weeks. Microsoft Sentinel analytics rules must keep creating incidents from the test activity so that the data is retained, but the incidents must be closed automatically with a closing reason. After the test, the closing must stop without manual cleanup.\n\nWhat should you create?",
+  "explanation": "An automation rule can close incidents with a reason and a comment, and an expiration date disables the rule after that date. This suits time-limited noise such as a penetration test.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules",
+  "choices": [
+   "An automation rule that closes the incidents and has an expiration date",
+   "A playbook that an analyst runs manually each day",
+   "A suppression setting that stops the analytics rule after it creates an alert",
+   "An incident task that reminds the analyst to close each incident"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: The rule uses the Change status action with a closing reason and an expiration date, so it handles the incidents during the test and then disables itself.",
+   "Incorrect: A manual daily run depends on a person and does not close incidents automatically. Manual runs fit one-off response actions on a single incident.",
+   "Incorrect: Suppression stops the query for a period after an alert, which also stops detections and hides real activity. The stem requires incidents to keep being created.",
+   "Incorrect: Incident tasks are checklists for analysts. They remind people but do not close incidents on their own."
+  ]
+ },
+ {
+  "id": "4.2.8-05",
+  "obj": "4.2.8",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Litware, Inc. has Playbook1 in the resource group RG-Playbooks. Playbook1 starts with the incident trigger. User1 has the Microsoft Sentinel Responder role on the workspace and must create an automation rule that runs Playbook1 when incidents are created. Playbook1 does not appear in the Run playbook action list.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "explanation": "Sentinel needs the Automation Contributor role on the playbook resource group to run playbooks from automation rules, and attaching a playbook to an automation rule needs Microsoft Sentinel Contributor.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automation/run-playbooks",
+  "choices": [
+   "Assign User1 the Microsoft Sentinel Playbook Operator role on RG-Playbooks",
+   "Grant Microsoft Sentinel permissions on RG-Playbooks by using Manage playbook permissions",
+   "Recreate Playbook1 by using the alert trigger",
+   "Assign User1 the Microsoft Sentinel Contributor role on the workspace resource group",
+   "Assign User1 the Logic App Operator role on RG-Playbooks"
+  ],
+  "answer": [
+   1,
+   3
+  ],
+  "rationale": [
+   "Incorrect: Playbook Operator lets a user run a playbook manually. It does not let automation rules run playbooks and does not allow attaching a playbook to a rule.",
+   "Correct: Manage playbook permissions gives the Sentinel service account the Automation Contributor role on RG-Playbooks, which makes the playbook available to automation rules. An Owner or User Access Administrator performs this step.",
+   "Incorrect: Incident-trigger automation rules can run only incident-trigger playbooks, so an alert-trigger playbook would not appear. The existing trigger is already the right one.",
+   "Correct: Attaching a playbook to an automation rule requires Microsoft Sentinel Contributor. Responder can manage incidents but cannot create or edit automation rules that run playbooks.",
+   "Incorrect: Logic App Operator reads, enables, and disables logic apps. It does not provide the Sentinel permissions that the automation rule needs."
+  ]
+ },
+ {
+  "id": "4.2.8-06",
+  "obj": "4.2.8",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Adatum Corporation plans three automated responses in Microsoft Sentinel and must choose the mechanism for each.\n\nWhich mechanism should you use for each requirement? To answer, drag the appropriate mechanisms to the correct requirements. Each mechanism may be used once, more than once, or not at all.",
+  "explanation": "Automation rules handle simple actions and orchestrate playbooks automatically, while playbooks implement complex workflows and can also be run manually on incidents, alerts, or entities.",
+  "ref": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules",
+  "choices": [
+   "Automation rule that adds a tag",
+   "Automation rule that runs an incident-trigger playbook",
+   "Playbook with an entity trigger that is run manually",
+   "Automation rule with the alert trigger that changes severity"
+  ],
+  "targets": [
+   "Requirement 1: tag incidents from one analytics rule with PCI, with no code",
+   "Requirement 2: open a ticket in an external system for every new incident",
+   "Requirement 3: let an analyst enrich a selected IP address entity on demand"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "The Add tags action of an automation rule applies a tag based on conditions such as the analytics rule name, without any code.",
+   "Contacting an external system needs a playbook, and an incident-created automation rule can run the incident-trigger playbook automatically for every new incident.",
+   "A playbook with an entity trigger receives the selected entity, and an analyst runs it manually from the incident, which needs the Playbook Operator role."
+  ],
+  "notes": [
+   "Automation rule action that applies tags to incidents. Use it for classification without code; it runs when its trigger and conditions match.",
+   "An automation rule that calls a playbook that starts with the incident trigger. Use it for automatic, complex responses such as ticketing; the playbook resource group needs Sentinel permissions.",
+   "A Logic Apps playbook that takes an entity as input and is started by an analyst. Use it for on-demand enrichment of an IP, account, or host.",
+   "Not valid because automation rules that use the alert trigger support only the Run playbook action. Use an incident trigger to change severity."
+  ]
+ },
+ {
+  "id": "4.2.9-01",
+  "obj": "4.2.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys has a Microsoft Sentinel workspace with the default retention settings. The SigninLogs table must stay available for interactive queries for 365 days. All other tables keep the default retention.\n\nWhat should you configure?",
+  "explanation": "Retention can be set per table. Setting the analytics retention of one Analytics table to 365 days keeps it interactive for a year without changing other tables. Analytics retention can reach two years.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/data-retention-configure",
+  "choices": [
+   "The workspace default retention set to 365 days",
+   "The analytics retention of the SigninLogs table set to 365 days",
+   "The SigninLogs table switched to the Basic table plan",
+   "A daily cap on the workspace"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: The workspace default applies to every table that inherits it, which would raise cost for tables that do not need a year. Use it when most tables share the same need.",
+   "Correct: Table-level analytics retention affects only SigninLogs, which keeps the data in the interactive state for 365 days while other tables keep their defaults.",
+   "Incorrect: The Basic plan offers discounted ingestion but only 30 days of query availability, so it shortens interactive access instead of extending it.",
+   "Incorrect: A daily cap stops ingestion above a volume limit. It protects the budget and has no effect on how long data is retained."
+  ]
+ },
+ {
+  "id": "4.2.9-02",
+  "obj": "4.2.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. stores verbose firewall logs in a custom table. The logs are required for audits and compliance, are rarely queried, and must stay queryable for the entire seven-year retention period at the lowest ingestion cost. No analytics rules use the table.\n\nWhich table plan should you configure?",
+  "explanation": "The Auxiliary plan offers low-cost ingestion for low-touch data such as verbose logs and compliance data, and the data remains queryable throughout its total retention period.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/logs-table-plans",
+  "choices": [
+   "Analytics plan",
+   "Basic plan",
+   "Auxiliary plan",
+   "A data export rule to Azure Storage"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: The Analytics plan gives the full feature set, including analytics rules and alerts, at the highest ingestion price. Use it for data that detections rely on.",
+   "Incorrect: The Basic plan is for troubleshooting and incident response and is queryable for only 30 days. Older data needs a search job, so it is not queryable for the full period.",
+   "Correct: Auxiliary tables are low cost for compliance and verbose data, and they stay queryable for the total retention period, up to 12 years.",
+   "Incorrect: A data export rule copies new data to a storage account for archiving, but the data would no longer be queryable in the workspace. It is an alternative archive path, not a table plan."
+  ]
+ },
+ {
+  "id": "4.2.9-03",
+  "obj": "4.2.9",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. must keep the SecurityEvent table of its Microsoft Sentinel workspace available for interactive queries for 90 days, and retain the data for a total of seven years (2,555 days) at the lowest cost for older data.\n\nWhich retention settings should you configure on the table?",
+  "explanation": "Analytics retention covers the interactive period and can be at most two years, while total retention extends the same table to a longer period in low-cost long-term retention, up to 12 years.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/data-retention-configure",
+  "choices": [
+   "Analytics retention of 2,555 days and total retention of 90 days",
+   "Analytics retention of 2,555 days and total retention of 2,555 days",
+   "Workspace default retention of 90 days and a Basic table plan",
+   "Analytics retention of 90 days and total retention of 2,555 days"
+  ],
+  "answer": [
+   3
+  ],
+  "rationale": [
+   "Incorrect: Total retention cannot be shorter than analytics retention, and analytics retention cannot exceed two years. These values are invalid.",
+   "Incorrect: Analytics retention of 2,555 days exceeds the two-year (730 days) maximum, and keeping all data interactive costs more than needed.",
+   "Incorrect: The Basic plan makes data queryable for only 30 days, and a workspace default of 90 days does not extend retention to seven years.",
+   "Correct: Ninety days of analytics retention with a total of 2,555 days keeps data interactive for 90 days and holds the remainder in long-term retention for the rest of the seven years."
+  ]
+ },
+ {
+  "id": "4.2.9-04",
+  "obj": "4.2.9",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Fabrikam, Inc. must keep the SecurityEvent table interactive for 90 days and keep the data for a total of 730 days.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\naz monitor log-analytics workspace table update --resource-group rg1 --workspace-name ws1 --name SecurityEvent --[[1]] 90 --[[2]] 730\n```",
+  "explanation": "On a table, --retention-time sets the analytics (interactive) retention and --total-retention-time sets the total period. The difference between the two values is held in low-cost long-term retention.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/data-retention-configure",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "retention-time",
+     "total-retention-time"
+    ],
+    "why": [
+     "Correct: --retention-time sets the analytics (interactive) retention of the table, which is 90 days here.",
+     "Incorrect: --total-retention-time sets the overall period, including long-term retention. Using it for 90 days would shorten the total period, and the value 730 would then be given to the wrong setting."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "total-retention-time",
+     "retention-time"
+    ],
+    "why": [
+     "Correct: --total-retention-time sets the total retention in days, so 730 keeps the remaining 640 days in long-term retention.",
+     "Incorrect: --retention-time is already used for the interactive period in Box 1. Setting it to 730 would make all data interactive, which costs more than required."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ]
+ },
+ {
+  "id": "4.2.9-05",
+  "obj": "4.2.9",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Woodgrove Bank has a Sentinel workspace in which SecurityEvent has analytics retention of 90 days and total retention of 730 days. During an investigation, an analyst must explore all rows from a one-week window 14 months ago by using full KQL, including joins and summarize, and no specific search term is known.\n\nWhat should you do?",
+  "explanation": "Restore makes a specific time range from long-term retention available in the hot cache for high-performance queries that support full KQL. Search jobs retrieve data by specific criteria.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/restore",
+  "choices": [
+   "Run a search job for a keyword and query the _SRCH table",
+   "Switch SecurityEvent to the Auxiliary table plan",
+   "Create an export rule to Azure Storage for SecurityEvent",
+   "Restore the one-week range into a _RST table and query that table"
+  ],
+  "answer": [
+   3
+  ],
+  "rationale": [
+   "Incorrect: A search job fetches records that match criteria into a _SRCH table. It fits when you know what to look for, but here no search term is known and the full week is needed.",
+   "Incorrect: Auxiliary tables stay queryable but are low cost because queries across tables are unoptimized, and alerts stop working on them. Switching a plan is not a targeted way to get full KQL on one week of data.",
+   "Incorrect: Export rules send newly ingested data to storage going forward. They do not make existing long-term data queryable in the workspace.",
+   "Correct: Restore creates a _RST table for the chosen range, and you run full KQL against it. Dismiss the restore afterward to stop billing."
+  ]
+ },
+ {
+  "id": "4.2.9-06",
+  "obj": "4.2.9",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Relecloud has a high-volume firewall table in its Microsoft Sentinel workspace. The data is low-touch, no analytics rules use it, and it must remain queryable for a total of five years without running search jobs. The company wants to reduce cost and does not want to change other tables.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "explanation": "The Auxiliary plan gives low-cost ingestion and keeps data queryable for the total retention period. Setting total retention on the table to 1,825 days covers five years without touching other tables.",
+  "ref": "https://learn.microsoft.com/azure/azure-monitor/logs/data-retention-configure",
+  "choices": [
+   "Switch the table to the Basic table plan",
+   "Increase the default retention of the workspace to 1,825 days",
+   "Set a daily cap of 5 GB on the workspace",
+   "Switch the table to the Auxiliary plan",
+   "Set the total retention of the table to 1,825 days"
+  ],
+  "answer": [
+   3,
+   4
+  ],
+  "rationale": [
+   "Incorrect: The Basic plan is queryable for only 30 days, and older data needs search jobs. That breaks the requirement to query for five years without search jobs.",
+   "Incorrect: The workspace default applies to all tables that inherit it, so it changes other tables and raises cost across the workspace.",
+   "Incorrect: A daily cap stops collection of billable data when reached, which risks losing events. It is a budget safeguard, not a retention or plan setting.",
+   "Correct: Auxiliary tables are priced for low-touch data and stay queryable through their total retention, which reduces cost and meets the query requirement.",
+   "Correct: A table-level total retention of 1,825 days keeps the data for five years. For Auxiliary tables only total retention is set, because analytics retention is read-only."
+  ]
+ },
+ {
+  "id": "4.2.10-01",
+  "obj": "4.2.10",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank has a security analyst who works in the Microsoft Defender portal. The analyst must use the same audit log search experience that Microsoft Purview offers, filtering by user, activity, and date range, without leaving the Defender portal.\n\nWhich Defender portal page should you use?",
+  "explanation": "The Audit page in the Defender portal opens the unified audit log search, which is identical to audit log search in the Microsoft Purview portal. You choose activities, dates, and users, and you can export the results.",
+  "ref": "https://learn.microsoft.com/defender-office-365/audit-log-search-defender-portal",
+  "choices": [
+   "Advanced hunting",
+   "Audit",
+   "Incidents and alerts",
+   "Threat analytics"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Advanced hunting runs KQL against Defender XDR tables. It can query audit data such as CloudAppEvents, but it is not the unified audit log search experience that the stem asks for.",
+   "Correct: The Audit page provides the unified audit log search with filters for activities, dates, and users, the same experience as in the Purview portal.",
+   "Incorrect: Incidents and alerts lists correlated security incidents and alerts. It does not search the unified audit log of user and admin activities.",
+   "Incorrect: Threat analytics presents Microsoft research on threats and your exposure to them. It is not a log search tool."
+  ]
+ },
+ {
+  "id": "4.2.10-02",
+  "obj": "4.2.10",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has an analyst named User1 who must search the audit log in the Microsoft Defender portal. User1 must not be able to change other settings, and you must follow the principle of least privilege.\n\nWhich role should you assign to User1?",
+  "explanation": "Searching the audit log requires the Audit Logs or View-Only Audit Logs role. View-Only Audit Logs is the narrower role that allows searching without administrative rights, whereas Global Administrator and Compliance Administrator grant much more.",
+  "ref": "https://learn.microsoft.com/purview/audit-search",
+  "choices": [
+   "Compliance Administrator",
+   "Global Administrator",
+   "View-Only Audit Logs",
+   "Security Reader"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: Compliance Administrator includes the needed permissions but also covers many compliance features. It is broader than required for a user who only searches audit data.",
+   "Incorrect: Global Administrator is highly privileged and should be limited to emergencies. It grants far more than audit search needs.",
+   "Correct: The View-Only Audit Logs role allows searching the audit log without more administrative rights, which is the least-privilege fit.",
+   "Incorrect: Security Reader provides read access to many security features but is not listed as granting access to audit log search. It would not meet the requirement."
+  ]
+ },
+ {
+  "id": "4.2.10-03",
+  "obj": "4.2.10",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Adatum Corporation has an analyst who runs audit searches in the Microsoft Defender portal and gets no results for recent activity. An administrator must verify that audit log search is turned on by checking the UnifiedAuditLogIngestionEnabled property of the Get-AdminAuditLogConfig cmdlet.\n\nWhich environment should you use to run the command?",
+  "explanation": "Run Get-AdminAuditLogConfig in Exchange Online PowerShell. The cmdlet also exists in Security and Compliance PowerShell, but there the UnifiedAuditLogIngestionEnabled property is always False.",
+  "ref": "https://learn.microsoft.com/purview/audit-search",
+  "choices": [
+   "Security and Compliance PowerShell",
+   "Microsoft Graph PowerShell",
+   "Exchange Online PowerShell",
+   "Azure Cloud Shell with the Az module"
+  ],
+  "answer": [
+   2
+  ],
+  "rationale": [
+   "Incorrect: The property returns False in this environment even when audit log search is on, so it would give a misleading result. The cmdlet exists there for other settings.",
+   "Incorrect: Microsoft Graph PowerShell uses Graph cmdlets and does not provide Get-AdminAuditLogConfig. Use it for Graph-based administration tasks.",
+   "Correct: In Exchange Online PowerShell the property reports whether unified audit log ingestion is enabled, and a value of True means audit search is turned on.",
+   "Incorrect: The Az module manages Azure resources and does not include Exchange Online audit configuration cmdlets."
+  ]
+ },
+ {
+  "id": "4.2.10-04",
+  "obj": "4.2.10",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Microsoft Defender XDR and has connected Microsoft 365 to Microsoft Defender for Cloud Apps. An analyst must write KQL in advanced hunting that correlates audit events for SharePoint, OneDrive, and Exchange with other hunting data.\n\nWhich table should the analyst query?",
+  "explanation": "The CloudAppEvents advanced hunting table contains audit logs across locations such as SharePoint, OneDrive, Exchange, and devices. Access requires Microsoft 365 to be connected to Defender for Cloud Apps.",
+  "ref": "https://learn.microsoft.com/defender-xdr/dlp-investigate-alerts-defender",
+  "choices": [
+   "CloudAppEvents",
+   "OfficeActivity",
+   "AuditLogs",
+   "AzureActivity"
+  ],
+  "answer": [
+   0
+  ],
+  "rationale": [
+   "Correct: CloudAppEvents holds the Microsoft Purview audit data for Microsoft 365 workloads in advanced hunting, and it can be joined with other Defender XDR tables.",
+   "Incorrect: OfficeActivity is the table that the Sentinel Microsoft 365 connector fills in a Log Analytics workspace. It is not a Defender XDR advanced hunting table in this scenario.",
+   "Incorrect: AuditLogs holds Microsoft Entra directory audit events, such as user and group management. It does not hold SharePoint, OneDrive, and Exchange activity.",
+   "Incorrect: AzureActivity holds Azure subscription activity log events. It does not contain Microsoft 365 audit data."
+  ]
+ },
+ {
+  "id": "4.2.10-05",
+  "obj": "4.2.10",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has an analyst who started an unfiltered audit log search from the Audit page that covers 180 days and is still running. The analyst starts a second search without any filter, and the second search is rejected. The analyst must keep using the Audit page and must not lose the first search.\n\nWhat should you do?",
+  "explanation": "Each audit user can run up to 10 search jobs at once, but only one of them can be unfiltered. Adding a filter to the second search keeps it within the limit while the first job continues.",
+  "ref": "https://learn.microsoft.com/purview/audit-search",
+  "choices": [
+   "Close the browser window to stop the first search job",
+   "Add a filter such as activities or users to the second search",
+   "Assign the analyst the Audit Logs role in addition to View-Only Audit Logs",
+   "Delete saved searches that are older than 30 days"
+  ],
+  "answer": [
+   1
+  ],
+  "rationale": [
+   "Incorrect: Search jobs started in the portal keep running after the browser closes, so closing the window does not stop the first job and does not free the unfiltered slot.",
+   "Correct: A filtered second search does not count against the single unfiltered job limit, so it can run alongside the first one.",
+   "Incorrect: Both roles allow searching, and the rejection is a concurrency limit, not a permission problem. More roles would not raise the limit on unfiltered jobs.",
+   "Incorrect: Completed search jobs are kept for 30 days for review, but they do not occupy a running slot. Deleting them does not change the unfiltered job limit."
+  ]
+ },
+ {
+  "id": "4.2.10-06",
+  "obj": "4.2.10",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Litware, Inc. needs three ways to query Microsoft Purview Audit data. You must choose the right tool for each requirement.\n\nWhich tool should you use for each requirement? To answer, drag the appropriate tools to the correct requirements. Each tool may be used once, more than once, or not at all.",
+  "explanation": "Pick the interface by how the audit data is consumed: the Audit page for interactive filtered searches, advanced hunting for KQL correlation, and Search-UnifiedAuditLog for PowerShell automation.",
+  "ref": "https://learn.microsoft.com/defender-xdr/microsoft-xdr-auditing",
+  "choices": [
+   "Audit page in the Defender portal",
+   "Advanced hunting with the CloudAppEvents table",
+   "Search-UnifiedAuditLog cmdlet in Exchange Online PowerShell",
+   "Audit Search Graph API"
+  ],
+  "targets": [
+   "Requirement 1: analysts filter by user, activity, and date range and export the results to Excel",
+   "Requirement 2: an analyst joins audit events with device events and email events by using KQL",
+   "Requirement 3: a scheduled script that runs in Exchange Online PowerShell retrieves audit records"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "The Audit page provides the portal search with filters and an export to Excel, which suits analysts who do not write code.",
+   "Advanced hunting can join the audit data in CloudAppEvents with tables such as DeviceEvents and EmailEvents by using KQL.",
+   "Search-UnifiedAuditLog is the Exchange Online PowerShell cmdlet that underlies the search tool and can be used in scripts."
+  ],
+  "notes": [
+   "Unified audit log search in the Defender portal, identical to the Purview portal search. Use it for interactive searches with filters and Excel export.",
+   "KQL hunting over Defender XDR tables, where CloudAppEvents holds audit logs for Microsoft 365 workloads. Use it to correlate audit data with other signals.",
+   "The cmdlet in Exchange Online PowerShell for searching audit events in scripts. Use it for automation that runs in PowerShell.",
+   "Microsoft Graph API for programmatic access to audit search. It is a valid method but does not fit a requirement that names an Exchange Online PowerShell script."
+  ]
+ }
+]

@@ -1,0 +1,1214 @@
+[
+ {
+  "id": "1.3.1-01",
+  "obj": "1.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. must prevent anyone from creating storage accounts that allow unencrypted HTTP traffic. Existing storage accounts are out of scope. You are writing a custom Azure Policy definition for this requirement.\n\nWhich effect should you use in the policy rule?",
+  "choices": [
+   "deny",
+   "audit",
+   "modify",
+   "deployIfNotExists"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The deny effect blocks a create or update request that does not meet the rule before the resource provider processes it. Audit only records non-compliance, while modify and deployIfNotExists change or deploy resources instead of blocking the request.",
+  "rationale": [
+   "Correct: deny is evaluated at request time and rejects the creation of a storage account that has HTTPS-only turned off, which is exactly the prevention the stem asks for.",
+   "Incorrect: audit creates a warning in the activity log and marks the resource non-compliant, but the storage account is still created. Use it first to measure impact before enforcing.",
+   "Incorrect: modify changes properties on the request, for example by turning HTTPS-only on. It fixes the resource instead of blocking creation. Use it when the goal is automatic correction.",
+   "Incorrect: deployIfNotExists deploys a related resource after the account exists, so it cannot stop the creation. Use it to add companions such as diagnostic settings."
+  ],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/concepts/effect-basics"
+ },
+ {
+  "id": "1.3.1-02",
+  "obj": "1.3.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. has 14 related policy definitions that make up its security baseline. The company wants to assign them together to a subscription and view compliance for the baseline as one unit.\n\nWhich Azure Policy object should you create?",
+  "choices": [
+   "An initiative definition",
+   "A policy exemption",
+   "A remediation task",
+   "A policy assignment exclusion"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "An initiative (policy set) groups several policy definitions so that you assign and track them together. Exemptions, remediation tasks and exclusions all act on an existing assignment instead of grouping definitions.",
+  "rationale": [
+   "Correct: an initiative definition bundles the 14 definitions into one object that you assign once, and compliance rolls up for the whole baseline.",
+   "Incorrect: a policy exemption removes a resource or scope from evaluation of an assignment. Use it when a specific resource has an approved reason to be non-compliant.",
+   "Incorrect: a remediation task deploys fixes for resources that are already non-compliant under a deployIfNotExists or modify assignment. It does not group definitions.",
+   "Incorrect: an exclusion (notScopes) removes child scopes from an assignment so they are not evaluated. Use it to carve out a resource group, not to bundle policies."
+  ],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/concepts/assignment-structure"
+ },
+ {
+  "id": "1.3.1-03",
+  "obj": "1.3.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. requires every resource to carry the CostCenter tag, with the value copied from the resource group when the tag is missing. The rule must apply to new resources and must be able to correct existing resources without redeploying them.\n\nWhich effect should you use in the policy rule?",
+  "choices": [
+   "modify",
+   "append",
+   "deny",
+   "auditIfNotExists"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Modify can add or update tags on create and update requests, and a remediation task can apply the same operations to existing resources. Append adds fields only during requests, and compliance for existing resources cannot be fixed by a remediation task.",
+  "rationale": [
+   "Correct: modify adds the tag on new and updated resources, and a remediation task runs the modify operations against existing non-compliant resources by using the assignment's managed identity.",
+   "Incorrect: append adds fields to a create or update request, but remediation tasks are supported only for modify and deployIfNotExists, so existing resources stay non-compliant.",
+   "Incorrect: deny rejects resources without the tag, so it neither copies the value from the resource group nor corrects existing resources. Use it when untagged resources must be blocked.",
+   "Incorrect: auditIfNotExists reports resources that lack a related resource or property but changes nothing. Use it for visibility when automatic correction is not wanted."
+  ],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/how-to/remediate-resources"
+ },
+ {
+  "id": "1.3.1-04",
+  "obj": "1.3.1",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Tailspin Toys must block the creation of storage accounts when the HTTPS-only property is not enabled. Both conditions in the rule must be true for a resource to match.\n\nHow should you complete the policy rule? To answer, select the appropriate options in the answer area.\n\n```json\n{\n  \"mode\": \"All\",\n  \"policyRule\": {\n    \"if\": {\n      \"[[1]]\": [\n        { \"field\": \"type\", \"equals\": \"Microsoft.Storage/storageAccounts\" },\n        { \"field\": \"Microsoft.Storage/storageAccounts/supportsHttpsTrafficOnly\", \"notEquals\": \"true\" }\n      ]\n    },\n    \"then\": { \"effect\": \"[[2]]\" }\n  }\n}\n```",
+  "choices": [],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "The allOf operator behaves like a logical AND, so the rule matches only storage accounts that lack HTTPS-only. The deny effect then rejects the create or update request.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/tutorials/create-custom-policy-definition",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "allOf",
+     "anyOf",
+     "not"
+    ],
+    "why": [
+     "Correct: allOf requires every condition to be true, so only storage accounts without supportsHttpsTrafficOnly match the rule.",
+     "Incorrect: anyOf matches when one condition is true, so every storage account (and every non-storage resource with the property unset) could match. Use it for either-or conditions.",
+     "Incorrect: not inverts the condition that it wraps and does not combine an array of conditions. Use it to exclude a case inside an allOf."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "deny",
+     "audit",
+     "disabled"
+    ],
+    "why": [
+     "Correct: deny blocks the creation of a non-compliant storage account, which is the stated requirement.",
+     "Incorrect: audit only reports non-compliance and still lets the account be created. Use it to assess impact before enforcing.",
+     "Incorrect: disabled turns evaluation off, so nothing is blocked. Use it to suspend a policy for an assignment while troubleshooting."
+    ]
+   }
+  ]
+ },
+ {
+  "id": "1.3.1-05",
+  "obj": "1.3.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank assigns an initiative at a management group. One policy in the initiative has the reference ID storageHttps and uses the deny effect. Subscription Sub2 hosts a legacy app that violates only that policy. The violation is temporarily accepted for 90 days. The other policies in the initiative must still apply to Sub2, and Sub2 must still appear in compliance reports as exempted.\n\nWhich three actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Create a policy exemption at the scope of Sub2 in the Waiver category.",
+   "Set the expiresOn property of the exemption to 90 days from now.",
+   "Set policyDefinitionReferenceIds on the exemption to storageHttps.",
+   "Add Sub2 to the notScopes of the initiative assignment.",
+   "Set the enforcement mode of the initiative assignment to DoNotEnforce.",
+   "Create the exemption in the Mitigated category."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "An exemption keeps the resource visible as exempted, can be limited to specific policies of an initiative by reference ID, and stops being honored at expiresOn. Waiver is the category for temporarily accepted non-compliance.",
+  "rationale": [
+   "Correct: an exemption at Sub2 scope keeps Sub2 in compliance reports as exempted, and Waiver is the category for temporarily accepted non-compliance.",
+   "Correct: expiresOn ends the exemption after 90 days, so the deny effect applies again without anyone having to remember to remove it.",
+   "Correct: policyDefinitionReferenceIds limits the exemption to storageHttps, so the other policies of the initiative still apply to Sub2.",
+   "Incorrect: notScopes excludes Sub2 from the whole assignment, removes it from compliance results and has no expiry. Use it for scopes that should never be evaluated.",
+   "Incorrect: DoNotEnforce stops enforcement of every policy in the assignment for all scopes. Use it to test an assignment before enforcing it.",
+   "Incorrect: Mitigated means the policy intent is met by another method. Here the violation is accepted temporarily, which is the Waiver category."
+  ],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/concepts/exemption-structure"
+ },
+ {
+  "id": "1.3.2-01",
+  "obj": "1.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. wants to see how its Azure subscriptions measure up against an industry standard such as ISO 27001, with the results grouped by control and a list of failing assessments for each control.\n\nWhich Microsoft Defender for Cloud feature should you use?",
+  "choices": [
+   "The regulatory compliance dashboard",
+   "Attack path analysis in the security graph",
+   "The cloud security explorer query builder",
+   "Workflow automation with Logic Apps"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The regulatory compliance dashboard shows the standards assigned to a scope, the controls in each standard and the assessments behind each control.",
+  "rationale": [
+   "Correct: the dashboard lists each assigned standard, its controls and the passing and failing assessments, so it directly answers a per-control compliance question.",
+   "Incorrect: attack path analysis shows exploitable routes to critical assets based on risk. Use it to prioritize exposure, not to report against a standard.",
+   "Incorrect: the cloud security explorer queries the security graph for relationships between assets. Use it for hunting posture issues, not for per-control compliance reporting.",
+   "Incorrect: workflow automation triggers a Logic App when alerts or recommendations occur. Use it to automate responses, not to view compliance."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-regulatory-compliance-standards"
+ },
+ {
+  "id": "1.3.2-02",
+  "obj": "1.3.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. just enabled Microsoft Defender for Cloud on a new Azure subscription and has not changed any settings.\n\nWhich standard should the company expect Defender for Cloud to assess on the subscription by default?",
+  "choices": [
+   "Microsoft cloud security benchmark",
+   "Payment Card Industry Data Security Standard (PCI DSS)",
+   "Health Insurance Portability and Accountability Act (HIPAA)",
+   "ISO/IEC 27001 information security standard"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The Microsoft cloud security benchmark is assigned automatically and appears in the regulatory compliance dashboard. Other standards must be added explicitly.",
+  "rationale": [
+   "Correct: the Microsoft cloud security benchmark is the default standard for Azure subscriptions and starts assessing resources as soon as Defender for Cloud is enabled.",
+   "Incorrect: PCI DSS is an optional standard that you add yourself from the available standards. Add it when you handle payment card data and need to report on it.",
+   "Incorrect: HIPAA is an optional standard for healthcare workloads and must be turned on for the scope. It is not assigned by default.",
+   "Incorrect: ISO/IEC 27001 is an optional industry standard that you add explicitly. Add it when auditors require evidence against that framework."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/faq-regulatory-compliance"
+ },
+ {
+  "id": "1.3.2-03",
+  "obj": "1.3.2",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Woodgrove Bank plans to add the SOC 2 standard to the regulatory compliance dashboard for Subscription1 by using Manage compliance policies in Microsoft Defender for Cloud. At least one Defender plan is enabled on the subscription.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "User1 needs the Owner or Policy Contributor role to add the standard.",
+   "The standard appears in the dashboard even when the subscription has no resources that the standard assesses.",
+   "A control that is grayed out has no Defender for Cloud assessments associated with it."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Adding a standard needs Owner or Policy Contributor. A standard with no relevant resources is not displayed, and grayed-out controls are those that Defender for Cloud cannot assess automatically.",
+  "rationale": [
+   "Yes: adding a regulatory standard requires Owner or Policy Contributor permissions on the scope, because the standard is deployed as an Azure Policy initiative.",
+   "No: if a subscription has no resources that are relevant to the standard, the standard is not shown in the dashboard even though it is assigned.",
+   "Yes: grayed-out controls have no associated assessments, for example because they are process-related, not yet implemented, or the platform's responsibility."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/assign-regulatory-compliance-standards"
+ },
+ {
+  "id": "1.3.2-04",
+  "obj": "1.3.2",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Tailspin Toys uses Microsoft Defender for Cloud to prepare for an audit.\n\nWhich feature should you use for each task? To answer, drag the appropriate features to the correct tasks. Each feature may be used once, more than once, or not at all.",
+  "choices": [
+   "Manage compliance policies",
+   "Manual attestation",
+   "Download audit report",
+   "Exemption",
+   "Governance rule"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Standards are turned on through Manage compliance policies, manual controls are attested with linked evidence, and auditors receive summary reports that you download from the dashboard.",
+  "rationale": [
+   "Turning on another standard for a subscription is done on the Manage compliance policies page, where you toggle the standard on for the scope.",
+   "A control that Defender for Cloud cannot assess automatically is satisfied through manual attestation, with evidence linked to demonstrate compliance.",
+   "Auditors need a document, so you download the audit report or summary report for the standard from the regulatory compliance dashboard."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/regulatory-compliance-dashboard",
+  "targets": [
+   "Turn on an additional standard for a subscription",
+   "Demonstrate compliance for a control that cannot be assessed automatically",
+   "Give auditors a summary report for a standard"
+  ],
+  "notes": [
+   "Opens the list of standards assigned to a scope and lets you toggle each one on or off. Use it to add or remove standards.",
+   "Lets you mark a manual assessment as compliant and link evidence. Use it for process-related controls that automation cannot verify.",
+   "Exports a report for a selected standard from the dashboard. Use it to hand evidence of the current compliance state to auditors.",
+   "Removes a recommendation or resource from scoring with a justification. Use it for accepted risk, not for audit reporting.",
+   "Assigns an owner and due date to recommendations. Use it to drive remediation accountability, not to report compliance."
+  ]
+ },
+ {
+  "id": "1.3.2-05",
+  "obj": "1.3.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Relecloud's compliance officer, User1, must view the regulatory compliance dashboard data for Subscription1, including the policy compliance results, but must not be able to change any configuration. User1 currently has the Security Reader role on the subscription and cannot see the policy compliance data.\n\nWhich role should you assign to User1?",
+  "choices": [
+   "Reader",
+   "Security Admin",
+   "Resource Policy Contributor",
+   "Contributor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Policy compliance data is visible to the Reader role, but not to Security Reader. Reader is read-only, so it satisfies both requirements, whereas the other roles can change configuration.",
+  "rationale": [
+   "Correct: the Reader role on the subscription grants access to policy compliance data and is read-only, so User1 can view the dashboard without changing anything.",
+   "Incorrect: Security Admin can view everything Security Reader can and also update security policies and dismiss alerts. It breaks the no-change requirement.",
+   "Incorrect: Resource Policy Contributor can create and modify policy resources, which is a write permission. Use it for people who manage policy assignments.",
+   "Incorrect: Contributor can create and manage resources in the subscription. It gives far more than the read-only access the compliance officer needs."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/regulatory-compliance-dashboard"
+ },
+ {
+  "id": "1.3.3-01",
+  "obj": "1.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants Microsoft Defender for Cloud to block the creation of any new storage account that does not meet a recommendation from the Microsoft cloud security benchmark.\n\nWhich option should you select for the recommendation?",
+  "choices": [
+   "Deny",
+   "Enforce",
+   "Fix",
+   "Exempt"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Deny uses the Azure Policy deny effect to stop non-compliant resources from being created. Enforce deploys a remediation instead, Fix remediates existing resources, and Exempt removes resources from scoring.",
+  "rationale": [
+   "Correct: Deny prevents the deployment of resources that do not comply with the recommendation, so a non-compliant storage account cannot be created.",
+   "Incorrect: Enforce uses deployIfNotExists to remediate non-compliant resources after they are created. Use it when you want automatic fixing instead of blocking.",
+   "Incorrect: Fix remediates existing unhealthy resources on demand. It does nothing to stop new non-compliant storage accounts from being created later.",
+   "Incorrect: Exempt removes a resource or scope from the recommendation and the secure score with a justification. Use it for accepted risk, not for prevention."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/prevent-misconfigurations"
+ },
+ {
+  "id": "1.3.3-02",
+  "obj": "1.3.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. wants every high-severity recommendation in a subscription to be assigned automatically to the owner named in a resource tag, with a due date of 14 days after the recommendation is raised.\n\nWhich Defender for Cloud capability should you configure?",
+  "choices": [
+   "A governance rule",
+   "Workflow automation",
+   "An exemption",
+   "A custom standard"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Governance rules assign an owner and a remediation due date to recommendations that match a severity, risk level, category or specific recommendation, and the owner can be read from a resource tag.",
+  "rationale": [
+   "Correct: a governance rule can match recommendations by severity, read the owner from a tag and set a time frame such as 14 days for the due date.",
+   "Incorrect: workflow automation runs a Logic App when a recommendation or alert is generated. It can notify people, but it does not assign owners and due dates itself.",
+   "Incorrect: an exemption removes a resource or recommendation from scoring. Use it when a recommendation does not apply, not to drive remediation.",
+   "Incorrect: a custom standard groups recommendations for assessment. Use it to define what is assessed, not who fixes it or by when."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/governance-rules"
+ },
+ {
+  "id": "1.3.3-03",
+  "obj": "1.3.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. uses governance rules to set due dates for recommendations of the Microsoft cloud security benchmark. The security team does not want unfixed recommendations to reduce the secure score until their due date has passed.\n\nWhat should you configure in the governance rule?",
+  "choices": [
+   "Apply grace period",
+   "A shorter remediation time frame",
+   "The Disabled effect for the recommendations",
+   "The Deny effect for the recommendations"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "With a grace period, resources that need remediation do not affect the secure score while the recommendation is on time. The score is affected only when the recommendation becomes overdue.",
+  "rationale": [
+   "Correct: Apply grace period keeps on-time recommendations from lowering the secure score, and only overdue recommendations count against it.",
+   "Incorrect: a shorter time frame only makes the due date arrive sooner, so the score drops earlier. The grace period setting controls score impact.",
+   "Incorrect: setting the effect to Disabled turns the recommendation off entirely, so it is no longer assessed or fixed. The stem wants tracking with a delayed score impact.",
+   "Incorrect: Deny blocks creation of non-compliant resources and does not change when existing unhealthy resources count against the score."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/governance-rules"
+ },
+ {
+  "id": "1.3.3-04",
+  "obj": "1.3.3",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Tailspin Toys manages recommendations of the Microsoft cloud security benchmark in Microsoft Defender for Cloud.\n\nWhich option should you use for each requirement? To answer, drag the appropriate options to the correct requirements. Each option may be used once, more than once, or not at all.",
+  "choices": [
+   "Deny",
+   "Enforce",
+   "Exempt",
+   "Governance rule",
+   "Fix"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Deny blocks non-compliant creations, Enforce deploys a remediation automatically on creation, and Exempt removes a resource from the recommendation with a justification.",
+  "rationale": [
+   "Blocking creation of a non-compliant storage account is the purpose of the Deny option, which maps to the Azure Policy deny effect.",
+   "Automatically deploying a fix when a non-compliant resource is created is the Enforce option, which uses the deployIfNotExists effect.",
+   "Removing one resource from the recommendation and its score impact, with a justification, is done by creating an exemption."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/prevent-misconfigurations",
+  "targets": [
+   "Prevent the creation of a storage account that violates a recommendation",
+   "Automatically deploy a remediation when a non-compliant resource is created",
+   "Remove one specific resource from a recommendation and from the secure score, with a justification"
+  ],
+  "notes": [
+   "Uses the deny effect to reject non-compliant deployments. Use it when a violation must never be created.",
+   "Uses deployIfNotExists to remediate resources at creation. Use it when you want automatic correction instead of rejection.",
+   "Marks a resource or scope as not applicable with a justification. Use it for accepted risk or compensating controls.",
+   "Assigns an owner and due date to recommendations. Use it for accountability, not to prevent or fix violations.",
+   "Remediates existing unhealthy resources on demand from the recommendation page. It does not affect future deployments."
+  ]
+ },
+ {
+  "id": "1.3.3-05",
+  "obj": "1.3.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank needs a custom recommendation that uses a KQL query to check that Azure Key Vaults have purge protection enabled. The recommendation must be added to a new custom standard for Subscription1.\n\nWhich three requirements should you meet? Each correct answer presents part of the solution.",
+  "choices": [
+   "The Defender Cloud Security Posture Management (CSPM) plan is enabled.",
+   "You have Security Admin permissions.",
+   "You have Owner permissions on Subscription1.",
+   "The Defender for Servers Plan 2 plan is enabled.",
+   "The Defender for Key Vault plan is enabled."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "KQL-based custom recommendations need Defender CSPM and Security Admin permissions, and creating a new security standard needs Owner on the subscription. Threat-protection plans are not required.",
+  "rationale": [
+   "Correct: custom recommendations that are based on a KQL query require the Defender CSPM plan. Recommendations based on Azure Policy do not.",
+   "Correct: Security Admin permissions are needed to create custom recommendations.",
+   "Correct: creating a new security standard requires Owner permissions on the subscription.",
+   "Incorrect: Defender for Servers Plan 2 protects machines and is unrelated to custom recommendation authoring. Enable it for server threat protection and vulnerability features.",
+   "Incorrect: Defender for Key Vault detects suspicious access to vaults. The purge-protection check is a posture query that runs on resource configuration and does not depend on it."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/create-custom-recommendations"
+ },
+ {
+  "id": "1.3.4-01",
+  "obj": "1.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. must let User1 create and delete management locks on resource groups in Subscription1. The company wants to use a built-in role.\n\nWhich role should you assign to User1?",
+  "choices": [
+   "Owner",
+   "Contributor",
+   "Reader",
+   "Virtual Machine Contributor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Creating and deleting locks requires access to Microsoft.Authorization/locks actions, which Owner and User Access Administrator include. Contributor and the more specific roles do not include them.",
+  "rationale": [
+   "Correct: Owner includes the Microsoft.Authorization/* actions that are needed to create and delete management locks.",
+   "Incorrect: Contributor can manage resources but cannot manage Microsoft.Authorization actions such as locks and role assignments. Use it for resource management without access control.",
+   "Incorrect: Reader is read-only and cannot create or delete any resource, including locks. Use it for viewing only.",
+   "Incorrect: Virtual Machine Contributor manages virtual machines only and has no Microsoft.Authorization lock permissions."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.4-02",
+  "obj": "1.3.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys needs a single CanNotDelete lock that protects every resource group in Subscription1, including resource groups that are created later.\n\nWhich scope should you use to create the lock?",
+  "choices": [
+   "Subscription1",
+   "The management group that contains Subscription1",
+   "Each existing resource group",
+   "The tenant root management group"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Locks apply to subscriptions, resource groups and resources, and child scopes inherit them, even resources added later. Locks cannot be added to management groups.",
+  "rationale": [
+   "Correct: a lock on the subscription is inherited by all current and future resource groups and resources in it.",
+   "Incorrect: you cannot add a management lock to a management group. Use Azure Policy at that level if you need a broader guardrail.",
+   "Incorrect: locks on each existing resource group do not cover resource groups created later. Use them when only specific groups need protection.",
+   "Incorrect: the tenant root management group is a management group, and management groups cannot hold locks."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.4-03",
+  "obj": "1.3.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has a ReadOnly lock on resource group RG1, which contains virtual machine VM1. Users report that they cannot start VM1. The company must still prevent deletion of RG1 and the resources in it.\n\nWhich action should you perform?",
+  "choices": [
+   "Replace the ReadOnly lock with a CanNotDelete lock",
+   "Assign the Virtual Machine Contributor role to the users",
+   "Assign the Owner role to the users on RG1",
+   "Create a policy exemption for VM1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Starting a virtual machine uses a POST request, which a ReadOnly lock blocks regardless of RBAC roles. A CanNotDelete lock still prevents deletion but allows operations such as start.",
+  "rationale": [
+   "Correct: CanNotDelete blocks deletion but still allows start and restart, which satisfies both requirements.",
+   "Incorrect: locks override user permissions, so adding Virtual Machine Contributor does not unblock the start operation. Use it when the block comes from missing RBAC permissions.",
+   "Incorrect: even Owner cannot perform an operation that a ReadOnly lock blocks until the lock is removed or changed.",
+   "Incorrect: policy exemptions affect Azure Policy evaluation and have no effect on management locks."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.4-04",
+  "obj": "1.3.4",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Litware, Inc. applies a ReadOnly lock to storage account Storage1. User1 has the Contributor role on Storage1 and User2 has permissions to delete blobs through the data plane.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "User2 can delete a blob in Storage1 by using a data plane operation.",
+   "User1 can list the account keys of Storage1 by using the Azure portal.",
+   "User1 can remove the ReadOnly lock from Storage1."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Locks apply to control plane operations only. A ReadOnly lock blocks the POST-based list keys action, and removing a lock needs Microsoft.Authorization/locks permissions, which Contributor lacks.",
+  "rationale": [
+   "Yes: locks do not apply to data plane operations, so a user with data permissions can still delete blobs. Use RBAC and immutability features to protect data.",
+   "No: listing account keys uses a POST request to the control plane, which a ReadOnly lock blocks for everyone.",
+   "No: removing a lock requires Microsoft.Authorization/locks permissions, which Owner and User Access Administrator have and Contributor does not."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.4-05",
+  "obj": "1.3.4",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Litware, Inc. must create resource group rg1 and storage account st1 in it. st1 must be protected against deletion, while configuration changes and listing of account keys must remain possible. You must then confirm that the lock exists.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az group create --name rg1 --location westeurope`",
+   "`az storage account create --name st1 --resource-group rg1 --location westeurope --sku Standard_LRS`",
+   "`az lock create --name stLock --lock-type CanNotDelete --resource-group rg1 --resource-name st1 --resource-type Microsoft.Storage/storageAccounts`",
+   "`az lock list --resource-group rg1 --resource-name st1 --namespace Microsoft.Storage --resource-type storageAccounts --parent \"\"`",
+   "`az lock create --name stLock --lock-type ReadOnly --resource-group rg1 --resource-name st1 --resource-type Microsoft.Storage/storageAccounts`",
+   "`az lock delete --name stLock --resource-group rg1 --resource-name st1 --resource-type Microsoft.Storage/storageAccounts`"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "Create the resource group, then the storage account in it, then lock the account with CanNotDelete, then list the locks to verify. ReadOnly would block listing of account keys, and deleting the lock removes the protection.",
+  "rationale": [
+   "Step 1: the resource group must exist before any resource can be created in it.",
+   "Step 2: the storage account is created in rg1, because a lock can only be applied to an existing resource.",
+   "Step 3: CanNotDelete prevents deletion but still permits configuration changes and listing of keys, which matches the requirement.",
+   "Step 4: listing the locks on st1 confirms that the lock exists, and it can only succeed after the lock has been created.",
+   "Incorrect: a ReadOnly lock blocks the POST-based list keys operation and all configuration changes. Use it when the resource must not change at all.",
+   "Incorrect: deleting the lock removes the protection that the task is meant to put in place. Use it only when you must change a protected resource."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.5-01",
+  "obj": "1.3.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. wants User1 to manage virtual machines in resource group RG1. The permissions must be limited to virtual machines that are created by using Azure Resource Manager, and User1 must not be able to grant access to others.\n\nWhich built-in role should you assign to User1 on RG1?",
+  "choices": [
+   "Virtual Machine Contributor",
+   "Virtual Machine Administrator Login",
+   "Virtual Machine User Login",
+   "Classic Virtual Machine Contributor"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Virtual Machine Contributor is a job function role scoped to the management of virtual machines. The login roles only grant sign-in rights to a machine, and the classic role manages classic virtual machines.",
+  "rationale": [
+   "Correct: Virtual Machine Contributor lets User1 manage Resource Manager virtual machines without broad rights over other resource types or over access control.",
+   "Incorrect: Virtual Machine Administrator Login grants sign-in as an administrator on a machine and does not allow managing the virtual machine resource. Use it for operating-system access.",
+   "Incorrect: Virtual Machine User Login grants sign-in as a regular user on a machine and does not allow managing the virtual machine resource. Use it for operating-system access.",
+   "Incorrect: Classic Virtual Machine Contributor manages virtual machines created through the classic deployment model. Use it only for legacy classic resources."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/quickstart-role-assignments-bicep"
+ },
+ {
+  "id": "1.3.5-02",
+  "obj": "1.3.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. administrators are learning how Azure RBAC grants access.\n\nWhich three elements should you specify to create an Azure role assignment?",
+  "choices": [
+   "Security principal, role definition, and scope",
+   "Security principal, role definition, and condition",
+   "Role definition, assignable scope, and deny assignment",
+   "Security principal, management lock, and scope"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A role assignment attaches a role definition to a security principal at a scope. Conditions are optional refinements, and locks and deny assignments are separate mechanisms.",
+  "rationale": [
+   "Correct: the three required elements of a role assignment are who (security principal), what (role definition) and where (scope).",
+   "Incorrect: a condition is an optional attribute-based refinement of an assignment. The assignment cannot be created without a scope, so condition does not replace it.",
+   "Incorrect: assignable scopes belong to custom role definitions, and deny assignments block actions. Neither identifies who receives access.",
+   "Incorrect: management locks are a separate protection that overrides permissions. They are not part of a role assignment."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/quickstart-role-assignments-bicep"
+ },
+ {
+  "id": "1.3.5-03",
+  "obj": "1.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. wants User1 to assign only the Backup Contributor and Backup Reader roles, and only to the Marketing and Sales groups, at the scope of Subscription1. User1 must not be able to assign any other role.\n\nWhich role assignment should you create for User1?",
+  "choices": [
+   "Role Based Access Control Administrator with a condition",
+   "User Access Administrator without a condition",
+   "Contributor with a condition",
+   "Backup Contributor on Subscription1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Role Based Access Control Administrator can write role assignments, and a condition can restrict which roles and which principals User1 can use. Contributor cannot write role assignments, and User Access Administrator without a condition is unrestricted.",
+  "rationale": [
+   "Correct: this role can create role assignments, and the condition limits the assignable roles to the two Backup roles and the principals to the two groups.",
+   "Incorrect: User Access Administrator without a condition can assign any role to anyone, including Owner. Add a condition if you use it for delegation.",
+   "Incorrect: Contributor does not include role assignment write permissions, so a condition on it cannot make User1 an assigner of roles.",
+   "Incorrect: Backup Contributor lets User1 manage backups and does not allow assigning roles to other principals."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/delegate-role-assignments-portal"
+ },
+ {
+  "id": "1.3.5-04",
+  "obj": "1.3.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. assigns Azure roles directly to 4,800 individual users in Subscription1. An administrator now receives the error RoleAssignmentLimitExceeded when creating another role assignment.\n\nWhat should you do?",
+  "choices": [
+   "Assign the roles to Microsoft Entra groups instead of users",
+   "Ask Microsoft support to raise the role assignment limit",
+   "Move the role assignments to a management group scope",
+   "Create custom roles that combine the permissions"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Each subscription supports up to 5,000 role assignments, and the limit cannot be increased. Assigning roles to groups reduces the number of assignments.",
+  "rationale": [
+   "Correct: assigning roles to groups replaces many per-user assignments with a few group assignments, which brings the subscription back under the limit.",
+   "Incorrect: the limit of 5,000 role assignments per subscription is fixed and cannot be increased through support.",
+   "Incorrect: management groups have their own limit of 500 role assignments, so moving thousands of assignments there does not solve the problem.",
+   "Incorrect: custom roles define permissions, not the number of assignments. The same number of assignments would still be needed."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/troubleshoot-limits"
+ },
+ {
+  "id": "1.3.5-05",
+  "obj": "1.3.5",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. must give the BackupOps team the Backup Contributor role on resource group rg1 by using one role assignment to a Microsoft Entra group. Group membership is managed separately by the HR team. You must then verify the assignment by using the Azure CLI.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az ad group create --display-name BackupOps --mail-nickname BackupOps`",
+   "`az ad group show --group BackupOps --query id --output tsv`",
+   "`az role assignment create --assignee-object-id <group-object-id> --assignee-principal-type Group --role \"Backup Contributor\" --scope /subscriptions/<subscription-id>/resourceGroups/rg1`",
+   "`az role assignment list --assignee <group-object-id> --scope /subscriptions/<subscription-id>/resourceGroups/rg1`",
+   "`az ad group member add --group BackupOps --member-id <user-object-id>`",
+   "`az role definition create --role-definition backupops.json`"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "explanation": "The group must exist and its object ID must be known before the role assignment can reference it. The list command verifies the assignment afterwards. Membership is out of scope, and no custom role is needed.",
+  "rationale": [
+   "Step 1: the group must exist before it can receive a role assignment.",
+   "Step 2: the object ID of the group is required as the assignee in the role assignment command.",
+   "Step 3: assigning Backup Contributor to the group at the scope of rg1 gives every member the role through one assignment.",
+   "Step 4: listing the assignments for the group at the resource group scope confirms the result, and it can only succeed after the assignment exists.",
+   "Incorrect: the stem says membership is managed separately by the HR team. Use this command only when you manage group membership yourself.",
+   "Incorrect: Backup Contributor is a built-in role, so no custom role definition is needed. Use this command only when no built-in role fits."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/role-assignments-cli#assign-role-examples"
+ },
+ {
+  "id": "1.3.6-01",
+  "obj": "1.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. is creating an Azure custom role. The Actions property contains the wildcard Microsoft.Compute/*, but the role must not allow deleting virtual machines.\n\nWhich property of the role definition should you use to exclude the delete operation?",
+  "choices": [
+   "NotActions",
+   "NotDataActions",
+   "DataActions",
+   "AssignableScopes"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "NotActions removes specific control plane operations from the set that Actions grants. NotDataActions does the same for data plane operations.",
+  "rationale": [
+   "Correct: NotActions subtracts control plane operations such as Microsoft.Compute/virtualMachines/delete from the permissions that the wildcard in Actions grants.",
+   "Incorrect: NotDataActions excludes data plane operations from DataActions. Virtual machine deletion is a control plane operation.",
+   "Incorrect: DataActions lists data plane operations that are allowed, so it would add permissions instead of removing them.",
+   "Incorrect: AssignableScopes defines where the role can be assigned and has no effect on the permissions that the role grants."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/custom-roles"
+ },
+ {
+  "id": "1.3.6-02",
+  "obj": "1.3.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank wants to create custom roles in Microsoft Entra ID to delegate the management of app registrations.\n\nWhich license should you ensure that each user with a custom role assignment has?",
+  "choices": [
+   "Microsoft Entra ID P1",
+   "Microsoft Entra ID Free",
+   "Microsoft Entra Workload ID",
+   "Microsoft Entra Verified ID"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Built-in Microsoft Entra roles are free, but custom roles need a Microsoft Entra ID P1 license for every user with a custom role assignment.",
+  "rationale": [
+   "Correct: a Microsoft Entra ID P1 license is required for each user who has a custom role assignment.",
+   "Incorrect: Microsoft Entra ID Free covers built-in roles but not custom roles. Use it when built-in roles meet your delegation needs.",
+   "Incorrect: Microsoft Entra Workload ID licenses features for workload identities and does not enable custom role assignments for users.",
+   "Incorrect: Microsoft Entra Verified ID issues and verifies decentralized credentials and is unrelated to custom directory roles."
+  ],
+  "ref": "https://learn.microsoft.com/entra/fundamentals/licensing"
+ },
+ {
+  "id": "1.3.6-03",
+  "obj": "1.3.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has 12 subscriptions in management group MG1. The company creates one Azure custom role that includes DataActions to read blob data, and must make that single role definition usable in all 12 subscriptions.\n\nWhich action should you perform?",
+  "choices": [
+   "Add MG1 to AssignableScopes and assign the role in each subscription",
+   "Add MG1 to AssignableScopes and assign the role at MG1",
+   "Set AssignableScopes to the root scope",
+   "Use a wildcard such as /subscriptions/* in AssignableScopes"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A custom role with DataActions cannot be assigned at management group scope, but it can list one management group in AssignableScopes and be assigned at the subscriptions below it. The root scope and wildcards are not allowed in AssignableScopes.",
+  "rationale": [
+   "Correct: one management group is allowed in AssignableScopes, and the role can then be assigned at the scope of each subscription in that group.",
+   "Incorrect: custom roles with DataActions cannot be assigned at management group scope, so the assignment at MG1 fails.",
+   "Incorrect: AssignableScopes cannot be set to the root scope. List explicit subscriptions or one management group.",
+   "Incorrect: wildcards are not allowed in AssignableScopes, which prevents a role update from granting access to a scope unintentionally."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/custom-roles"
+ },
+ {
+  "id": "1.3.6-04",
+  "obj": "1.3.6",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Contoso, Ltd. plans to create a custom role in Microsoft Entra ID to delegate the management of application registrations.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "The administrator who creates the role must have at least the Privileged Role Administrator role.",
+   "You can clone a built-in role as the baseline permissions for the new role.",
+   "The custom role can be assigned at the scope of a single app registration."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Creating a custom role needs at least Privileged Role Administrator and a Microsoft Entra ID P1 license. You can clone only custom roles, and an assignment can be scoped to the directory or to a single app registration.",
+  "rationale": [
+   "Yes: the prerequisites for creating a custom role include the Privileged Role Administrator role and a Microsoft Entra ID P1 or P2 license.",
+   "No: on the Basics tab you can clone baseline permissions from an existing custom role, but you cannot clone a built-in role.",
+   "Yes: a custom role can be assigned at directory scope or at the scope of a single app registration, which allows delegation per app."
+  ],
+  "ref": "https://learn.microsoft.com/entra/identity/role-based-access-control/custom-create"
+ },
+ {
+  "id": "1.3.6-05",
+  "obj": "1.3.6",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Relecloud is writing a custom Azure role that lets users view everything in a subscription, open support tickets and read blob data. The role must be available only in one subscription.\n\nHow should you complete the role definition? To answer, select the appropriate options in the answer area.\n\n```json\n{\n  \"Name\": \"Support Reader\",\n  \"IsCustom\": true,\n  \"Description\": \"View everything, open support tickets, and read blob data.\",\n  \"[[1]]\": [\"*/read\", \"Microsoft.Support/*\"],\n  \"[[2]]\": [\"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\"],\n  \"AssignableScopes\": [\"[[3]]\"]\n}\n```",
+  "choices": [],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "Control plane operations such as */read and Microsoft.Support/* belong in Actions, data plane operations belong in DataActions, and AssignableScopes must name an explicit scope without the root or wildcards.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/custom-roles",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Actions",
+     "NotActions",
+     "DataActions"
+    ],
+    "why": [
+     "Correct: */read and Microsoft.Support/* are control plane operations that the role allows, so they belong in Actions.",
+     "Incorrect: NotActions removes operations from the allowed set, which would take away the read and support permissions.",
+     "Incorrect: DataActions holds data plane operations, such as reading blob contents. Control plane operations placed there would not be granted."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "DataActions",
+     "Actions",
+     "NotDataActions"
+    ],
+    "why": [
+     "Correct: reading the contents of a blob is a data plane operation, which is granted through DataActions.",
+     "Incorrect: Actions covers control plane operations. A data plane operation string placed there does not grant access to blob data.",
+     "Incorrect: NotDataActions excludes data plane operations, which would remove blob read access instead of granting it."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "/subscriptions/00000000-0000-0000-0000-000000000000",
+     "/",
+     "/subscriptions/*"
+    ],
+    "why": [
+     "Correct: an explicit subscription ID limits the role to one subscription, as the stem requires.",
+     "Incorrect: AssignableScopes cannot be set to the root scope (/). Use an explicit subscription or one management group.",
+     "Incorrect: wildcards are not allowed in AssignableScopes. List each subscription ID explicitly instead."
+    ]
+   }
+  ]
+ },
+ {
+  "id": "1.3.7-01",
+  "obj": "1.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. reviews its Azure RBAC assignments against best practices and Microsoft Defender for Cloud recommendations.\n\nWhat is the maximum number of Owner assignments that the company should designate for a subscription?",
+  "choices": [
+   "3",
+   "5",
+   "10",
+   "1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure RBAC best practices recommend at most three subscription owners, and Defender for Cloud flags subscriptions that exceed this. More than one owner is also recommended for redundancy.",
+  "rationale": [
+   "Correct: limiting a subscription to a maximum of three owners reduces the risk of a compromised owner account, and Defender for Cloud monitors this recommendation.",
+   "Incorrect: five owners exceeds the recommended maximum and would trigger the Defender for Cloud recommendation.",
+   "Incorrect: ten owners greatly increases the number of highly privileged accounts that an attacker could target.",
+   "Incorrect: a single owner removes administrative redundancy, and a separate recommendation asks for more than one owner."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/best-practices"
+ },
+ {
+  "id": "1.3.7-02",
+  "obj": "1.3.7",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Litware, Inc. wants administrators to hold the Owner role on subscriptions only when needed. Activation must be time-bound and require multi-factor authentication, instead of standing assignments.\n\nWhich service should you use?",
+  "choices": [
+   "Microsoft Entra Privileged Identity Management",
+   "Microsoft Entra Conditional Access policies for administrators",
+   "Microsoft Entra ID Protection risk-based policies",
+   "Azure Policy with a deny effect on role assignments"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Privileged Identity Management provides just-in-time, time-bound and approval-based activation of eligible role assignments for Azure resources and Microsoft Entra roles.",
+  "rationale": [
+   "Correct: PIM makes assignments eligible, requires activation with MFA and expires access automatically, which removes standing privileged access.",
+   "Incorrect: Conditional Access controls how users sign in to apps. It does not convert standing role assignments into eligible, time-bound ones.",
+   "Incorrect: ID Protection detects risky users and sign-ins and applies remediation. It does not manage the activation of roles.",
+   "Incorrect: Azure Policy can audit or block resource configurations. It does not provide just-in-time activation of RBAC roles."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/best-practices"
+ },
+ {
+  "id": "1.3.7-03",
+  "obj": "1.3.7",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Tailspin Toys must have subscription owners recertify every quarter who holds privileged Azure roles. Assignments that reviewers deny must be removed automatically when the review ends.\n\nWhich feature should you configure?",
+  "choices": [
+   "A Microsoft Entra access review of Azure resource roles",
+   "A Defender for Cloud governance rule with a recurring due date",
+   "An Azure Policy remediation task for role assignments",
+   "A role assignment condition on each Owner assignment"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Access reviews for Azure resource roles let reviewers recertify assignments on a schedule, and the auto apply setting removes access that was denied.",
+  "rationale": [
+   "Correct: an access review of Azure resource roles recurs quarterly, lets owners approve or deny each assignment, and can apply the results automatically.",
+   "Incorrect: governance rules assign owners and due dates to security recommendations. They do not recertify or remove role assignments.",
+   "Incorrect: remediation tasks fix resources that are non-compliant with modify or deployIfNotExists policies. They do not review RBAC assignments.",
+   "Incorrect: a condition narrows what an assignment allows but does not trigger reviews or remove assignments."
+  ],
+  "ref": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-complete-roles-and-resource-roles-review"
+ },
+ {
+  "id": "1.3.7-04",
+  "obj": "1.3.7",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Contoso, Ltd. reviews Azure RBAC assignments in Subscription1 to remove overprivileged access.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Replacing an Owner assignment at subscription scope with a job function role at resource group scope reduces privilege.",
+   "Eligible role assignments in Privileged Identity Management count toward the limit of 5,000 role assignments per subscription.",
+   "Assigning roles directly to individual users helps keep the number of role assignments low."
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Narrower roles at narrower scopes reduce exposure. Eligible assignments do not count toward the subscription limit, and group assignments, not per-user assignments, keep the count low.",
+  "rationale": [
+   "Yes: avoiding privileged administrator roles when a job function role is enough, and using a narrow scope, limits what a compromised account can do.",
+   "No: eligible role assignments and role assignments scheduled in the future do not count toward the 5,000 assignment limit.",
+   "No: assigning roles to groups instead of users minimizes the number of role assignments. Per-user assignments increase the count."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/best-practices"
+ },
+ {
+  "id": "1.3.7-05",
+  "obj": "1.3.7",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Fabrikam, Inc. finds that 15 users hold the Owner role on Subscription1. Only two users need Owner. The other 13 deploy virtual machines to resource group RG-App only. The company wants to remove overprivileged access and keep a way to use Owner when necessary.\n\nWhich three actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Remove the unnecessary Owner assignments so that no more than three remain.",
+   "Assign Virtual Machine Contributor to the 13 users at the scope of RG-App.",
+   "Make the remaining Owner assignments eligible in Privileged Identity Management.",
+   "Assign Contributor to the 13 users at the scope of Subscription1.",
+   "Apply a ReadOnly lock to Subscription1."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Remove unneeded privileged assignments, give the VM deployers a job function role at the narrowest scope, and protect the remaining Owner assignments with just-in-time activation. A ReadOnly lock would block deployments.",
+  "rationale": [
+   "Correct: removing unnecessary Owner assignments reduces the number of highly privileged accounts to at most three.",
+   "Correct: Virtual Machine Contributor at RG-App scope gives the 13 users the access they need without a privileged administrator role or a broad scope.",
+   "Correct: eligible assignments in PIM require activation, so the remaining owners have Owner only when needed.",
+   "Incorrect: Contributor at subscription scope is still far broader than deploying virtual machines to one resource group. Use a narrower role and scope.",
+   "Incorrect: a ReadOnly lock blocks create and update operations for everyone, so the 13 users could not deploy virtual machines."
+  ],
+  "ref": "https://learn.microsoft.com/azure/role-based-access-control/best-practices"
+ },
+ {
+  "id": "1.3.8-01",
+  "obj": "1.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. must ensure that a single compromised backup administrator cannot disable soft delete or reduce retention on a Recovery Services vault without approval from a separate security administrator.\n\nWhich feature should you use?",
+  "choices": [
+   "Multiuser authorization by using a Resource Guard",
+   "Locked immutability on the vault",
+   "Always-on soft delete",
+   "The Backup Reader role for the administrators"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Multiuser authorization requires approval through a Resource Guard, which is owned by a different person, before critical operations such as disabling soft delete or reducing retention can proceed.",
+  "rationale": [
+   "Correct: a Resource Guard makes critical vault operations depend on a second identity that holds the Backup MUA Operator role on the guard, which gives the required separation of duties.",
+   "Incorrect: locked immutability blocks destructive operations and cannot be reversed, but it does not add an approval workflow. Use it for WORM-style protection.",
+   "Incorrect: always-on soft delete keeps deleted data recoverable and cannot be turned off, but it does not require approval for operations such as reducing retention.",
+   "Incorrect: Backup Reader only views backup information. It removes the ability to act but does not add an approval step for administrators who must manage backups."
+  ],
+  "ref": "https://learn.microsoft.com/azure/backup/multi-user-authorization-concept"
+ },
+ {
+  "id": "1.3.8-02",
+  "obj": "1.3.8",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. must keep deleted backup items in a Recovery Services vault recoverable for 30 days after deletion. Users must still be able to delete items, but no administrator must be able to turn this protection off for the vault.\n\nWhat should you configure?",
+  "choices": [
+   "Always-on soft delete with a 30-day retention period",
+   "Soft delete in the On state with a 30-day retention period",
+   "Immutability in the Enabled state",
+   "Locked immutability on the vault"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Always-on soft delete is irreversible and keeps deleted backup data recoverable for the retention period of 14 to 180 days. Plain soft delete can be switched off, and immutability prevents deletion instead of allowing recovery.",
+  "rationale": [
+   "Correct: always-on soft delete cannot be disabled, and deleted items stay recoverable for the configured 30 days, so deletions remain possible but reversible.",
+   "Incorrect: soft delete in the On state provides the same recovery window but an administrator can still disable it. Use it when the setting may need to change.",
+   "Incorrect: the Enabled state of immutability can be disabled again and blocks deletion rather than allowing recovery after deletion.",
+   "Incorrect: locked immutability is irreversible but blocks operations that would delete recovery points, so users could not delete items. Use it for WORM requirements."
+  ],
+  "ref": "https://learn.microsoft.com/azure/backup/secure-by-default"
+ },
+ {
+  "id": "1.3.8-03",
+  "obj": "1.3.8",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud's compliance policy requires that recovery points in vault RSV1 cannot be deleted before they expire and that retention in backup policies cannot be reduced. Nobody, including administrators, may be able to reverse the setting.\n\nWhat should you configure?",
+  "choices": [
+   "Immutable vault in the Locked state",
+   "Immutable vault in the Enabled state",
+   "Always-on soft delete",
+   "Multiuser authorization"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A locked immutable vault blocks operations that could lose recovery points, such as deleting data before expiry or reducing retention, and the locked state cannot be reversed.",
+  "rationale": [
+   "Correct: the Locked state is irreversible and blocks deleting recovery points early and reducing retention, which matches all three constraints.",
+   "Incorrect: the Enabled state can be disabled again by a Backup Contributor, so it fails the requirement that nobody can reverse the setting. Use it when flexibility is needed.",
+   "Incorrect: always-on soft delete keeps deleted data recoverable but does not stop retention from being reduced in policies.",
+   "Incorrect: multiuser authorization adds an approval step, but an approver can still authorize destructive operations, so it is not an irreversible block."
+  ],
+  "ref": "https://learn.microsoft.com/azure/backup/azure-backup-data-protection-best-practices"
+ },
+ {
+  "id": "1.3.8-04",
+  "obj": "1.3.8",
+  "difficulty": "medium",
+  "type": "order",
+  "stem": "Litware, Inc. wants multiuser authorization on Recovery Services vault RSV1. A separate security team must control the approvals, and the Backup admin must not be able to approve critical operations alone.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create a Resource Guard in a subscription that the Backup admin cannot manage.",
+   "Assign the Backup MUA Operator role on the Resource Guard to the Backup admin.",
+   "In the properties of RSV1, update Multi-user Authorization and select Protect with Resource Guard.",
+   "Create the Resource Guard in the subscription of RSV1 and make the Backup admin its Owner.",
+   "Set immutability on RSV1 to the Locked state."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The Resource Guard must exist in a separate scope first, the Backup admin then needs the Backup MUA Operator role on it so that the vault can be associated, and finally the vault is protected with the guard.",
+  "rationale": [
+   "Step 1: the Resource Guard is the resource that holds the approval permissions, and it belongs in a subscription or tenant that the Backup admin does not control.",
+   "Step 2: the Backup admin needs the Backup MUA Operator role on the Resource Guard, which the security admin grants, before the vault can be associated with it.",
+   "Step 3: selecting Protect with Resource Guard on the vault property page associates RSV1 with the guard and turns on multiuser authorization.",
+   "Incorrect: making the Backup admin the Owner of the guard removes the separation of duties, so the admin could approve their own operations.",
+   "Incorrect: locked immutability is irreversible and unrelated to setting up approvals. Use it when WORM protection is required."
+  ],
+  "ref": "https://learn.microsoft.com/azure/backup/multi-user-authorization"
+ },
+ {
+  "id": "1.3.8-05",
+  "obj": "1.3.8",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank has Recovery Services vault RSV1 with soft delete in the On state, which administrators can disable, and no multiuser authorization. Security wants all protected items to reach the Excellent security level in the Azure Backup security posture assessment.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable multiuser authorization on RSV1 by using a Resource Guard.",
+   "Make soft delete always-on for RSV1.",
+   "Set immutability on RSV1 to the Enabled state.",
+   "Assign the Backup Operator role to the backup administrators.",
+   "Increase the soft delete retention period to 180 days."
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "The Excellent level needs an irreversible protection, which is either always-on soft delete or locked immutability, together with multiuser authorization on the vault. Reversible settings and role changes do not reach it.",
+  "rationale": [
+   "Correct: multiuser authorization is required for the Excellent level, because it protects critical operations with an additional approval.",
+   "Correct: always-on soft delete is an irreversible deletion protection, which together with multiuser authorization meets the Excellent requirement.",
+   "Incorrect: the Enabled state of immutability is reversible, so it does not count as the irreversible protection. The Locked state would.",
+   "Incorrect: Backup Operator limits what administrators can do but is not a vault security setting that the posture assessment evaluates.",
+   "Incorrect: a longer retention period lengthens recoverability but does not make soft delete irreversible, so the level does not change."
+  ],
+  "ref": "https://learn.microsoft.com/azure/backup/azure-backup-data-protection-best-practices"
+ },
+ {
+  "id": "1.3.9-01",
+  "obj": "1.3.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. deploys resources by using Bicep. The company needs to include a CanNotDelete lock for a storage account in the same Bicep file.\n\nWhich resource type should you declare for the lock?",
+  "choices": [
+   "Microsoft.Authorization/locks",
+   "Microsoft.Authorization/roleAssignments",
+   "Microsoft.Authorization/policyAssignments",
+   "Microsoft.Authorization/roleDefinitions"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Management locks are the Microsoft.Authorization/locks resource type, with a level property of CanNotDelete or ReadOnly. The other types in the same namespace deploy role assignments, policy assignments and custom roles.",
+  "rationale": [
+   "Correct: Microsoft.Authorization/locks is the resource type for management locks, and its level property takes the value CanNotDelete.",
+   "Incorrect: Microsoft.Authorization/roleAssignments grants a role to a principal at a scope. Use it for access control, not for protection against deletion.",
+   "Incorrect: Microsoft.Authorization/policyAssignments assigns a policy or initiative to a scope. Use it to enforce or audit configurations.",
+   "Incorrect: Microsoft.Authorization/roleDefinitions defines custom roles. Use it to describe permissions, not to lock resources."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
+ },
+ {
+  "id": "1.3.9-02",
+  "obj": "1.3.9",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. deploys resources by using a deployment stack. The company must block all users, including users with the Owner role, from updating or deleting the managed resources of the stack.\n\nWhich value should you use for the deny settings mode?",
+  "choices": [
+   "Mode denyWriteAndDelete",
+   "Mode denyDelete",
+   "Mode none",
+   "Action on unmanage detachAll"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The deny settings modes are none, denyDelete and denyWriteAndDelete. Only denyWriteAndDelete blocks both updates and deletions. detachAll is a value of the action-on-unmanage setting.",
+  "rationale": [
+   "Correct: denyWriteAndDelete creates a deny assignment that blocks both update and delete operations on the managed resources for everyone except excluded principals.",
+   "Incorrect: denyDelete blocks deletions only, so users could still update the resources. Use it when updates must remain possible.",
+   "Incorrect: none creates no deny assignment, so managed resources are not protected. Use it when the stack is only used for lifecycle management.",
+   "Incorrect: detachAll controls what happens to resources that are removed from the template, and is not a deny settings mode."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deployment-stacks"
+ },
+ {
+  "id": "1.3.9-03",
+  "obj": "1.3.9",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. deploys a stack with deny settings mode denyWriteAndDelete. Twelve CI/CD service principals must still be able to update the managed resources. All other users must stay blocked.\n\nWhat should you do?",
+  "choices": [
+   "Put the service principals in a Microsoft Entra group and exclude it",
+   "Add all twelve service principal object IDs to the excluded principals list",
+   "Add the twelve write operations that the pipelines use to the excluded actions list",
+   "Change the deny settings mode to denyDelete so that updates are allowed"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Deny settings accept a limited number of excluded principals (up to five), and exceeding the limit does not return an error. Excluding a Microsoft Entra group avoids the limit and lets you manage exclusions through group membership.",
+  "rationale": [
+   "Correct: a group counts as one excluded principal and the deny setting does not apply to its members, which works around the limit of five principals.",
+   "Incorrect: at most five principals are permitted, and specifying more does not return an error, so some of the twelve identities would silently remain blocked.",
+   "Incorrect: excluded actions exempt operations for every user, so all users could perform them. They do not exempt specific identities.",
+   "Incorrect: denyDelete would allow every user to update the managed resources, which violates the requirement that all other users stay blocked."
+  ],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deployment-stacks"
+ },
+ {
+  "id": "1.3.9-04",
+  "obj": "1.3.9",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Tailspin Toys deploys a Bicep file with a deployment stack. The stack must exist at the subscription scope so that developers with access only to resource groups cannot change its deny assignment. Managed resources must be protected against deletion, but updates must remain possible.\n\nHow should you complete the Azure CLI command? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz stack [[1]] create \\\n  --name stack1 \\\n  --location westeurope \\\n  --template-file main.bicep \\\n  --action-on-unmanage detachAll \\\n  --deny-settings-mode [[2]]\n```",
+  "choices": [],
+  "answer": [
+   1,
+   0
+  ],
+  "explanation": "az stack sub create creates the stack at subscription scope, and the denyDelete mode blocks deletions of managed resources while allowing updates.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deployment-stacks",
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "group",
+     "sub",
+     "mg"
+    ],
+    "why": [
+     "Incorrect: az stack group create creates the stack in a resource group, where developers with resource group access could modify it. It also uses --resource-group instead of --location.",
+     "Correct: az stack sub create creates the stack at subscription scope, which separates it from the resource groups that the developers can access.",
+     "Incorrect: az stack mg create creates the stack at management group scope. The stem requires the subscription scope."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "denyDelete",
+     "denyWriteAndDelete",
+     "none"
+    ],
+    "why": [
+     "Correct: denyDelete blocks deletion of managed resources while still allowing updates, which matches the requirement.",
+     "Incorrect: denyWriteAndDelete also blocks updates, but the stem says updates must remain possible.",
+     "Incorrect: none creates no deny assignment, so the managed resources are not protected against deletion."
+    ]
+   }
+  ]
+ },
+ {
+  "id": "1.3.9-05",
+  "obj": "1.3.9",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Contoso, Ltd. stores governance as code and uses the Azure CLI. The company must create a custom policy definition with the modify effect that adds a tag, assign it to Subscription1 with a system-assigned managed identity that has the Tag Contributor role, and correct the resources that already exist.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az policy definition create --name addCostCenter --mode All --rules rules.json`",
+   "`az policy assignment create --name addCostCenterAssign --policy addCostCenter --scope /subscriptions/<subscription-id> --location westeurope --mi-system-assigned --role \"Tag Contributor\" --identity-scope /subscriptions/<subscription-id>`",
+   "`az policy remediation create --name fixTags --policy-assignment addCostCenterAssign`",
+   "`az lock create --name tagLock --lock-type ReadOnly --resource-group rg1`",
+   "`az stack sub create --name stack1 --location westeurope --template-file main.bicep --deny-settings-mode denyWriteAndDelete`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The definition must exist before it can be assigned, and the assignment with its managed identity and role must exist before a remediation task can correct existing resources. Locks and deployment stacks do not remediate tags.",
+  "rationale": [
+   "Step 1: the custom definition must exist before an assignment can reference it.",
+   "Step 2: the assignment with a system-assigned identity and the Tag Contributor role gives the policy the permission to modify tags on resources.",
+   "Step 3: a remediation task runs the modify operations on existing non-compliant resources, and it needs the assignment and the identity role to exist first.",
+   "Incorrect: a ReadOnly lock blocks changes, including the tag updates that remediation needs. Use locks to protect resources, not to correct them.",
+   "Incorrect: a deployment stack with deny settings protects resources that it deploys. It neither assigns the policy nor remediates tags."
+  ],
+  "ref": "https://learn.microsoft.com/azure/governance/policy/how-to/remediate-resources"
+ }
+]

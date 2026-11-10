@@ -1,0 +1,1122 @@
+[
+ {
+  "id": "2.1.1-01",
+  "obj": "2.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a storage account named Storage1. A security review requires that requests signed with the storage account access keys are rejected, so that clients must authenticate with Microsoft Entra ID.\n\nWhich setting should you configure on Storage1?",
+  "choices": [
+   "Disallow Shared Key authorization (Allow storage account key access set to Disabled)",
+   "Regenerate both storage account access keys and discard the new values",
+   "Enable Secure transfer required for requests to the account",
+   "Set the minimum TLS version of the account to version 1.2"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Setting the allowSharedKeyAccess property to false makes the account reject every request that is authorized with an account key. Clients must then use Microsoft Entra ID or a user delegation SAS.",
+  "rationale": [
+   "Correct: Disabling Shared Key authorization is the setting that rejects requests signed with the account keys, which forces Microsoft Entra ID based authorization.",
+   "Incorrect: Regenerating keys only invalidates the old key values. Anyone who reads the new values can sign requests again. Use regeneration to respond to a leaked key, not to stop key based access.",
+   "Incorrect: Secure transfer required rejects HTTP requests. It protects data in transit but does not change how requests are authorized, so signed requests over HTTPS still succeed.",
+   "Incorrect: A minimum TLS version rejects clients that use older protocol versions. It controls the transport, not the authorization method, so key signed requests over TLS 1.2 still work."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent"
+ },
+ {
+  "id": "2.1.1-02",
+  "obj": "2.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. stores marketing files in several blob containers of Storage2. You must prevent any user from configuring anonymous read access on any container in the account, including containers that are created later.\n\nWhat should you do?",
+  "choices": [
+   "Set Allow Blob anonymous access to Disabled on the account",
+   "Set the public access level of each existing container to Private",
+   "Set the default network action of the storage firewall to Deny",
+   "Disallow Shared Key authorization on the storage account"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When anonymous access is disallowed at the account level, Azure Storage rejects anonymous requests regardless of the container setting and users cannot enable anonymous access on containers later.",
+  "rationale": [
+   "Correct: The account level setting overrides every container setting and also blocks users from turning anonymous access on again, which covers containers created later.",
+   "Incorrect: Setting current containers to Private fixes only the existing containers. A user with permission can change a container or create a new one with public access, so the requirement is not met.",
+   "Incorrect: A default action of Deny limits which networks can reach the endpoint, but a container with public access still serves anonymous requests from the allowed networks.",
+   "Incorrect: Disallowing Shared Key blocks key signed requests. Anonymous requests are not signed with the key, so containers with public read access keep working."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/blobs/anonymous-read-access-prevent"
+ },
+ {
+  "id": "2.1.1-03",
+  "obj": "2.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Woodgrove Bank creates a new storage account that will hold encrypted customer documents. The security team must control the encryption key lifecycle, including rotation, by using a key stored in Azure Key Vault. The storage account must authorize to the key vault through a managed identity.\n\nWhich identity type should you use when you create the storage account with customer-managed keys?",
+  "choices": [
+   "A user-assigned managed identity that already exists",
+   "A system-assigned managed identity of the storage account",
+   "A service principal that uses a client secret",
+   "The Microsoft Entra account of the person creating the account"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "When you configure customer-managed keys while you create a storage account, the account cannot yet have a system-assigned identity, so you must supply an existing user-assigned managed identity that has access to the key.",
+  "rationale": [
+   "Correct: A new storage account requires an existing user-assigned managed identity that has been granted access to the key vault key at creation time.",
+   "Incorrect: A system-assigned identity is created together with the account, so it cannot be granted vault access beforehand. It is usable when you add customer-managed keys to an existing account.",
+   "Incorrect: Storage encryption authenticates to Key Vault through a managed identity, not a client secret. A secret would also add a credential that you must store and rotate.",
+   "Incorrect: Storage uses the identity configured on the account when it wraps and unwraps keys. The identity of the administrator is not used for these background operations."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-configure-new-account"
+ },
+ {
+  "id": "2.1.1-04",
+  "obj": "2.1.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. will disallow Shared Key authorization on a storage account. A partner portal currently gives external users time-limited access to individual blobs by generating service SAS tokens that are signed with the account key. The solution must keep granting time-limited blob access after the change.\n\nWhich type of shared access signature should the portal generate?",
+  "choices": [
+   "User delegation SAS",
+   "Account SAS",
+   "Service SAS that references a stored access policy",
+   "Service SAS with a short expiry time"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A user delegation SAS is signed with Microsoft Entra credentials and is still permitted for Blob Storage when Shared Key access is disallowed. Service SAS and account SAS depend on the account key and are denied.",
+  "rationale": [
+   "Correct: A user delegation SAS is authorized by Microsoft Entra ID, so Blob Storage accepts it when AllowSharedKeyAccess is false.",
+   "Incorrect: An account SAS is signed with the account key, so requests that use it are denied once Shared Key is disallowed. It is useful only while key authorization stays enabled.",
+   "Incorrect: A stored access policy adds revocation control, but the service SAS is still signed with the account key and is denied when Shared Key is disallowed.",
+   "Incorrect: A short lifetime reduces exposure, but a service SAS without a policy is still signed with the account key and is denied. The signing method matters, not the expiry."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent"
+ },
+ {
+  "id": "2.1.1-05",
+  "obj": "2.1.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Adatum Corporation wants a Microsoft Entra Conditional Access policy that requires a compliant device for access to the data in Storage3. Security testing shows that users with the account key can still read blobs from unmanaged devices.\n\nWhich action should you take so that the Conditional Access policy cannot be bypassed?",
+  "choices": [
+   "Disallow Shared Key authorization on Storage3",
+   "Enable the default to Microsoft Entra authorization setting for the Azure portal",
+   "Add an ABAC condition to the Storage Blob Data Reader role assignments",
+   "Rotate the account keys on a 30 day schedule with a key expiration policy"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Conditional Access applies to Microsoft Entra authorization. Requests signed with the account key never reach Microsoft Entra ID, so you must disallow Shared Key authorization to make the policy effective.",
+  "rationale": [
+   "Correct: Account key requests are not evaluated by Conditional Access. Disallowing Shared Key forces clients through Microsoft Entra ID, where the policy is enforced.",
+   "Incorrect: This setting only changes which method the Azure portal uses by default, and users can still switch to the access key. It does not stop key based access from other tools.",
+   "Incorrect: An ABAC condition narrows what a role assignment allows, but it does not affect requests that use the account key. Use it to restrict blobs by tag or path.",
+   "Incorrect: Rotation limits how long a leaked key is useful, but the key still grants access that bypasses Conditional Access between rotations. Use it when keys must stay enabled."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent"
+ },
+ {
+  "id": "2.1.1-06",
+  "obj": "2.1.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys has an existing storage account named Storage4 and a key vault named Vault1 that contains an RSA key. You must configure encryption with customer-managed keys for Storage4. After the key is rotated in Vault1, Storage4 must start using the new key version without any administrator action.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Grant a managed identity of Storage4 access to the key in Vault1",
+   "Select the key without specifying a key version",
+   "Specify the key version URI of the current key version",
+   "Regenerate the access keys of Storage4 after each rotation",
+   "Enable infrastructure encryption on Storage4"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "The managed identity needs permission to get, wrap and unwrap the key. If you omit the key version, Azure Storage checks the vault about once a day and automatically uses the newest version.",
+  "rationale": [
+   "Correct: Storage4 authenticates to Vault1 through a managed identity, which needs access to the key (get, wrapKey and unwrapKey) before encryption can use it.",
+   "Correct: Leaving the key version empty enables automatic version updates. Storage checks the vault daily, so the new version is used without changing the account.",
+   "Incorrect: Pinning a key version disables automatic updates, so an administrator must change the URI after each rotation. Use it when you must control exactly when a version takes effect.",
+   "Incorrect: Account access keys are unrelated to customer-managed key encryption. Regenerating them affects Shared Key clients and SAS tokens, not the key that protects the data at rest.",
+   "Incorrect: Infrastructure encryption adds a second layer of platform managed encryption. It does not configure a customer-managed key or influence how key versions are picked up."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-overview"
+ },
+ {
+  "id": "2.1.1-07",
+  "obj": "2.1.1",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Proseware, Inc. has a storage account named Storage5 and a key vault named Vault5 that contains an RSA key and uses Azure role-based access control. You must configure customer-managed keys for Storage5 by using a managed identity of the account.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Enable a system-assigned managed identity on Storage5.",
+   "Assign the Key Vault Crypto Service Encryption User role on Vault5 to the identity of Storage5.",
+   "Configure the encryption of Storage5 to use the key in Vault5.",
+   "Regenerate the access keys of Storage5.",
+   "Disable Shared Key authorization on Storage5.",
+   "Create a stored access policy on each container of Storage5."
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The identity must exist before it can receive a role assignment, and the assignment must exist before the account can use the key. The other actions concern key based access, not encryption keys.",
+  "rationale": [
+   "Step 1: The identity must exist first, because you cannot assign a role to it or select it for key access until Storage5 has a managed identity.",
+   "Step 2: The role gives the identity the permissions to get, wrap and unwrap the key. It must be in place before encryption is switched to the key, or the change fails.",
+   "Step 3: With the identity authorized, you point the account encryption at the key. Omit the key version if you want automatic version updates.",
+   "Incorrect: Regenerating access keys invalidates key signed requests and SAS tokens. It has no effect on the key that protects data at rest. Use it after a leaked access key.",
+   "Incorrect: Disallowing Shared Key stops key signed requests but does not configure encryption keys. Use it when clients must use Microsoft Entra ID.",
+   "Incorrect: Stored access policies manage SAS constraints for a container. They do not affect encryption. Use them when you need to revoke service SAS tokens."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-configure-existing-account"
+ },
+ {
+  "id": "2.1.1-08",
+  "obj": "2.1.1",
+  "difficulty": "medium",
+  "type": "yesno",
+  "stem": "Northwind Traders has a storage account named Storage6 with Shared Key authorization disallowed. One container named public1 is configured for anonymous read access. Anonymous access is still allowed at the account level.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A request to Blob Storage that uses a user delegation SAS is permitted.",
+   "A request to Blob Storage that uses a service SAS tied to a stored access policy is permitted.",
+   "An anonymous read request to a blob in public1 can still succeed."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "With Shared Key disallowed, requests authorized by Microsoft Entra ID, including a user delegation SAS, still work. Service and account SAS are denied. Anonymous access is a separate setting.",
+  "rationale": [
+   "Yes: A user delegation SAS is authorized by Microsoft Entra ID, so Blob Storage accepts it when AllowSharedKeyAccess is false.",
+   "No: A service SAS is signed with the account key, so it is denied even when it references a stored access policy. The policy controls constraints, not the signing method.",
+   "Yes: Anonymous requests are not authorized with the account key, so disallowing Shared Key does not affect them. Disable anonymous access separately at the account level."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent"
+ },
+ {
+  "id": "2.1.1-09",
+  "obj": "2.1.1",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Wide World Importers must harden the storage account Storage7: anonymous blob access must be disabled and clients that use TLS 1.0 or TLS 1.1 must be rejected. Clients that use TLS 1.3 must keep working through negotiation.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\naz storage account update --name Storage7 --resource-group RG1 --[[1]] false --min-tls-version [[2]]\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "allow-blob-public-access",
+     "allow-shared-key-access",
+     "https-only"
+    ],
+    "why": [
+     "Correct: allow-blob-public-access set to false disallows anonymous access to containers and blobs for the whole account.",
+     "Incorrect: allow-shared-key-access set to false rejects account key requests. Use it for Entra only authorization, but it does not stop anonymous blob reads.",
+     "Incorrect: https-only false would allow HTTP requests, which lowers security. https-only true is the Secure transfer required setting and does not control anonymous access."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "TLS1_2",
+     "TLS1_3",
+     "TLS1_0"
+    ],
+    "why": [
+     "Correct: TLS1_2 is the recommended minimum. Clients that support TLS 1.3 negotiate it automatically, and TLS 1.0 and 1.1 clients are rejected.",
+     "Incorrect: Azure Storage does not support enforcing TLS 1.3 as the minimum version, so this value cannot be set. TLS 1.3 is still used when clients negotiate it.",
+     "Incorrect: TLS1_0 would keep accepting TLS 1.0 and 1.1 clients, which the requirement forbids. Use it only for legacy clients that cannot be upgraded."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "Anonymous access is controlled by allow-blob-public-access and the minimum TLS version by min-tls-version. TLS 1.2 is the highest value that can be enforced as a minimum.",
+  "ref": "https://learn.microsoft.com/azure/storage/common/transport-layer-security-configure-minimum-version"
+ },
+ {
+  "id": "2.1.1-10",
+  "obj": "2.1.1",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Alpine Ski House must configure security settings on storage accounts. Each requirement maps to one setting.\n\nWhich setting should you configure for each requirement? To answer, drag the appropriate settings to the correct requirements. Each setting may be used once, more than once, or not at all.",
+  "choices": [
+   "Secure transfer required",
+   "Minimum TLS version",
+   "Allow Blob anonymous access (Disabled)",
+   "Allow storage account key access (Disabled)",
+   "Infrastructure encryption"
+  ],
+  "targets": [
+   "Requests over HTTP must fail",
+   "Clients that negotiate TLS 1.0 must be rejected",
+   "Containers cannot be made publicly readable",
+   "Requests signed with the account key must be rejected"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "Secure transfer required rejects any request that uses HTTP, so only HTTPS connections are accepted.",
+   "A minimum TLS version of 1.2 rejects connections that use older protocol versions, even over HTTPS.",
+   "Disabling Blob anonymous access at the account level blocks anonymous reads and prevents containers from being made public.",
+   "Disabling storage account key access rejects Shared Key and account or service SAS requests, so clients must use Microsoft Entra ID."
+  ],
+  "notes": [
+   "Rejects non-HTTPS requests. Use it to protect data in transit against plain text access.",
+   "Sets the lowest TLS version that is accepted (1.2 is the recommended value). Use it to retire old clients.",
+   "Account level switch that blocks anonymous read access to blobs. Use it to prevent accidental public containers.",
+   "Rejects Shared Key authorization. Use it to force Microsoft Entra ID and to make Conditional Access effective.",
+   "Adds a second layer of encryption at rest with platform keys. Use it for compliance, not to control transport or authorization."
+  ],
+  "explanation": "Each setting covers a different layer: transport protocol, TLS version, anonymous access and key based authorization.",
+  "ref": "https://learn.microsoft.com/azure/storage/common/secure-storage"
+ },
+ {
+  "id": "2.1.2-01",
+  "obj": "2.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Relecloud has a storage account named Storage1 that accepts connections from all networks. Staff in the head office reach the internet through a static public IP range of 203.0.113.0/24. Only the head office must be able to reach the blob endpoint of Storage1 over the internet.\n\nWhat should you do?",
+  "choices": [
+   "Add an IP network rule for 203.0.113.0/24 and set the default network action to Deny",
+   "Add a virtual network rule for the head office subnet and set the default action to Deny",
+   "Create a resource instance rule for the head office firewall device",
+   "Add the trusted Azure services exception and keep the default action at Allow"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "IP network rules allow specific public IPv4 ranges, but network rules take effect only when the default action is Deny. Virtual network rules and resource instance rules apply to other kinds of sources.",
+  "rationale": [
+   "Correct: An IP network rule admits the static public range and the default action Deny blocks every other source. Without Deny the rule has no restricting effect.",
+   "Incorrect: Virtual network rules identify Azure subnets that use a service endpoint. A head office on premises network is not an Azure subnet. Use them for Azure virtual network workloads.",
+   "Incorrect: Resource instance rules admit specific Azure resources by resource ID. A network device on premises has no Azure resource ID. Use them for Azure services outside a virtual network.",
+   "Incorrect: The trusted services exception admits listed Azure services, not people on a corporate network, and with default action Allow nothing is restricted. Use it for services such as Azure Backup."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security"
+ },
+ {
+  "id": "2.1.2-02",
+  "obj": "2.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. runs virtual machines in Subnet1 of VNet1. The virtual machines use private addresses and must reach Storage2 in the same region, while internet clients are blocked. Traffic must use the virtual network identity of the subnet instead of a public source address.\n\nWhich configuration should you implement?",
+  "choices": [
+   "Enable the Microsoft.Storage service endpoint on Subnet1 and add a virtual network rule",
+   "Add an IP network rule that contains the private address range of Subnet1 on Storage2",
+   "Create a resource instance rule for each virtual machine in Subnet1 by resource ID",
+   "Add the Logging and Metrics exceptions to the network rules of Storage2 for the subnet"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A virtual network rule identifies an allowed subnet, and the subnet must have the Azure Storage service endpoint enabled so that its traffic carries the virtual network identity.",
+  "rationale": [
+   "Correct: The service endpoint makes storage traffic from Subnet1 carry its virtual network identity, and the virtual network rule on Storage2 allows that subnet.",
+   "Incorrect: IP network rules accept public IPv4 addresses only. Private RFC 1918 ranges cannot be used, so the rule would never match. Use IP rules for stable public addresses.",
+   "Incorrect: Resource instance rules admit Azure PaaS resources that have a managed identity, not virtual machines in a subnet. Use them for services that run outside your network.",
+   "Incorrect: The Logging and Metrics exceptions let services read storage analytics data. They do not admit application traffic from a subnet. Use them for monitoring integrations."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-virtual-networks"
+ },
+ {
+  "id": "2.1.2-03",
+  "obj": "2.1.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. has an Azure resource named Resource1 that runs outside any virtual network and has no stable public IP address. Resource1 must write to the blob endpoint of Storage3, which uses the Deny default action. Other resources of the same service type, including those in other subscriptions, must stay blocked.\n\nWhich type of network rule should you add to Storage3?",
+  "choices": [
+   "Resource instance rule",
+   "Trusted Azure services exception",
+   "IP network rule",
+   "Virtual network rule"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A resource instance rule scopes access to the public endpoint to one specific resource by its resource ID. A trusted services exception is broader because it applies to the documented scenarios of that service.",
+  "rationale": [
+   "Correct: A resource instance rule names the exact resource, so only Resource1 can reach the endpoint and other resources of the same type remain blocked.",
+   "Incorrect: The trusted services exception admits the listed service for documented scenarios and is not scoped to one resource instance. Use it when the service has no instance rule support.",
+   "Incorrect: An IP rule needs a stable public address range. Resource1 has none, and an address range of a shared service would also admit other tenants. Use it for fixed addresses.",
+   "Incorrect: Virtual network rules require a subnet with a service endpoint. Resource1 does not run in a virtual network, so there is no subnet to allow."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-resource-instances"
+ },
+ {
+  "id": "2.1.2-04",
+  "obj": "2.1.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. configured a resource instance network rule on Storage4 for an Azure service resource named Resource2. Resource2 now reaches the blob endpoint, but its requests to read blobs fail with an authorization error. Resource2 has a system-assigned managed identity.\n\nWhat should you do?",
+  "choices": [
+   "Assign Storage Blob Data Reader to the managed identity of Resource2",
+   "Add the public IP address of Resource2 as an IP network rule",
+   "Change the default network action of Storage4 to Allow",
+   "Enable Secure transfer required on Storage4"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A resource instance rule opens network access to the public endpoint but does not grant access to data. The resource must still be authorized, for example through an Azure role on its managed identity.",
+  "rationale": [
+   "Correct: The rule provides network access only. Data access requires an Azure role, such as Storage Blob Data Reader, on the system-assigned managed identity of Resource2.",
+   "Incorrect: Network access already works, so another network rule does not fix an authorization error. IP rules would also be unreliable for a service with changing addresses.",
+   "Incorrect: Setting the default action to Allow would open the account to every network and would still not authorize the request. The failure is about permissions, not network reach.",
+   "Incorrect: Secure transfer required rejects HTTP requests. Resource2 is already connecting, and the setting does not grant any data permissions."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-resource-instances"
+ },
+ {
+  "id": "2.1.2-05",
+  "obj": "2.1.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Adatum Corporation changed Storage5 from Enabled from selected virtual networks and IP addresses to Public network access Disabled. Storage5 has the Allow Azure services on the trusted services list exception enabled for Azure Backup. An audit shows that the Azure Backup service can still reach the account over its public endpoint. You must remove this access.\n\nWhat should you do?",
+  "choices": [
+   "Remove the trusted services exception by setting bypass to None",
+   "Delete all private endpoint connections of Storage5",
+   "Set the default network action of Storage5 to Deny",
+   "Regenerate the access keys of Storage5"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Trusted service access has the highest precedence over other network restrictions. Exceptions and resource instance rules configured earlier stay in effect after you disable public network access, so you must remove them explicitly.",
+  "rationale": [
+   "Correct: Exceptions and resource instance rules remain in effect after public access is disabled, so setting the bypass value to None removes the trusted service path.",
+   "Incorrect: Private endpoints are a separate path and do not control the trusted service exception. Removing them would cut private clients without closing the trusted access.",
+   "Incorrect: The default action is already effectively blocking public traffic, and trusted services take precedence over it. Changing it does not remove the exception.",
+   "Incorrect: Regenerating keys invalidates key based credentials but leaves the network exception in place. Use it after a key leak, not to close a network path."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-limitations"
+ },
+ {
+  "id": "2.1.2-06",
+  "obj": "2.1.2",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys has a storage account named Storage6 that currently allows all networks. The application servers run in Subnet1 of VNet1 in the same region. The administrators connect from the public IP range 198.51.100.0/24. All other sources must be blocked, and the application must not be interrupted while you change the configuration.\n\nWhich three actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable the Microsoft.Storage service endpoint on Subnet1 and add a virtual network rule for Subnet1",
+   "Add an IP network rule for 198.51.100.0/24",
+   "Set the default network action to Deny after the allow rules exist",
+   "Add an IP network rule for the private address range of Subnet1",
+   "Create a resource instance rule for VNet1"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Allowed sources must be defined first, then the default action Deny blocks everyone else. The subnet needs a service endpoint, and IP rules accept only public ranges.",
+  "rationale": [
+   "Correct: The service endpoint gives Subnet1 traffic a virtual network identity, and the virtual network rule allows it. Without both, the application loses access once Deny is set.",
+   "Correct: The IP network rule admits the public range of the administrators before the default action blocks other internet sources.",
+   "Correct: Rules have no effect until the default action is Deny. Setting it last avoids interrupting the application because the allow rules are already present.",
+   "Incorrect: IP network rules do not accept private RFC 1918 ranges, so a rule for the Subnet1 address range cannot match. Use a virtual network rule for subnets.",
+   "Incorrect: Resource instance rules apply to Azure PaaS resource IDs, not to virtual networks. Use a virtual network rule for subnet traffic."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-ip-address-range"
+ },
+ {
+  "id": "2.1.2-07",
+  "obj": "2.1.2",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Wide World Importers has a storage account named Storage7 in resource group RG1 that allows all networks. You must restrict access to Subnet1 of VNet1 by using Azure CLI, without interrupting the application that runs in Subnet1 during the change.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az network vnet subnet update --resource-group RG1 --vnet-name VNet1 --name Subnet1 --service-endpoints Microsoft.Storage`",
+   "`az storage account network-rule add --resource-group RG1 --account-name Storage7 --vnet-name VNet1 --subnet Subnet1`",
+   "`az storage account update --resource-group RG1 --name Storage7 --default-action Deny`",
+   "`az storage account update --resource-group RG1 --name Storage7 --public-network-access Disabled`",
+   "`az storage account network-rule add --resource-group RG1 --account-name Storage7 --ip-address 10.0.1.0/24`",
+   "`az storage account revoke-delegation-keys --resource-group RG1 --name Storage7`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The service endpoint must exist before the virtual network rule is added, and the default action Deny is set last so the allowed subnet keeps working. Disabled public access, private IP rules and delegation key revocation do not fit.",
+  "rationale": [
+   "Step 1: The subnet needs the Microsoft.Storage service endpoint first, so that its storage traffic carries the virtual network identity that the rule matches.",
+   "Step 2: The virtual network rule allows Subnet1 on Storage7. It is added before Deny so the application keeps access.",
+   "Step 3: Setting the default action to Deny last activates the rules and blocks other sources without interrupting Subnet1.",
+   "Incorrect: Public network access Disabled blocks the whole public endpoint, including the service endpoint path from Subnet1. Use it when only private endpoints must be used.",
+   "Incorrect: IP network rules accept public addresses only, so a private range such as 10.0.1.0/24 is invalid. Use IP rules for public ranges and virtual network rules for subnets.",
+   "Incorrect: Revoking delegation keys invalidates user delegation SAS tokens. It does not change network rules. Use it after a user delegation SAS is compromised."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-virtual-networks"
+ },
+ {
+  "id": "2.1.2-08",
+  "obj": "2.1.2",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Northwind Traders uses the Azure Storage firewall on Storage8 with the default network action Deny.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A virtual network rule requires the Microsoft.Storage service endpoint on the allowed subnet.",
+   "An IP network rule can limit a source to a single container of the account.",
+   "Exceptions and resource instance rules stay in effect after you set Public network access to Disabled."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Storage network rules apply to the account endpoint, not to individual containers. Virtual network rules need the service endpoint, and earlier exceptions and instance rules remain after public access is disabled.",
+  "rationale": [
+   "Yes: The subnet must expose the Azure Storage service endpoint so that its traffic carries the virtual network identity that the rule matches.",
+   "No: Network rules are evaluated at the storage account endpoint and cannot target a container. Use RBAC, ACLs or a scoped SAS for container level authorization.",
+   "Yes: Trusted service exceptions and resource instance rules keep working after public network access is disabled, so they must be removed separately."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-limitations"
+ },
+ {
+  "id": "2.1.2-09",
+  "obj": "2.1.2",
+  "difficulty": "easy",
+  "type": "dropdown",
+  "stem": "Proseware, Inc. wants the storage account Storage9 to block all sources that are not explicitly allowed by network rules, but trusted Azure services must keep access. No other exceptions are needed.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```\naz storage account update --resource-group RG1 --name Storage9 --default-action [[1]] --bypass [[2]]\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "Deny",
+     "Allow"
+    ],
+    "why": [
+     "Correct: The default action Deny blocks every source that is not allowed by a network rule, and it activates the network rules.",
+     "Incorrect: Allow admits every network that no rule excludes, so network rules do not restrict anything. Use it only to reopen the account to all networks."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "AzureServices",
+     "None",
+     "Logging Metrics"
+    ],
+    "why": [
+     "Correct: AzureServices enables the exception for trusted Azure services that appear on the trusted services list.",
+     "Incorrect: None removes all exceptions, so trusted Azure services lose access. Use it to close every exception path.",
+     "Incorrect: Logging and Metrics allow only reading of storage analytics data and do not enable the trusted services list. Use them for monitoring integrations."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "Network rules need default action Deny to take effect, and the bypass value controls which exceptions bypass the rules. AzureServices enables trusted services.",
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security-manage-exceptions"
+ },
+ {
+  "id": "2.1.2-10",
+  "obj": "2.1.2",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Lucerne Publishing must allow four sources to reach storage accounts that use the Deny default action.\n\nWhich network access method should you use for each source? To answer, drag the appropriate methods to the correct sources. Each method may be used once, more than once, or not at all.",
+  "choices": [
+   "IP network rule",
+   "Virtual network rule",
+   "Resource instance rule",
+   "Trusted service exception",
+   "Private endpoint"
+  ],
+  "targets": [
+   "Branch office that connects through a fixed public NAT address",
+   "Virtual machines in an Azure subnet in the same region",
+   "A single Azure resource that runs outside any virtual network",
+   "Azure Backup operations from a vault in the same tenant"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "The branch uses a stable public address, which an IP network rule admits. Virtual network rules cannot match on premises sources.",
+   "A subnet with the Microsoft.Storage service endpoint is admitted by a virtual network rule, without public IP addresses.",
+   "A resource instance rule admits exactly one Azure resource by resource ID, and the resource also needs a role for data access.",
+   "Azure Backup is on the trusted services list, so the exception admits it for the documented scenarios without network rules."
+  ],
+  "notes": [
+   "Allows public IPv4 addresses or CIDR ranges. Use it for on premises or internet clients with stable public addresses.",
+   "Allows a subnet that has the Azure Storage service endpoint. Use it for Azure virtual network workloads.",
+   "Allows one named Azure resource to reach the public endpoint. Use it for PaaS resources that run outside your network.",
+   "Allows listed Azure services outside your network boundary. Use it for documented scenarios such as backup or logging.",
+   "Gives a private IP address in your virtual network for the account. Use it for private only access, not as a firewall rule."
+  ],
+  "explanation": "Choose the rule type from the kind of source: public address range, subnet, single Azure resource, or listed Azure service.",
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-network-security"
+ },
+ {
+  "id": "2.1.3-01",
+  "obj": "2.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Microsoft Defender for Storage. Its web application lets customers upload documents to a blob container of Storage1. The security team requires every uploaded or modified blob to be scanned for malware automatically as soon as it arrives.\n\nWhich Defender for Storage feature should you enable?",
+  "choices": [
+   "On-upload malware scanning",
+   "On-demand malware scanning",
+   "Sensitive data threat detection",
+   "Activity monitoring alerts"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "On-upload malware scanning scans blobs automatically when they are uploaded or modified, by using Microsoft Defender Antivirus. On-demand scanning is started manually or by schedule for blobs that already exist.",
+  "rationale": [
+   "Correct: On-upload scanning is triggered by each upload or modification and scans the blob with Microsoft Defender Antivirus without extra infrastructure.",
+   "Incorrect: On-demand scanning is started by you for existing blobs, for example to create a baseline or to investigate an alert. It does not scan each new upload automatically.",
+   "Incorrect: Sensitive data threat detection raises the priority of alerts when sensitive data is at risk. It does not inspect blobs for malicious content.",
+   "Incorrect: Activity monitoring analyzes access patterns to detect anomalies such as unusual access. It does not scan blob content for malware."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-introduction"
+ },
+ {
+  "id": "2.1.3-02",
+  "obj": "2.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. has a subscription that contains 40 storage accounts, and new storage accounts are created every week. The security team requires Microsoft Defender for Storage to protect all existing and future storage accounts in the subscription without extra work.\n\nWhat should you do?",
+  "choices": [
+   "Turn on the Storage plan for the subscription in Microsoft Defender for Cloud environment settings",
+   "Turn on Defender for Storage separately in the Microsoft Defender for Cloud pane of each storage account",
+   "Enable diagnostic settings that send storage logs to a Log Analytics workspace on every account",
+   "Create an Event Grid system topic in the resource group of each storage account"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Enabling the Defender for Storage plan at the subscription level automatically covers all existing and newly created storage accounts. You can exclude individual accounts later by overriding the setting.",
+  "rationale": [
+   "Correct: The subscription level plan automatically protects existing accounts and every storage account created later, which matches the requirement.",
+   "Incorrect: Per account enablement works but protects only the accounts you configure, so each new account would need manual work. Use it to protect a single account in a subscription without the plan.",
+   "Incorrect: Diagnostic logs support auditing and queries but do not provide threat detection. Defender for Storage analyzes its own data and control plane logs without resource logs.",
+   "Incorrect: Event Grid system topics are created automatically when malware scanning is enabled. Creating them manually does not enable the Defender plan."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-storage-plan"
+ },
+ {
+  "id": "2.1.3-03",
+  "obj": "2.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank enabled Defender for Storage on Storage2 today. The account already holds 20 TB of blobs that were uploaded earlier. The security team must scan the existing blobs for malware once to establish a baseline.\n\nWhich feature should you use?",
+  "choices": [
+   "On-demand malware scanning",
+   "On-upload malware scanning",
+   "Sensitive data threat detection",
+   "Event Grid scan result notifications"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "On-demand malware scanning scans blobs and files that already exist, either for the whole account or filtered to a container, blob or prefix. On-upload scanning covers only blobs that are uploaded or modified after it is enabled.",
+  "rationale": [
+   "Correct: On-demand scanning addresses data uploaded before scanning was enabled and creates a security baseline for existing content.",
+   "Incorrect: On-upload scanning is triggered by uploads or modifications, so blobs that were uploaded earlier are not scanned until they change. Use it for new content.",
+   "Incorrect: Sensitive data threat detection finds data sensitivity to prioritize alerts and does not scan for malware. Use it to focus alerts on sensitive containers.",
+   "Incorrect: Event Grid only delivers scan results to your automation. It does not start scans. Use it to trigger quarantine or deletion workflows after a scan."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/on-demand-malware-scanning"
+ },
+ {
+  "id": "2.1.3-04",
+  "obj": "2.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has Defender for Storage enabled on a subscription with the default settings. One storage account named Storage3 receives very large volumes of uploads. The security team wants to limit on-upload malware scanning on Storage3 to 2,000 GB per month to control cost, while all other accounts keep the default.\n\nWhat should you do?",
+  "choices": [
+   "Override the subscription level settings on Storage3 and set the monthly scanning limit to 2,000 GB",
+   "Set the monthly scanning limit to 2,000 GB in the subscription level plan settings",
+   "Turn off on-upload malware scanning on Storage3",
+   "Turn off the Defender for Storage plan on the subscription"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The monthly cap is configured per storage account, either as a subscription default or as an account specific override. To change one account only, override the subscription level setting on that account.",
+  "rationale": [
+   "Correct: An override on Storage3 saves the custom limit for that account only, so other accounts keep the default cap of 10,000 GB.",
+   "Incorrect: A change at subscription level applies as the new default to all accounts that inherit the setting. Use it when every account needs the same cap.",
+   "Incorrect: Turning off scanning removes protection from Storage3 instead of limiting cost. Use it only for accounts that do not accept untrusted content.",
+   "Incorrect: Disabling the plan removes threat detection and scanning for every account. Use it only when the subscription no longer needs Defender for Storage."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning"
+ },
+ {
+  "id": "2.1.3-05",
+  "obj": "2.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Adatum Corporation needs an automated response for malware found by Defender for Storage on Storage4. Within seconds of a malicious verdict, a Logic app must move the blob to a quarantine container.\n\nWhich destination for the scan results should you configure?",
+  "choices": [
+   "An Event Grid custom topic",
+   "Blob index tags on the scanned blobs",
+   "A Log Analytics workspace",
+   "Soft delete of malicious blobs"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Sending every scan result to an Event Grid custom topic gives near-real-time events that can trigger Logic Apps or Azure Functions. Log Analytics and index tags store results but do not push events.",
+  "rationale": [
+   "Correct: An Event Grid custom topic emits an event for every scan result, which can trigger the Logic app that moves the blob to quarantine in near real time.",
+   "Incorrect: Index tags record the verdict on the blob so that applications can check it. They do not push an event to a workflow. Use them to gate downstream reads.",
+   "Incorrect: Log Analytics stores each scan result for audit and queries. It does not trigger a workflow by itself. Use it for compliance records and hunting.",
+   "Incorrect: Soft delete of malicious blobs removes the blob but keeps it recoverable. It cannot move the blob to a quarantine container, so the workflow requirement is not met."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning"
+ },
+ {
+  "id": "2.1.3-06",
+  "obj": "2.1.3",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys configured an Event Grid custom topic as the scan result destination for malware scanning on Storage5. The topic uses the default Event Grid schema, allows access from public IP addresses and is in the same subscription as Storage5. No scan result events arrive. The topic is in a different Azure region than Storage5.\n\nWhat should you do?",
+  "choices": [
+   "Create the custom topic in the same region as Storage5 and select it as the destination",
+   "Configure a private endpoint for the custom topic and disable public network access",
+   "Replace the custom topic with an Event Grid system topic that you create manually",
+   "Register the Microsoft.Security resource provider in the subscription"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The destination custom topic for malware scan results must be in the same region as the storage account, use the default Event Grid schema and allow public IP access. The region mismatch is the failing condition here.",
+  "rationale": [
+   "Correct: The topic must be created in the same region as the storage account. Schema and public access already meet the requirements, so the region is the cause.",
+   "Incorrect: The service that publishes scan results needs the topic to allow access from public IP addresses. A private only topic would block delivery.",
+   "Incorrect: Defender creates its own system topic to detect uploads. Scan results are sent to a custom topic that you provide. A manual system topic cannot serve as destination.",
+   "Incorrect: Microsoft.Security is already in use because Defender for Storage works. The needed provider for scanning is Microsoft.EventGrid. Registering a provider does not fix a region mismatch."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning"
+ },
+ {
+  "id": "2.1.3-07",
+  "obj": "2.1.3",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders has a subscription where the Defender for Storage plan is off. A single storage account named Storage6 accepts uploads from partners. You must enable on-upload malware scanning on Storage6 only, and the subscription plan must stay off.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable Defender for Storage with on-upload malware scanning on Storage6 in its Microsoft Defender for Cloud pane",
+   "Register the Microsoft.EventGrid resource provider in the subscription",
+   "Turn on the Storage plan for the whole subscription",
+   "Create an Event Grid system topic for Storage6 before you enable scanning",
+   "Install the Azure Monitor agent on Storage6"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Malware scanning can be enabled on a single storage account, and it requires the Microsoft.EventGrid provider because Defender creates an Event Grid system topic automatically to detect uploads.",
+  "rationale": [
+   "Correct: Defender for Storage can be enabled at the resource level, and on-upload malware scanning is a feature of that setting.",
+   "Correct: Scanning relies on an Event Grid system topic that Defender creates, which requires the Microsoft.EventGrid resource provider to be registered.",
+   "Incorrect: Enabling the plan on the subscription would protect all accounts, but the requirement is to keep the subscription plan off. Use it when every account needs protection.",
+   "Incorrect: Defender creates the Event Grid system topic automatically in the resource group of the account, so no manual creation is needed.",
+   "Incorrect: Defender for Storage is agentless and storage accounts do not host agents. Use the Azure Monitor agent for virtual machines."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/on-upload-malware-scanning"
+ },
+ {
+  "id": "2.1.3-08",
+  "obj": "2.1.3",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Proseware, Inc. plans to use the Defender for Storage plan on its subscription.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "Sensitive data threat detection can be turned on at no additional cost.",
+   "On-demand malware scanning is limited by the monthly scanning cap per storage account.",
+   "To send scan results to a different Event Grid topic on one account, you should override the subscription level settings for that account."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Sensitive data threat detection has no extra cost. The monthly cap applies to on-upload scanning, while on-demand scans are billed by usage without a cap. Account specific destinations need the override setting.",
+  "rationale": [
+   "Yes: Sensitive data threat detection is a configurable feature that you can enable or disable at no additional cost.",
+   "No: The monthly cap applies to on-upload scanning. On-demand scanning has no cap and is billed by the amount of data scanned, so estimate cost before you start.",
+   "Yes: Settings that differ from the subscription, such as an Event Grid destination, must be saved with the override option on so that the subscription settings do not overwrite them."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning"
+ },
+ {
+  "id": "2.1.3-09",
+  "obj": "2.1.3",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Wide World Importers has Defender for Storage enabled on the subscription with the default settings. On Storage7, malware scanning must have no monthly cap. The account setting must apply to Storage7 only and must not be overwritten by the subscription settings.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```powershell\nUpdate-AzSecurityDefenderForStorage -ResourceId $id -IsEnabled [[1]] -OnUploadIsEnabled -OnUploadCapGbPerMonth [[2]]\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "-OverrideSubscriptionLevelSetting",
+     "-SensitiveDataDiscoveryIsEnabled",
+     "-WhatIf"
+    ],
+    "why": [
+     "Correct: Without the override parameter the account settings follow the subscription level settings, so the custom cap would be ignored.",
+     "Incorrect: This parameter turns on sensitive data threat detection. It does not make the account settings independent of the subscription. Use it to enable that feature.",
+     "Incorrect: WhatIf only shows what would change and applies nothing, so the cap would not be configured. Use it to preview a change."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "-1",
+     "10000",
+     "100"
+    ],
+    "why": [
+     "Correct: A value of -1 permits unlimited scanning, which satisfies the no cap requirement.",
+     "Incorrect: 10,000 GB is the default limit, so scanning would still stop once that amount is exceeded in a month.",
+     "Incorrect: 100 GB is a low cap that would stop scanning early, which is the opposite of the requirement."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "The override parameter keeps account settings independent of the subscription, and a cap of -1 means unlimited malware scanning.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-powershell-enablement"
+ },
+ {
+  "id": "2.1.3-10",
+  "obj": "2.1.3",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Alpine Ski House uses on-upload malware scanning in Defender for Storage. Each scan result must be handled in a different way.\n\nWhich scan result destination or option should you use for each requirement? To answer, drag the appropriate options to the correct requirements. Each option may be used once, more than once, or not at all.",
+  "choices": [
+   "Event Grid custom topic",
+   "Log Analytics workspace",
+   "Blob index tags",
+   "Soft delete of malicious blobs",
+   "On-demand malware scanning"
+  ],
+  "targets": [
+   "Trigger a Logic app in near real time for each malicious verdict",
+   "Keep every scan result in a central repository for audit and compliance",
+   "Let an application check the verdict on the blob before it reads the blob",
+   "Recover a blob that was removed because it was flagged as malicious"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "rationale": [
+   "Event Grid delivers an event per scan result, which can start an automated response in near real time.",
+   "Log Analytics stores each scan result in a central workspace that supports queries, retention and compliance reporting.",
+   "Index tags store the verdict on the blob itself, so applications can filter or check it before use.",
+   "Soft delete keeps a removed malicious blob for the retention period, so it can be restored if the verdict was a false positive."
+  ],
+  "notes": [
+   "Pushes an event for every scan result. Use it to trigger Logic Apps or Azure Functions for quarantine or alerts.",
+   "Stores all scan results centrally. Use it for audit, hunting and compliance evidence.",
+   "Writes the verdict to the blob as index tags. Use it for gating reads in applications.",
+   "Retains deleted malicious blobs for recovery. Use it as a safety net for automated deletion.",
+   "Starts scans of existing blobs. It is a scan mode, not a destination for results, so it fits none of these requirements."
+  ],
+  "explanation": "Choose the destination from how the result is consumed: event driven response, central audit, per blob check or recovery.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning"
+ },
+ {
+  "id": "2.1.4-01",
+  "obj": "2.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. has a storage account named Storage1 that contains containers named logs1 and reports1. App1 runs with a managed identity and must read blobs in logs1 only. The solution must follow the principle of least privilege.\n\nWhich role assignment should you create?",
+  "choices": [
+   "Storage Blob Data Reader for the managed identity, scoped to the logs1 container",
+   "Storage Blob Data Contributor for the managed identity, scoped to Storage1",
+   "Reader for the managed identity, scoped to Storage1",
+   "Storage Account Contributor for the managed identity, scoped to logs1"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Storage Blob Data Reader is a data plane role that allows read access to blob data. Assigning it at the container scope limits the access to logs1, which gives the least privilege.",
+  "rationale": [
+   "Correct: The data plane read role at the scope of the logs1 container grants exactly the read access that App1 needs and nothing on reports1.",
+   "Incorrect: Contributor on the account scope allows writes and covers all containers, which exceeds the need. Use it for an application that must write blobs across the account.",
+   "Incorrect: The Reader role is a management plane role. It lets a user see the account resource but does not grant access to blob data. Use it for inventory or monitoring.",
+   "Incorrect: Storage Account Contributor is a management plane role that can manage the account and list the account keys, which would let App1 reach all data. Use it for administrators."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/blobs/authorize-access-azure-active-directory"
+ },
+ {
+  "id": "2.1.4-02",
+  "obj": "2.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. issues user delegation SAS tokens for blobs in Storage2. One of the signing identities was compromised. You must invalidate all user delegation SAS tokens that were issued for Storage2 as quickly as possible.\n\nWhat should you do?",
+  "choices": [
+   "Revoke the user delegation keys of the storage account",
+   "Regenerate the access keys of the storage account",
+   "Delete the stored access policies of each container",
+   "Change the SAS expiration policy of the storage account"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A user delegation SAS depends on a user delegation key obtained with Microsoft Entra credentials. Revoking the user delegation keys invalidates every SAS that relies on them.",
+  "rationale": [
+   "Correct: Revoking the user delegation keys, for example with az storage account revoke-delegation-keys, invalidates all SAS tokens signed with those keys.",
+   "Incorrect: Account key regeneration invalidates account and service SAS tokens. User delegation SAS tokens are signed with Microsoft Entra backed keys and are not affected.",
+   "Incorrect: Stored access policies cannot be used with a user delegation SAS, so deleting them has no effect. Use them to revoke service SAS tokens.",
+   "Incorrect: A SAS expiration policy limits the validity of newly issued tokens and does not invalidate tokens that already exist. Use it to prevent long lived tokens."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/blobs/storage-blob-user-delegation-sas-create-cli"
+ },
+ {
+  "id": "2.1.4-03",
+  "obj": "2.1.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has an application that signs service SAS tokens for the container exports1 in Storage3 by using the account key. Shared Key authorization stays enabled and the application has no Microsoft Entra identity. The security team requires that all outstanding tokens for the container can be revoked immediately without regenerating the account keys and without changing the application.\n\nWhat should the application use?",
+  "choices": [
+   "A service SAS that references a stored access policy",
+   "An account SAS with a short expiry time",
+   "A user delegation SAS signed with a user delegation key",
+   "An ad hoc service SAS with an expiry time of one hour"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A service SAS inherits its constraints from a stored access policy on the container. Deleting the policy or moving its expiry into the past revokes every SAS that references it, without regenerating account keys.",
+  "rationale": [
+   "Correct: Tokens that reference the stored access policy are revoked by deleting or expiring the policy, which does not need key regeneration or application changes.",
+   "Incorrect: An account SAS cannot reference a stored access policy, so the only immediate revocation is regenerating the account key. Use it for service level operations, not revocable access.",
+   "Incorrect: A user delegation SAS needs Microsoft Entra credentials, which the application does not have, and it does not support stored access policies.",
+   "Incorrect: A short expiry limits exposure but tokens cannot be revoked before they expire. Without a policy, only regenerating the account key revokes an ad hoc token."
+  ],
+  "ref": "https://learn.microsoft.com/rest/api/storageservices/create-service-sas"
+ },
+ {
+  "id": "2.1.4-04",
+  "obj": "2.1.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Adatum Corporation has no role assignments for User1 on Storage4. Storage4 contains blobs that are tagged with Project=Alpha or Project=Beta. User1 must read only blobs that have the tag Project=Alpha, and the restriction must be enforced by the role assignment itself.\n\nWhat should you do?",
+  "choices": [
+   "Assign Storage Blob Data Reader to User1 with an ABAC condition on the blob index tag",
+   "Create a stored access policy that allows read for the tag Project=Alpha",
+   "Assign Storage Blob Data Reader to User1 at the scope of each container",
+   "Set the container public access level to Blob for the Project=Alpha blobs"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Azure attribute-based access control lets you add a condition to a role assignment, for example to allow reads only for blobs with a specific index tag or path prefix.",
+  "rationale": [
+   "Correct: An ABAC condition on the role assignment filters data access by blob index tag, so User1 can read only blobs tagged Project=Alpha.",
+   "Incorrect: Stored access policies define start time, expiry and permissions for service SAS tokens at container level. They cannot filter by tag.",
+   "Incorrect: Container scope narrows access by container, but both tags can exist in the same container, so User1 would read Project=Beta blobs too. Use it when containers separate the data.",
+   "Incorrect: Anonymous public access exposes the blobs to everyone, and the access level applies to the container, not to individual tags. It is the opposite of a restriction."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/blobs/storage-auth-abac"
+ },
+ {
+  "id": "2.1.4-05",
+  "obj": "2.1.4",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys stores the keys of Storage5 in Azure Key Vault. Key1 is compromised. Applications use ad hoc service SAS tokens that were signed with key1. All applications were already switched to use key2, and no user delegation SAS is in use. You must invalidate the tokens signed with key1 with minimal disruption.\n\nWhat should you do?",
+  "choices": [
+   "Regenerate key1",
+   "Revoke the user delegation keys of the storage account",
+   "Delete the stored access policies of all containers",
+   "Rename the containers that the tokens refer to"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Ad hoc service SAS and account SAS are signed with an account key, and regenerating that key is the only way to revoke an ad hoc SAS immediately. Applications that already use the other key are not interrupted.",
+  "rationale": [
+   "Correct: Regenerating key1 invalidates every SAS signed with it. Because applications already use key2, the disruption is minimal.",
+   "Incorrect: User delegation keys back user delegation SAS tokens only. Tokens signed with key1 are not affected. Use this action only when a user delegation SAS is compromised.",
+   "Incorrect: Stored access policies revoke SAS tokens that reference them. These ad hoc tokens carry their own constraints and reference no policy, so deleting policies changes nothing.",
+   "Incorrect: Renaming containers would break applications and the tokens would work again if a container is renamed back. It is not a revocation mechanism and causes disruption."
+  ],
+  "ref": "https://learn.microsoft.com/azure/storage/common/storage-account-keys-manage"
+ },
+ {
+  "id": "2.1.4-06",
+  "obj": "2.1.4",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Northwind Traders issues service SAS tokens that reference the stored access policy Pol1 on the container docs1 of Storage6. A token was leaked. You must revoke all tokens that reference Pol1, ensure that they cannot become valid again, and keep access working for applications that use other policies. Account keys must not be regenerated.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Delete the stored access policy Pol1",
+   "Use a different policy name for any replacement policy",
+   "Re-create a policy named Pol1 with a later expiry time",
+   "Regenerate the access keys of Storage6",
+   "Revoke the user delegation keys of Storage6"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Deleting the policy revokes the tokens. If you re-create a policy with the same name, existing unexpired tokens become valid again, so a replacement policy must use a different name.",
+  "rationale": [
+   "Correct: Deleting the stored access policy revokes every SAS that references it, without regenerating account keys.",
+   "Correct: A new policy with a different name issues new tokens that old tokens cannot use, because the tokens reference the identifier Pol1.",
+   "Incorrect: Re-creating a policy with the same name makes previously issued unexpired tokens valid again, because the SAS refers to the policy name.",
+   "Incorrect: Regenerating keys would revoke the tokens but also breaks every SAS and client that uses those keys, which the requirement forbids.",
+   "Incorrect: User delegation keys back user delegation SAS tokens only and are not related to service SAS tokens that reference a stored policy."
+  ],
+  "ref": "https://learn.microsoft.com/rest/api/storageservices/create-service-sas"
+ },
+ {
+  "id": "2.1.4-07",
+  "obj": "2.1.4",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Wide World Importers has a storage account named Storage7 and a container named data1. You must give a partner read access to data1 by using a service SAS that you can revoke without regenerating account keys. You must then revoke it, using Azure CLI.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az storage container policy create --account-name Storage7 --container-name data1 --name Pol1 --permissions r --expiry 2027-12-31`",
+   "`az storage container generate-sas --account-name Storage7 --name data1 --policy-name Pol1`",
+   "`az storage container policy delete --account-name Storage7 --container-name data1 --name Pol1`",
+   "`az storage account revoke-delegation-keys --name Storage7 --resource-group RG1`",
+   "`az storage account keys renew --account-name Storage7 --resource-group RG1 --key primary`",
+   "`az storage account update --name Storage7 --resource-group RG1 --allow-shared-key-access false`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The policy must exist before a SAS can reference it, and the SAS must be issued before there is anything to revoke. Deleting the policy then revokes the SAS. Key renewal, delegation key revocation and disabling Shared Key do not fit the requirements.",
+  "rationale": [
+   "Step 1: The stored access policy defines the permissions and expiry and must exist before a SAS can reference it.",
+   "Step 2: Generating the SAS with the policy name makes the token inherit the constraints of Pol1, so it can later be revoked through the policy.",
+   "Step 3: Deleting the policy revokes every SAS that references it, without regenerating the account keys.",
+   "Incorrect: Revoking delegation keys invalidates user delegation SAS tokens only. It does nothing to a service SAS. Use it after a user delegation SAS is compromised.",
+   "Incorrect: Renewing the primary key would revoke the token but also break every client and SAS that uses that key, which the requirement forbids. Use it after a key leak.",
+   "Incorrect: Disallowing Shared Key would make the service SAS unusable from the start because it is signed with the account key. Use it when clients must use Microsoft Entra ID."
+  ],
+  "ref": "https://learn.microsoft.com/azure/hdinsight/hdinsight-storage-sharedaccesssignature-permissions"
+ },
+ {
+  "id": "2.1.4-08",
+  "obj": "2.1.4",
+  "difficulty": "easy",
+  "type": "yesno",
+  "stem": "Relecloud uses stored access policies on the containers of Storage8.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A container can have up to five stored access policies.",
+   "A user delegation SAS can reference a stored access policy.",
+   "If you delete a policy and re-create it with the same name, unexpired SAS tokens that reference the name become valid again."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Stored access policies apply to service SAS only, and a container supports up to five of them. A SAS refers to the policy by name, so re-creating the same name revives tokens that have not expired.",
+  "rationale": [
+   "Yes: There is a limit of five stored access policies per container, so plan policies for groups of tokens instead of one policy per token.",
+   "No: Stored access policies are not supported for user delegation SAS or account SAS. Only a service SAS can reference a policy.",
+   "Yes: The token holds the policy identifier. If a policy with the same name exists again and the token has not expired, the token is valid. Use a different name when you replace a revoked policy."
+  ],
+  "ref": "https://learn.microsoft.com/rest/api/storageservices/delegate-access-with-shared-access-signature"
+ },
+ {
+  "id": "2.1.4-09",
+  "obj": "2.1.4",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Lucerne Publishing must ensure that SAS tokens signed with the account key of Storage9 are valid for at most 1 day and 12 hours. Tokens that exceed the limit must be rejected instead of only being logged.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```powershell\nSet-AzStorageAccount -ResourceGroupName RG1 -Name Storage9 -SasExpirationPeriod [[1]] -SasExpirationAction [[2]]\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "1.12:00:00",
+     "12.01:00:00",
+     "1.00:12:00"
+    ],
+    "why": [
+     "Correct: The format is days.hours:minutes:seconds, so 1.12:00:00 is 1 day and 12 hours.",
+     "Incorrect: 12.01:00:00 is 12 days and 1 hour, which is far above the limit. Check the days field first in this format.",
+     "Incorrect: 1.00:12:00 is 1 day and 12 minutes, which is shorter than the requirement. The hours field is the second part."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Block",
+     "Log"
+    ],
+    "why": [
+     "Correct: Block rejects tokens whose validity is longer than the policy allows.",
+     "Incorrect: Log only records out of policy tokens and still lets them work. Use it first to find long lived tokens before you enforce the policy."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0
+  ],
+  "explanation": "A SAS expiration policy sets the maximum validity interval for account key signed SAS tokens, and the action decides whether violations are only logged or also blocked.",
+  "ref": "https://learn.microsoft.com/azure/storage/common/sas-expiration-policy"
+ },
+ {
+  "id": "2.1.4-10",
+  "obj": "2.1.4",
+  "difficulty": "medium",
+  "type": "dragdrop",
+  "stem": "Alpine Ski House must be able to revoke different types of shared access signatures for Storage10.\n\nWhich action should you use to revoke each type? To answer, drag the appropriate actions to the correct SAS types. Each action may be used once, more than once, or not at all.",
+  "choices": [
+   "Delete the stored access policy",
+   "Revoke the user delegation keys",
+   "Regenerate the account access key",
+   "Change the container access level",
+   "Set a SAS expiration policy"
+  ],
+  "targets": [
+   "Service SAS that references a stored access policy",
+   "User delegation SAS",
+   "Ad hoc account SAS signed with key1"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "Deleting the policy, or setting its expiry in the past, revokes every service SAS that references it.",
+   "Revoking the user delegation keys invalidates every user delegation SAS that was signed with them.",
+   "An ad hoc SAS carries its own constraints, so regenerating the account key that signed it is the only immediate revocation."
+  ],
+  "notes": [
+   "Revokes service SAS tokens that reference the policy. Use it for revocable service SAS.",
+   "Invalidates user delegation SAS tokens. Use it when Microsoft Entra backed tokens must be revoked.",
+   "Invalidates account and service SAS tokens that were signed with that key. Use it when no policy exists.",
+   "Controls anonymous access to a container. It does not affect SAS tokens, so it is not a revocation method.",
+   "Limits the validity of newly issued tokens and does not revoke existing tokens. Use it to prevent long lived SAS."
+  ],
+  "explanation": "Choose the revocation method by how the SAS is signed and whether it references a policy.",
+  "ref": "https://learn.microsoft.com/rest/api/storageservices/create-service-sas"
+ }
+]

@@ -1,0 +1,153 @@
+[
+  {
+    "id": "X-order",
+    "obj": "3.1.1",
+    "difficulty": "medium",
+    "type": "order",
+    "stem": "Fabrikam, Inc. runs a Python app that uses Microsoft Agent Framework. You need to send the app's agent traces to the Application Insights resource that is connected to the company's Microsoft Foundry project, and then confirm that the traces arrive.\n\nWhich four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+    "choices": [
+      "Connect an Application Insights resource to the Foundry project.",
+      "Install the azure-monitor-opentelemetry package in the app environment.",
+      "Call configure_azure_monitor() with the Application Insights connection string at app startup.",
+      "Run the agent and open the Tracing page of the Foundry project.",
+      "Enable diagnostic settings on the Foundry resource that send metrics to a Log Analytics workspace.",
+      "Create a continuous evaluation rule for the agent."
+    ],
+    "answer": [0, 1, 2, 3],
+    "explanation": "Tracing needs a destination first (Application Insights connected to the project), then the exporter library, then exporter configuration at startup. Only then do runs produce traces that you can inspect.",
+    "rationale": [
+      "Step 1: the project needs a connected Application Insights resource before there is a destination and a connection string to export traces to.",
+      "Step 2: the azure-monitor-opentelemetry package provides the OpenTelemetry exporter for Azure Monitor that the app imports in the next step.",
+      "Step 3: configure_azure_monitor() wires the OpenTelemetry exporter to Application Insights; it must run before the first agent run so spans are captured.",
+      "Step 4: once the exporter is configured, each run emits spans that appear on the Tracing page, which confirms the setup.",
+      "Incorrect: diagnostic settings export platform metrics and resource logs of the Foundry resource, not the OpenTelemetry spans that the app emits. Use them when you need resource-level audit or usage logs.",
+      "Incorrect: continuous evaluation scores sampled production responses for quality and safety. It consumes traces but does not send them. Use it after tracing works, to monitor quality."
+    ],
+    "ref": "https://learn.microsoft.com/azure/ai-foundry/how-to/develop/trace-agents-sdk"
+  },
+  {
+    "id": "X-yesno",
+    "obj": "2.4.8",
+    "difficulty": "medium",
+    "type": "yesno",
+    "stem": "Litware, Inc. adds this middleware to an agent that uses Microsoft Agent Framework:\n\n```python\nasync def audit(context, call_next):\n    started = time.perf_counter()\n    await call_next()\n    log.info(\"run took %.2fs\", time.perf_counter() - started)\n```\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+    "choices": [
+      "The log line is written after the agent produces its response.",
+      "If the middleware does not call call_next(), the agent still runs.",
+      "The middleware can replace the response by assigning context.result after call_next() returns."
+    ],
+    "answer": [0, 2],
+    "explanation": "Code after call_next() runs on the way out, when the result exists. Skipping call_next() short-circuits the pipeline, and assigning context.result overrides what the caller receives.",
+    "rationale": [
+      "Yes: everything after await call_next() runs after the inner middleware and the agent have finished, so the elapsed time covers the whole run.",
+      "No: call_next() is what invokes the next middleware and finally the agent. Not calling it short-circuits the run, which is how a guard middleware blocks a request.",
+      "Yes: context.result holds the response after call_next() returns, and a middleware can overwrite it, for example to redact data or return a fallback."
+    ],
+    "ref": "https://learn.microsoft.com/agent-framework/agents/middleware/"
+  },
+  {
+    "id": "X-dropdown",
+    "obj": "2.4.8",
+    "difficulty": "hard",
+    "type": "dropdown",
+    "stem": "Tailspin Toys must stop an agent run before the model is called when the user message contains a blocked term, and must return a fixed reply instead.\n\nHow should you complete the code? To answer, select the appropriate options in the answer area.\n\n```python\nasync def guard(context, call_next):\n    if BLOCKED in context.messages[-1].text:\n        context.result = [[1]]\n        [[2]]\n    await call_next()\n```",
+    "targets": [
+      {
+        "label": "Box 1",
+        "options": ["AgentResponse(messages=[Message(\"assistant\", [\"Request blocked.\"])])", "\"Request blocked.\"", "None"],
+        "why": [
+          "Correct: context.result must hold a response object of the type the caller expects, so build an AgentResponse with an assistant message.",
+          "Incorrect: a plain string is not a response object; callers that read .text or .messages fail. A string is fine only as the content inside a Message.",
+          "Incorrect: None clears the result, so the caller receives no reply at all. Use it only when an outer layer sets the result instead."
+        ]
+      },
+      {
+        "label": "Box 2",
+        "options": ["return", "await call_next()", "raise RuntimeError(\"blocked\")"],
+        "why": [
+          "Correct: returning without calling call_next() short-circuits the pipeline, so the agent and model are never invoked and the fixed reply is returned.",
+          "Incorrect: calling call_next() runs the agent anyway, which is what the requirement forbids. Call it when the guard lets the request through.",
+          "Incorrect: raising an exception ends the run with an error instead of the fixed reply. Raise when the caller must handle the failure explicitly."
+        ]
+      }
+    ],
+    "answer": [0, 0],
+    "explanation": "A guard middleware sets context.result to a response and returns before call_next(), so nothing downstream runs.",
+    "ref": "https://learn.microsoft.com/agent-framework/agents/middleware/"
+  },
+  {
+    "id": "X-dragdrop",
+    "obj": "2.2.1",
+    "difficulty": "medium",
+    "type": "dragdrop",
+    "stem": "Relecloud runs three agents that use Microsoft Agent Framework. You must choose a compaction strategy for each agent.\n\nWhich strategy should you use for each agent? To answer, drag the appropriate strategies to the correct agents. Each strategy may be used once, more than once, or not at all.",
+    "choices": ["SlidingWindowStrategy", "SummarizationStrategy", "ToolResultCompactionStrategy", "TruncationStrategy"],
+    "targets": [
+      "Agent1: long chats in which facts from early turns must stay available in condensed form",
+      "Agent2: runs many tools whose large outputs are only needed for the turn that called them",
+      "Agent3: a chat bot that only needs the most recent turns, with no extra model calls"
+    ],
+    "answer": [1, 2, 0],
+    "rationale": [
+      "Agent1 needs early facts kept in condensed form, which only summarization provides; the other strategies drop old content.",
+      "Agent2 is dominated by large tool outputs, so collapsing old tool results saves the most context while keeping the conversation.",
+      "Agent3 only needs recent turns and no extra model calls, so a sliding window that keeps the last turns is enough."
+    ],
+    "notes": [
+      "Keeps only the most recent turns and drops older ones. Cheap and predictable; use it when old context does not matter.",
+      "Uses a model call to replace older messages with a summary. Use it when early facts must survive, at the cost of extra tokens.",
+      "Collapses older tool call results into short placeholders. Use it when tool outputs, not chat text, fill the context.",
+      "Drops the oldest messages once a token budget is exceeded. Use it as a hard safety limit, not to preserve meaning."
+    ],
+    "explanation": "Pick the strategy by what fills the context and what must survive: summaries keep meaning, tool-result compaction targets tool output, and windows keep only recent turns.",
+    "ref": "https://learn.microsoft.com/agent-framework/agents/conversations/compaction"
+  },
+  {
+    "id": "X-series-1",
+    "obj": "3.2.1",
+    "difficulty": "medium",
+    "type": "single",
+    "series": "X-S1",
+    "stem": "Woodgrove Bank has an agent in Foundry Agent Service that receives HTTP 429 responses during peak hours. The model deployment uses Standard deployment type, and the agent must keep answering during peaks without code changes to the agent.\n\nSolution: You increase the tokens-per-minute quota of the deployment.\n\nDoes this meet the goal?",
+    "choices": ["Yes", "No"],
+    "answer": [0],
+    "explanation": "429 responses on a Standard deployment mean the TPM or RPM limit is exceeded. Raising the quota raises the limit without touching the agent.",
+    "rationale": [
+      "Correct: a higher tokens-per-minute quota raises the rate limit that triggers the 429 responses, and it is a deployment setting, so the agent code does not change.",
+      "Incorrect: the solution does meet the goal. No would be right if the quota were already at the regional maximum, in which case you would add a deployment in another region or move to provisioned throughput."
+    ],
+    "ref": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/quota"
+  },
+  {
+    "id": "X-series-2",
+    "obj": "3.2.1",
+    "difficulty": "medium",
+    "type": "single",
+    "series": "X-S1",
+    "stem": "Woodgrove Bank has an agent in Foundry Agent Service that receives HTTP 429 responses during peak hours. The model deployment uses Standard deployment type, and the agent must keep answering during peaks without code changes to the agent.\n\nSolution: You lower the temperature setting of the agent.\n\nDoes this meet the goal?",
+    "choices": ["Yes", "No"],
+    "answer": [1],
+    "explanation": "Temperature changes randomness of the output, not the token or request rate, so 429 responses continue.",
+    "rationale": [
+      "Incorrect: temperature only controls how random the sampled tokens are. It does not change tokens per minute or requests per minute, so the rate limit is still hit.",
+      "Correct: the solution does not meet the goal. Temperature is the right lever for more deterministic answers, not for rate limiting."
+    ],
+    "ref": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/quota"
+  },
+  {
+    "id": "X-series-3",
+    "obj": "3.2.1",
+    "difficulty": "medium",
+    "type": "single",
+    "series": "X-S1",
+    "stem": "Woodgrove Bank has an agent in Foundry Agent Service that receives HTTP 429 responses during peak hours. The model deployment uses Standard deployment type, and the agent must keep answering during peaks without code changes to the agent.\n\nSolution: You set max_tokens of the agent to a lower value.\n\nDoes this meet the goal?",
+    "choices": ["Yes", "No"],
+    "answer": [1],
+    "explanation": "Lowering max_tokens changes the agent definition and truncates answers; it is not a capacity fix.",
+    "rationale": [
+      "Incorrect: a lower max_tokens can reduce token use a little, but it changes the agent definition and cuts off long answers, so it breaks the no-change requirement and harms quality.",
+      "Correct: the solution does not meet the goal. max_tokens is the right setting when you need to cap answer length, not to raise capacity."
+    ],
+    "ref": "https://learn.microsoft.com/azure/ai-foundry/openai/how-to/quota"
+  }
+]

@@ -1,0 +1,987 @@
+[
+ {
+  "id": "4.1.1-01",
+  "obj": "4.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses Microsoft Defender for Cloud with the Defender CSPM plan. The security team wants a view that shows how an attacker could move from an internet-exposed virtual machine, through an attached identity, to a database that holds sensitive data, and that suggests the recommendations that break that chain.\n\nWhich Defender for Cloud capability should the team use?",
+  "choices": [
+   "Secure score",
+   "Asset inventory",
+   "Attack path analysis",
+   "Workflow automation"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Attack path analysis uses the cloud security graph to find exploitable routes from an external entry point to critical assets and lists the recommendations that break each route. It is a Defender CSPM capability.",
+  "rationale": [
+   "Incorrect: secure score is a single percentage that summarizes how many recommendations are remediated. It does not show attacker routes between resources. Use it to track posture progress over time.",
+   "Incorrect: asset inventory lists resources and their security state with filters, but it does not compute lateral movement chains. Use it when you need a searchable list of assets, software or secrets findings.",
+   "Correct: attack path analysis builds multistep chains (entry point, lateral movement, critical target) from the cloud security graph and links the recommendations that remove the path, which is exactly the view requested.",
+   "Incorrect: workflow automation runs Logic Apps in response to alerts or recommendations. It reacts to findings but does not discover attack chains. Use it to notify teams or open tickets automatically."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path"
+ },
+ {
+  "id": "4.1.1-02",
+  "obj": "4.1.1",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys has enabled the Defender CSPM plan on a subscription and an AWS connector. A security analyst must build an ad hoc query that finds virtual machines that are exposed to the internet and have a high-severity vulnerability, and must save the query for reuse.\n\nWhich capability should the analyst use?",
+  "choices": [
+   "Cloud security explorer",
+   "Regulatory compliance dashboard",
+   "Attack path analysis",
+   "Recommendations page"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Cloud security explorer runs graph-based queries on the cloud security graph. You build the query yourself from insights such as internet exposure and vulnerabilities, and you can save it. Attack path analysis reports predefined chains instead.",
+  "rationale": [
+   "Correct: cloud security explorer is the query builder for the cloud security graph, so the analyst can combine internet exposure and vulnerability insights across Azure and AWS and save the query.",
+   "Incorrect: the regulatory compliance dashboard reports pass or fail status per control of a standard. It cannot join exposure and vulnerability context into a custom query. Use it for audit and compliance reporting.",
+   "Incorrect: attack path analysis displays chains that Defender for Cloud calculates for you. You cannot author your own query there. Use it to see which exploitable chains deserve remediation first.",
+   "Incorrect: the Recommendations page lists recommendations with filters, but it does not query relationships such as exposure combined with a vulnerability on the same VM. Use it to work through remediation items."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path#what-is-cloud-security-explorer"
+ },
+ {
+  "id": "4.1.1-03",
+  "obj": "4.1.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. runs workloads in Azure and AWS and uses only Foundational CSPM. The security team must add attack path analysis and cloud security explorer across both clouds. The team does not need workload threat protection for servers, storage or containers.\n\nWhich Defender for Cloud plan should you enable?",
+  "choices": [
+   "Defender for Servers Plan 1",
+   "Defender for Containers",
+   "Defender for Storage",
+   "Defender CSPM"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Attack path analysis and cloud security explorer are capabilities of the paid Defender CSPM plan. Foundational CSPM is free and does not include them. The workload protection plans protect specific resource types and do not add the security graph features.",
+  "rationale": [
+   "Incorrect: Defender for Servers Plan 1 adds Defender for Endpoint features for machines. It is a workload protection plan and does not provide attack path analysis. Use it when you need endpoint protection on servers.",
+   "Incorrect: Defender for Containers protects Kubernetes clusters and images with runtime detection and image assessment. The stem excludes workload protection, and the plan does not unlock the graph features.",
+   "Incorrect: Defender for Storage detects threats and scans for malware in storage accounts. It does not add attack path analysis. Use it when storage accounts need malware scanning or activity monitoring.",
+   "Correct: Defender CSPM is the plan that provides the cloud security graph, attack path analysis and cloud security explorer for Azure and AWS, and it needs no workload protection plan."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-cloud-security-posture-management"
+ },
+ {
+  "id": "4.1.1-04",
+  "obj": "4.1.1",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. enabled the Defender CSPM plan on a subscription. The user who enabled it has the Contributor role on the subscription. Several days later, attack path analysis shows no paths that involve vulnerable virtual machines, although many VMs have known vulnerabilities.\n\nWhat should you do to fix the problem?",
+  "choices": [
+   "Assign the Security Reader role to the security analysts on the subscription",
+   "Have a subscription Owner turn on agentless scanning in the Defender CSPM plan settings",
+   "Enable the Defender for Resource Manager plan on the subscription",
+   "Redeploy the Azure Policy add-on to the virtual machines on the subscription"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Agentless scanning needs permissions that only a subscription Owner has. When a lower-privileged user enables Defender CSPM, the agentless scanner stays off, so attack paths and the explorer have no vulnerability data. An Owner must enable the setting.",
+  "rationale": [
+   "Incorrect: Security Reader lets analysts view findings but does not enable the scanner that produces the data. Use it to give read-only access to posture and alerts.",
+   "Correct: agentless scanning for machines supplies the vulnerability data to the graph, and only a subscription Owner can enable it in the plan settings, so an Owner must turn it on.",
+   "Incorrect: Defender for Resource Manager monitors control-plane operations in Azure Resource Manager. It does not scan VM disks for vulnerabilities. Use it to detect suspicious management operations.",
+   "Incorrect: the Azure Policy add-on is for Kubernetes posture assessment on clusters, not for VM vulnerability data. Use it to deploy Kubernetes policy checks to clusters."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-cspm-plan"
+ },
+ {
+  "id": "4.1.1-05",
+  "obj": "4.1.1",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Woodgrove Bank has the Defender CSPM plan enabled on an Azure subscription. The security team must find storage accounts that contain sensitive data and are reachable from internet-exposed virtual machines, and the team must be able to review the results as query output.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Enable sensitive data discovery in the Defender CSPM plan settings",
+   "Run a cloud security explorer query that combines internet-exposed VMs with data resources that hold sensitive data",
+   "Enable on-upload malware scanning in Defender for Storage",
+   "Create a custom recommendation that uses a KQL query on storage accounts",
+   "Enable Foundational CSPM on the subscription"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Sensitive data discovery in Defender CSPM finds data resources that hold sensitive data and adds that context to the cloud security graph. Cloud security explorer then lets you query that graph for exposed compute with access to those data stores.",
+  "rationale": [
+   "Correct: sensitive data discovery is the Defender CSPM component that identifies resources with sensitive data by using Microsoft Purview sensitive information types, so the graph knows which stores are sensitive.",
+   "Correct: cloud security explorer queries the graph for relationships such as internet-exposed VMs that have access to sensitive data stores, and it returns the matching resources as results.",
+   "Incorrect: on-upload malware scanning looks for malicious files in uploaded blobs. It does not classify data sensitivity. Use it when untrusted content is uploaded to storage accounts.",
+   "Incorrect: a KQL custom recommendation can flag a configuration such as public network access, but it does not discover sensitive data or evaluate exposure from VMs. Use it to enforce your own configuration checks.",
+   "Incorrect: Foundational CSPM is the free tier. It does not include sensitive data discovery or cloud security explorer, and the subscription already has the paid Defender CSPM plan."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-data-security-posture"
+ },
+ {
+  "id": "4.1.1-06",
+  "obj": "4.1.1",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Relecloud uses Defender CSPM on Azure and AWS. You must match each requirement with the Defender for Cloud capability that meets it.\n\nWhich capability should you use for each requirement? To answer, drag the appropriate capabilities to the correct requirements. Each capability may be used once, more than once, or not at all.",
+  "choices": [
+   "Attack path analysis",
+   "Cloud security explorer",
+   "Agentless scanning for machines",
+   "Sensitive data discovery",
+   "Secure score"
+  ],
+  "targets": [
+   "Requirement 1: automatically list exploitable routes from internet entry points to critical assets, ranked by risk",
+   "Requirement 2: build your own graph queries about assets and the relationships between them",
+   "Requirement 3: collect software inventory and vulnerability findings from VMs without installing agents"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "Attack path analysis calculates the chains for you and ranks them by risk, so no query authoring is needed.",
+   "Cloud security explorer is the query builder over the cloud security graph, which fits custom questions about relationships.",
+   "Agentless scanning for machines snapshots disks to find software and vulnerabilities, so no agent is deployed on the VMs."
+  ],
+  "notes": [
+   "Finds exploitable routes from external entry points to critical targets and recommends fixes. Use it to prioritize remediation by real exposure.",
+   "Lets you run graph-based queries over assets, exposure, permissions and vulnerabilities. Use it to hunt for specific risk patterns and save queries.",
+   "Reads machine disk snapshots for software inventory, vulnerabilities and secrets with no agent. Use it for broad coverage without touching workloads.",
+   "Discovers data resources that hold sensitive data by using Purview classifications. Use it when data sensitivity must influence risk, not for software findings.",
+   "One percentage that summarizes remediated recommendations. Use it to track posture trend, not to find routes or run queries."
+  ],
+  "explanation": "The cloud security graph feeds three Defender CSPM experiences: attack paths (calculated for you), the explorer (queries you author) and agentless scanning (data collection that supplies vulnerabilities and inventory to the graph).",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path"
+ },
+ {
+  "id": "4.1.2-01",
+  "obj": "4.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Adatum Corporation enables Microsoft Defender for Cloud on a new Azure subscription and makes no other configuration changes. An auditor opens the Regulatory compliance dashboard.\n\nWhich standard should the auditor expect to see assessed by default?",
+  "choices": [
+   "Payment Card Industry Data Security Standard",
+   "Microsoft cloud security benchmark",
+   "ISO/IEC 27001 certification standard",
+   "NIST SP 800-53 security controls"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The Microsoft cloud security benchmark (MCSB) is assigned automatically when Defender for Cloud is enabled. Industry and regulatory standards such as PCI DSS, ISO 27001 and NIST SP 800-53 must be added explicitly.",
+  "rationale": [
+   "Incorrect: PCI DSS is a built-in regulatory standard, but you must add it to the dashboard yourself. Add it when the workload handles payment card data.",
+   "Correct: MCSB is the default initiative that Defender for Cloud assigns to every registered subscription, so it is the only standard assessed without further action.",
+   "Incorrect: ISO 27001 is available in the standards list but is not assigned by default. Add it when the organization must report against that certification.",
+   "Incorrect: NIST SP 800-53 is a selectable regulatory standard and is not assigned automatically. Add it when a US federal or contractual requirement applies."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-regulatory-compliance-standards"
+ },
+ {
+  "id": "4.1.2-02",
+  "obj": "4.1.2",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Northwind Traders onboards an AWS account to Defender for Cloud by using the native connector and enables Defender CSPM. The compliance officer wants to know which AWS-specific standard is assigned in addition to the Microsoft cloud security benchmark.\n\nWhich standard should the compliance officer expect to find?",
+  "choices": [
+   "GCP Default",
+   "CIS Microsoft Azure Foundations Benchmark",
+   "AWS Foundational Security Best Practices",
+   "NIST SP 800-172"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Every onboarded AWS account gets the Microsoft cloud security benchmark and the AWS Foundational Security Best Practices standard by default. GCP Default is the GCP counterpart, and the CIS Azure benchmark applies to Azure only.",
+  "rationale": [
+   "Incorrect: GCP Default is the default standard for GCP projects, not for AWS accounts. It applies when you onboard a GCP project or organization.",
+   "Incorrect: the CIS Microsoft Azure Foundations Benchmark is available for Azure scopes only. Use it for Azure subscriptions that must follow CIS guidance.",
+   "Correct: AWS Foundational Security Best Practices is the AWS-specific standard that is assigned automatically to each onboarded AWS account, next to MCSB.",
+   "Incorrect: NIST SP 800-172 can be added to AWS accounts, but it is optional and is not assigned at onboarding. Add it when you need to report against that publication."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/faq-regulatory-compliance"
+ },
+ {
+  "id": "4.1.2-03",
+  "obj": "4.1.2",
+  "difficulty": "medium",
+  "type": "dropdown",
+  "stem": "Fabrikam, Inc. has the Defender CSPM plan enabled and must create a custom recommendation that marks Azure storage accounts that allow HTTP traffic as non-compliant.\n\nHow should you complete the KQL query? To answer, select the appropriate options in the answer area.\n\n```kql\nRawEntityMetadata\n| where Environment == [[1]] and Identifiers.Type =~ 'Microsoft.Storage/storageAccounts'\n| extend condition = (Record.properties.supportsHttpsTrafficOnly != true)\n| extend HealthStatus = iff(condition, [[2]], [[3]])\n| project Id, Name, Environment, Identifiers, AdditionalData, Record, HealthStatus\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "'Azure'",
+     "'AWS'",
+     "'GCP'"
+    ],
+    "why": [
+     "Correct: Microsoft.Storage/storageAccounts is an Azure resource type, so the query must filter on the Azure environment.",
+     "Incorrect: 'AWS' selects resources from connected AWS accounts, which do not have Azure storage account types. Use it for AWS resource types such as S3 buckets.",
+     "Incorrect: 'GCP' selects resources from connected GCP projects. Azure storage accounts are not in that scope, so the query would return nothing."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "'UNHEALTHY'",
+     "'HEALTHY'"
+    ],
+    "why": [
+     "Correct: when the condition is true the account allows HTTP, so HealthStatus must be UNHEALTHY to appear as a non-compliant finding.",
+     "Incorrect: HEALTHY marks a resource as compliant. Using it for the true branch would hide the accounts that allow HTTP."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "'HEALTHY'",
+     "'UNHEALTHY'"
+    ],
+    "why": [
+     "Correct: accounts that require HTTPS meet the standard, so the false branch returns HEALTHY and they stay compliant.",
+     "Incorrect: UNHEALTHY in the false branch would flag every account, including the compliant ones, and make the recommendation useless."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "A KQL custom recommendation must return all in-scope resources with a HealthStatus of UNHEALTHY or HEALTHY. The condition expresses the failing state, and the Environment filter selects Azure, AWS or GCP resources.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/create-custom-recommendations"
+ },
+ {
+  "id": "4.1.2-04",
+  "obj": "4.1.2",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Contoso, Ltd. must write recommendations in KQL that check storage buckets in connected AWS accounts and assign them to a custom security standard. The subscription has Foundational CSPM and Defender for Containers enabled.\n\nWhich plan should you enable to create the KQL-based custom recommendations?",
+  "choices": [
+   "Defender for Servers Plan 2",
+   "Defender CSPM",
+   "Defender for Storage",
+   "Defender for Resource Manager"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "KQL-based custom recommendations require the Defender CSPM plan. Recommendations that are based on Azure Policy are available to all customers, but the KQL query editor for multicloud resources needs the paid CSPM plan.",
+  "rationale": [
+   "Incorrect: Defender for Servers Plan 2 protects machines with vulnerability management and endpoint features. It does not unlock the KQL custom recommendation editor.",
+   "Correct: Defender CSPM enables KQL-based custom recommendations for Azure, AWS and GCP resources, which matches the AWS bucket requirement.",
+   "Incorrect: Defender for Storage detects threats and malware in Azure storage accounts. It does not cover AWS buckets and does not enable custom recommendations.",
+   "Incorrect: Defender for Resource Manager monitors Azure Resource Manager operations for suspicious activity. It does not provide custom recommendation authoring."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/create-custom-recommendations"
+ },
+ {
+  "id": "4.1.2-05",
+  "obj": "4.1.2",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Woodgrove Bank has assigned several standards to an Azure subscription and reviews the Regulatory compliance dashboard before an audit.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "A control that is grayed out has no Defender for Cloud assessments associated with it.",
+   "A standard that is assigned to a subscription without relevant resources still appears on the dashboard with a score of 0 percent.",
+   "Compliance data for standards that you add to the dashboard is surfaced automatically in Microsoft Purview Compliance Manager."
+  ],
+  "answer": [
+   0,
+   2
+  ],
+  "explanation": "Grayed-out controls cannot be assessed automatically, for example process-related controls. A standard with no relevant resources is hidden from the dashboard. Defender for Cloud compliance data integrates with Purview Compliance Manager for standards you add.",
+  "rationale": [
+   "Yes: controls without associated assessments are grayed out because Defender for Cloud cannot verify them. Some are procedural, some are the platform responsibility, and some have no policy yet.",
+   "No: when a subscription has no resources that are relevant to a standard, the standard is not shown on the dashboard at all, even though it is assigned. It does not show 0 percent.",
+   "Yes: when you add a standard, including those for AWS and GCP, the resource-level compliance data is surfaced in Compliance Manager for the same standard, so you can manage compliance centrally."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/regulatory-compliance-dashboard"
+ },
+ {
+  "id": "4.1.2-06",
+  "obj": "4.1.2",
+  "difficulty": "hard",
+  "type": "single",
+  "stem": "Tailspin Toys must show auditors that a procedural control in an assigned standard is met, for example a quarterly access review that Defender for Cloud cannot test. The proof must be recorded against that control in the Defender for Cloud Regulatory compliance dashboard.\n\nWhat should you do?",
+  "choices": [
+   "Create a KQL custom recommendation that returns HEALTHY for the control",
+   "Create an Azure Policy exemption for the control on the subscription",
+   "Attest the manual assessment and link the evidence in Your Actions",
+   "Download the audit report for the standard and send it to the auditors"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Controls that have manual assessments can be attested in the dashboard, and evidence can be linked to demonstrate compliance. KQL custom recommendations evaluate resource configuration, and exemptions remove scope instead of documenting compliance.",
+  "rationale": [
+   "Incorrect: a KQL recommendation inspects resource properties, so it cannot evaluate a quarterly review process, and forcing HEALTHY would be misleading. Use KQL for configuration checks on resources.",
+   "Incorrect: an exemption excludes a resource from an assessment, which removes the item instead of proving that it is met. Use it when a recommendation does not apply to a resource.",
+   "Correct: manual assessments under Your Actions can be manually attested with linked evidence, which records the proof against the control in the dashboard.",
+   "Incorrect: the audit report is an export of the current state. It does not record new attestation or evidence. Download it after the attestation to give auditors a summary."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/regulatory-compliance-dashboard"
+ },
+ {
+  "id": "4.1.3-01",
+  "obj": "4.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Adatum Corporation administrator opens Environment settings for an Azure subscription and turns the Servers plan switch to On. The administrator does not select Change plans.\n\nWhich Defender for Servers plan should you expect to be enabled?",
+  "choices": [
+   "Defender for Servers Plan 1",
+   "Defender CSPM",
+   "Defender for Endpoint standalone licensing",
+   "Defender for Servers Plan 2"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Toggling Servers to On enables Defender for Servers Plan 2 by default. To use Plan 1 you must select Change plans and confirm Plan 1 before saving.",
+  "rationale": [
+   "Incorrect: Plan 1 is available only when you choose Change plans. Select it when you need endpoint protection and vulnerability scanning with the Defender for Endpoint sensor at lower cost.",
+   "Incorrect: Defender CSPM is a separate posture plan with its own toggle. Turning on Servers does not enable it. Enable it for attack path analysis and cloud security explorer.",
+   "Incorrect: Defender for Endpoint licensing is not a Defender for Cloud plan toggle. The Servers plan integrates the Defender for Endpoint agent but is enabled through its own plan switch.",
+   "Correct: the default result of the Servers toggle is Plan 2, which includes the broader feature set such as agentless scanning and file integrity monitoring."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-servers-plan"
+ },
+ {
+  "id": "4.1.3-02",
+  "obj": "4.1.3",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Tailspin Toys enables the Defender for Storage plan on a subscription and keeps the on-upload malware scanning setting at its default. The finance team asks for the maximum amount of uploaded data that is scanned each month per storage account before scanning stops.\n\nWhat monthly cap should you plan for?",
+  "choices": [
+   "1,000 GB",
+   "10,000 GB",
+   "5,000 GB",
+   "100,000 GB"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The default monthly cap for on-upload malware scanning is 10,000 GB per storage account. After the threshold is exceeded, scanning stops for the remaining blobs. You can change the cap or set it to -1 for unlimited scanning.",
+  "rationale": [
+   "Incorrect: 1,000 GB is not the default. You can set a lower cap per storage account when a small data volume is expected and you want to limit cost.",
+   "Correct: Defender for Storage uses 10,000 GB of uploaded blobs per month per storage account as the default cap, which keeps malware scanning cost predictable.",
+   "Incorrect: 5,000 GB is not the documented default. Set it explicitly if you want to cap scanning at half of the default value.",
+   "Incorrect: 100,000 GB is not the default. A higher or unlimited cap (-1) must be configured by you when very large upload volumes must be scanned."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-storage-plan"
+ },
+ {
+  "id": "4.1.3-03",
+  "obj": "4.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. has an Azure subscription where the Defender for Servers plan is turned off. The security team must enable Defender for Servers Plan 1 for the machines that carry the tag SecurityTier=High and must not enable the plan for the other machines.\n\nWhat should you do?",
+  "choices": [
+   "Assign the built-in tag-based Azure Policy for the P1 subplan and create a remediation task",
+   "Turn on the Servers plan for the subscription and select Plan 1 in Environment settings",
+   "Enable Defender for Servers Plan 2 on each tagged machine in its resource settings",
+   "Enable the Defender for Endpoint integration setting for the subscription in plan settings"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Plan 1 can be enabled at the resource level, for example by script or by the granular pricing Azure Policy that targets a tag. Turning the plan on for the subscription would cover every machine, and Plan 2 cannot be enabled at the resource level.",
+  "rationale": [
+   "Correct: the built-in granular pricing policy enables Plan 1 for tagged Azure VMs, scale sets and Arc servers, and a remediation task applies it to existing machines without enabling the plan for the whole subscription.",
+   "Incorrect: enabling the plan at the subscription level covers every machine in the subscription, which violates the requirement. Use it when all machines need protection.",
+   "Incorrect: Plan 2 cannot be enabled at the resource level, only disabled there, and the requirement asks for Plan 1. Plan 2 is selected for a whole subscription.",
+   "Incorrect: the Defender for Endpoint integration setting applies to a plan that is already enabled. It does not enable Defender for Servers on selected machines."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/plan-defender-for-servers-select-plan"
+ },
+ {
+  "id": "4.1.3-04",
+  "obj": "4.1.3",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud has 30 Azure subscriptions in one management group and creates new storage accounts every week. The security team must ensure that Defender for Storage protects all existing and future storage accounts in the management group with the same configuration.\n\nWhat should you do?",
+  "choices": [
+   "Enable Defender for Storage on each storage account in the Azure portal",
+   "Turn on the Defender for Storage plan in Environment settings of one subscription",
+   "Assign the built-in Azure Policy for Defender for Storage at the management group scope",
+   "Deploy a Bicep template for Defender for Storage once to the hub subscription"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Azure Policy at the management group scope keeps the plan and its settings consistent for existing and future resources and subscriptions in scope. Per-account portal changes and one-time deployments to one subscription do not cover new resources elsewhere.",
+  "rationale": [
+   "Incorrect: enabling the plan account by account does not cover storage accounts created later and does not scale to 30 subscriptions. Use it for a one-off exception.",
+   "Incorrect: Environment settings of one subscription covers only that subscription. The other 29 subscriptions stay unprotected. Use it when a single subscription is in scope.",
+   "Correct: a policy assignment at the management group scope enforces Defender for Storage on all current and new storage accounts in every subscription below it, which is the recommended method at scale.",
+   "Incorrect: a template deployed once to one subscription configures that subscription only and does not apply to new accounts or other subscriptions. Use IaC when you manage each subscription in a pipeline."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-storage-plan#deployment-methods"
+ },
+ {
+  "id": "4.1.3-05",
+  "obj": "4.1.3",
+  "difficulty": "hard",
+  "type": "dropdown",
+  "stem": "Woodgrove Bank must enable Defender for Servers Plan 2 on the current Azure subscription by using the Azure CLI. The security team requires agentless malware scanning of the virtual machines.\n\nHow should you complete the command? To answer, select the appropriate options in the answer area.\n\n```azurecli\naz security pricing create --name [[1]] --tier [[2]] --subplan [[3]]\n```",
+  "choices": [],
+  "targets": [
+   {
+    "label": "Box 1",
+    "options": [
+     "VirtualMachines",
+     "StorageAccounts",
+     "CloudPosture",
+     "Containers"
+    ],
+    "why": [
+     "Correct: VirtualMachines is the pricing name of the Defender for Servers plan.",
+     "Incorrect: StorageAccounts is the pricing name of Defender for Storage. Use it when you configure storage account protection.",
+     "Incorrect: CloudPosture is the pricing name of Defender CSPM. Use it for attack path analysis and the cloud security explorer.",
+     "Incorrect: Containers is the pricing name of Defender for Containers. Use it for Kubernetes clusters and images."
+    ]
+   },
+   {
+    "label": "Box 2",
+    "options": [
+     "Standard",
+     "Free"
+    ],
+    "why": [
+     "Correct: the Standard tier turns the paid plan on for the scope.",
+     "Incorrect: the Free tier turns the plan off, so no Plan 2 features would apply."
+    ]
+   },
+   {
+    "label": "Box 3",
+    "options": [
+     "P2",
+     "P1",
+     "DefenderForStorageV2"
+    ],
+    "why": [
+     "Correct: P2 selects Defender for Servers Plan 2, which includes agentless malware scanning.",
+     "Incorrect: P1 selects Plan 1, which does not include agentless malware scanning. Use it for endpoint protection at lower cost.",
+     "Incorrect: DefenderForStorageV2 is a sub plan of the StorageAccounts plan. It is not valid for the VirtualMachines plan."
+    ]
+   }
+  ],
+  "answer": [
+   0,
+   0,
+   0
+  ],
+  "explanation": "az security pricing create sets the plan by name, the tier (Standard turns the plan on) and the sub plan. VirtualMachines with P2 is Defender for Servers Plan 2, while StorageAccounts uses DefenderForStorageV2.",
+  "rationale": [],
+  "ref": "https://learn.microsoft.com/cli/azure/security/pricing?view=azure-cli-latest"
+ },
+ {
+  "id": "4.1.3-06",
+  "obj": "4.1.3",
+  "difficulty": "hard",
+  "type": "dragdrop",
+  "stem": "Fabrikam, Inc. enables the Defender for Containers plan on an Azure subscription that contains AKS clusters and an Azure container registry. You must select the plan component for each requirement.\n\nWhich component should you enable for each requirement? To answer, drag the appropriate components to the correct requirements. Each component may be used once, more than once, or not at all.",
+  "choices": [
+   "Defender sensor",
+   "Registry access",
+   "Azure Policy",
+   "Kubernetes API access",
+   "Agentless scanning for machines"
+  ],
+  "targets": [
+   "Requirement 1: collect runtime security telemetry from cluster nodes for threat detection",
+   "Requirement 2: assess vulnerabilities in container images stored in connected registries without agents",
+   "Requirement 3: deploy the Kubernetes add-on that supports security posture assessments and recommendations"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "rationale": [
+   "The Defender sensor runs on the nodes and sends runtime telemetry that detections use.",
+   "Registry access enables agentless vulnerability assessment of images in connected registries.",
+   "The Azure Policy component installs the Azure Policy for Kubernetes add-on that checks cluster configuration."
+  ],
+  "notes": [
+   "Deploys a sensor to cluster nodes for runtime telemetry. Use it for threat detection on running workloads.",
+   "Lets Defender for Cloud pull images from connected registries for agentless vulnerability assessment. Use it for image scanning.",
+   "Deploys the Azure Policy for Kubernetes add-on for posture assessments. Use it for hardening recommendations on clusters.",
+   "Lets Defender for Cloud call the Kubernetes API for inventory and configuration analysis. Use it for cluster metadata, not for telemetry or image scans.",
+   "Scans the Kubernetes node VMs for vulnerabilities and secrets without agents. Use it for node-level findings, not images or telemetry."
+  ],
+  "explanation": "Defender for Containers is a bundle of components. The sensor provides runtime detection, registry access provides image vulnerability assessment, and the Azure Policy component provides posture checks.",
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable-plan"
+ },
+ {
+  "id": "4.1.4-01",
+  "obj": "4.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Northwind Traders has 20 Windows servers in an on-premises datacenter. The servers must be monitored by Microsoft Defender for Cloud, and the company has no AWS or GCP resources.\n\nWhich Azure service should you use to connect the servers?",
+  "choices": [
+   "Azure Lighthouse delegation",
+   "Azure Arc-enabled servers",
+   "Azure Migrate discovery appliance",
+   "Azure Site Recovery replication"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Non-Azure machines are connected to Defender for Cloud by onboarding them with Azure Arc, which is the recommended method. The multicloud connectors for AWS and GCP deploy Arc for you, but on-premises servers need Arc directly.",
+  "rationale": [
+   "Incorrect: Azure Lighthouse delegates management of customer tenants. It does not connect machines. Use it when a service provider manages resources in other tenants.",
+   "Correct: Azure Arc-enabled servers projects the on-premises machines into Azure so Defender for Cloud can assess and protect them as it does Azure VMs.",
+   "Incorrect: Azure Migrate assesses and moves servers to Azure. It does not onboard machines for protection in place. Use it for datacenter migration projects.",
+   "Incorrect: Azure Site Recovery replicates machines for disaster recovery. It does not connect them to Defender for Cloud. Use it for failover planning."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-machines"
+ },
+ {
+  "id": "4.1.4-02",
+  "obj": "4.1.4",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. uses AWS Organizations with one management account and 40 member accounts. All accounts must be monitored by Defender for Cloud, and new member accounts must be onboarded automatically with the least administrative effort.\n\nWhich connector configuration should you create?",
+  "choices": [
+   "One AWS connector that uses the Management account option",
+   "40 connectors that use the Single account option",
+   "One connector for a delegated administrator account",
+   "One GCP organization connector"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "A connector for the AWS management account creates connectors for discovered member accounts and for newly created accounts. Delegated administrator accounts are not supported for management account onboarding.",
+  "rationale": [
+   "Correct: the Management account option auto-provisions connectors for existing and new member accounts, so only one connector is configured manually.",
+   "Incorrect: 40 single-account connectors work but need manual work for every account, and new accounts need new connectors. Use single account connectors for a standalone account.",
+   "Incorrect: management account onboarding supports only the AWS management account. Delegated administrator accounts are not supported for this purpose.",
+   "Incorrect: a GCP organization connector monitors Google Cloud, not AWS. Use it when the resources run in a GCP organization."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws"
+ },
+ {
+  "id": "4.1.4-03",
+  "obj": "4.1.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. must connect a GCP project to Defender for Cloud. The security policy forbids storing long-lived credentials or service account keys for the integration.\n\nWhich mechanism should you use?",
+  "choices": [
+   "A service account key file that is stored in Azure Key Vault",
+   "A Microsoft Entra application registration with a client secret",
+   "Workload identity federation that the generated gcloud script configures",
+   "A GCP user account with a password for Defender for Cloud"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "The GCP connector uses federated authentication. The generated script creates a workload identity pool, a workload identity provider, service accounts and project-level policy bindings, so no long-lived credentials are stored.",
+  "rationale": [
+   "Incorrect: a service account key file is a long-lived credential, even when it is stored in Key Vault, so it violates the policy. Keys are used by integrations that do not support federation.",
+   "Incorrect: a client secret is also a long-lived credential, and it would authenticate to Azure, not to GCP. Secrets are used by apps that call Entra-protected APIs.",
+   "Correct: workload identity federation with service account impersonation lets Defender for Cloud access GCP APIs without storing long-lived credentials.",
+   "Incorrect: a shared user account with a password is a long-lived credential and an interactive identity. It is not how the connector authenticates."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-gcp"
+ },
+ {
+  "id": "4.1.4-04",
+  "obj": "4.1.4",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Relecloud connects an AWS account and enables Defender for Servers on it. The security engineer finds that the EC2 instances are not onboarded through Azure Arc by autoprovisioning. The instances do not have the AWS SSM Agent.\n\nWhat should you do first?",
+  "choices": [
+   "Install the Log Analytics agent on the instances and connect it to a workspace",
+   "Install the Azure Monitor agent on the instances and create a data collection rule",
+   "Join the EC2 instances to Microsoft Entra Domain Services and enable Kerberos",
+   "Install the AWS SSM Agent and attach the AmazonSSMManagedInstanceCore policy"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Defender for Servers on AWS uses Azure Arc autoprovisioning, and autoprovisioning needs the AWS SSM Agent with the AmazonSSMManagedInstanceCore policy on the instances. Without it, Arc onboarding cannot proceed.",
+  "rationale": [
+   "Incorrect: the Log Analytics agent was retired in August 2024, and Defender for Servers features now use Defender for Endpoint integration or agentless scanning.",
+   "Incorrect: Azure Monitor agent is not what blocks onboarding, and it cannot be pushed to non-Azure EC2 instances until they are Arc-enabled. It is used for data collection after onboarding.",
+   "Incorrect: domain join has no role in Arc onboarding. Arc agent installation depends on SSM for automated deployment, not on a directory.",
+   "Correct: the SSM Agent with the managed instance policy is a prerequisite for Arc autoprovisioning on EC2, so installing it lets the connector onboard the instances."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws#native-connector-plan-requirements"
+ },
+ {
+  "id": "4.1.4-05",
+  "obj": "4.1.4",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Woodgrove Bank must connect a single AWS account to Microsoft Defender for Cloud by using the portal and the CloudFormation deployment method. The connector must enable the Defender CSPM plan.\n\nWhich five actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "In Environment settings, select Add environment > Amazon Web Services and enter the connector name, account type, regions and AWS account ID",
+   "Select the Defender plans to enable, including Defender CSPM",
+   "Select the permissions type and the AWS CloudFormation deployment method, and download the template",
+   "Create the CloudFormation stack in AWS by using the downloaded template",
+   "Select Review and generate, and then select Create",
+   "Install the Azure Arc agent manually on every EC2 instance in the account",
+   "Create a Log Analytics workspace and install the Azure Monitor agent on the instances"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "explanation": "The wizard collects account details, then plans, then access configuration. The template produced by the access step depends on the selected plans, so it is deployed in AWS before you review and create the connector.",
+  "rationale": [
+   "Step 1: the connector wizard starts in Environment settings, where you name the connector and identify the AWS account and regions.",
+   "Step 2: the plans you choose determine which permissions the template must grant, so plans come before the access step.",
+   "Step 3: the template content depends on the chosen plans and the permissions type, so you download it after the selection.",
+   "Step 4: the stack creates the IAM role that Defender for Cloud assumes. It must exist in AWS before the connector can validate access.",
+   "Step 5: after the stack is deployed you review the settings and create the connector so scanning starts.",
+   "Incorrect: the connector handles Azure Arc deployment through autoprovisioning for the plans that need it. Manual installation on every instance is unnecessary. Use manual Arc onboarding for machines outside connectors.",
+   "Incorrect: a Log Analytics workspace and Azure Monitor agent are not part of the native AWS connector setup for Defender CSPM. Use them for other collection scenarios such as Sentinel."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws"
+ },
+ {
+  "id": "4.1.4-06",
+  "obj": "4.1.4",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys onboards a GCP organization that was created after May 2024. The deployment script that Defender for Cloud generated fails when it assigns IAM permissions to service accounts. The error indicates that the Domain Restricted Sharing organization policy blocks identities outside the GCP organization.\n\nWhich two actions should you perform? Each correct answer presents part of the solution.",
+  "choices": [
+   "Add the Defender for Cloud principal to the allowed principals of the Domain Restricted Sharing policy",
+   "Run the deployment script that Defender for Cloud generated again after the policy change propagates",
+   "Create a service account key and upload it to the connector",
+   "Enable Security Command Center premium tier on the GCP organization",
+   "Assign the Contributor role on the Azure subscription to the GCP service account"
+  ],
+  "answer": [
+   0,
+   1
+  ],
+  "explanation": "Domain Restricted Sharing blocks IAM bindings for principals outside the organization, which breaks the generated script. Allowing the Defender for Cloud principal and then rerunning the script resolves it, without long-lived credentials.",
+  "rationale": [
+   "Correct: allowing the Defender for Cloud principal set in the policy removes the block on the IAM bindings that the script creates for the workload identity.",
+   "Correct: the script must run again after the policy change takes effect, because the earlier run failed before it created the required resources.",
+   "Incorrect: the connector does not use service account keys. It uses workload identity federation, and a key does not remove the policy block on IAM bindings.",
+   "Incorrect: Security Command Center is a native GCP service. Its tier has no effect on the organization policy that blocks the script.",
+   "Incorrect: the Contributor role on the Azure subscription is the permission of the person who creates the connector. It does not change GCP policies."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/resolve-gcp-sharing-policy"
+ },
+ {
+  "id": "4.1.5-01",
+  "obj": "4.1.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Fabrikam, Inc. enables Defender for Servers Plan 1 on a subscription that contains Azure VMs. The security team wants to know how Microsoft Defender Vulnerability Management scans those VMs.\n\nWhich scanning method should you expect to apply to the VMs?",
+  "choices": [
+   "Agentless scanning of the VM disk snapshots each day",
+   "Agent-based scanning by the Defender for Endpoint sensor",
+   "A Qualys scanner that you license and deploy separately",
+   "Azure Policy guest configuration assessments of the VM baseline"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The Defender for Endpoint integration provides vulnerability scanning in Defender for Servers Plan 1 and Plan 2. Agentless scanning is available in Plan 2 (and Defender CSPM) only. BYOL scanners are an optional alternative.",
+  "rationale": [
+   "Incorrect: agentless scanning is available in Defender for Servers Plan 2 or Defender CSPM, not in Plan 1 alone. Choose Plan 2 when machines cannot run a sensor.",
+   "Correct: Plan 1 includes the Defender for Endpoint integration, so the sensor on the VMs performs the vulnerability scanning with Defender Vulnerability Management.",
+   "Incorrect: Qualys is a bring-your-own-license alternative that you deploy yourself. It is not what the integrated scanner uses. Use it when the organization already licenses Qualys.",
+   "Incorrect: guest configuration assesses operating system settings against baselines. It does not scan for software vulnerabilities. Use it for OS misconfiguration findings."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/auto-deploy-vulnerability-assessment"
+ },
+ {
+  "id": "4.1.5-02",
+  "obj": "4.1.5",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. must scan Azure VMs for vulnerabilities without installing any agent on the VMs. The company wants to enable a single Defender for Cloud workload protection plan for this purpose and no posture plan.\n\nWhich plan should you enable?",
+  "choices": [
+   "Defender for Servers Plan 1",
+   "Defender for Storage",
+   "Defender for Servers Plan 2",
+   "Defender for App Service"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Agentless vulnerability scanning is part of agentless machine scanning, which is available in Defender for Servers Plan 2 and in the Defender CSPM plan. Plan 1 relies on the Defender for Endpoint sensor.",
+  "rationale": [
+   "Incorrect: Plan 1 scans through the Defender for Endpoint sensor, which is an agent. Use Plan 1 when sensor-based scanning is acceptable and cost matters.",
+   "Incorrect: Defender for Storage protects storage accounts and does not scan VMs. Use it to detect storage threats and scan uploaded blobs.",
+   "Correct: Plan 2 provides agentless vulnerability scanning through Defender Vulnerability Management, so no agent is needed on the VMs.",
+   "Incorrect: Defender for App Service protects web apps against threats. It does not assess VM vulnerabilities. Use it for App Service plans."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-agentless-data-collection"
+ },
+ {
+  "id": "4.1.5-03",
+  "obj": "4.1.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. licenses both Qualys and Rapid7 vulnerability scanners. The security team wants Defender for Cloud to show vulnerability findings for Azure VMs and asks whether both partner scanners can be deployed through Defender for Cloud.\n\nWhat should you recommend?",
+  "choices": [
+   "Deploy both scanners and merge their results in the recommendations",
+   "Deploy Qualys on Windows VMs and Rapid7 on Linux VMs",
+   "Deploy both scanners and disable the integrated Defender Vulnerability Management",
+   "Choose one BYOL scanner, because Defender for Cloud supports a single non-Microsoft scanner"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Defender for Cloud supports one bring-your-own-license scanner at a time, either Qualys or Rapid7. Multiple non-Microsoft scanners are not supported. The integrated Defender Vulnerability Management scanner is the Microsoft alternative.",
+  "rationale": [
+   "Incorrect: Defender for Cloud does not merge results from several non-Microsoft scanners, because only one BYOL solution is supported.",
+   "Incorrect: splitting the scanners by operating system still deploys two non-Microsoft solutions, which is not supported. One scanner covers every supported OS.",
+   "Incorrect: disabling the integrated scanner does not make two partner scanners supported. The limit is on non-Microsoft scanners, not on the integrated one.",
+   "Correct: a single BYOL scanner is supported, so the team must choose either Qualys or Rapid7, or use the integrated Defender Vulnerability Management scanner."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/faq-defender-for-servers"
+ },
+ {
+  "id": "4.1.5-04",
+  "obj": "4.1.5",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Woodgrove Bank has Defender for Servers Plan 2 with agentless scanning turned on. VM1 also runs the Defender for Endpoint sensor, and both scanning methods report findings for VM1.\n\nWhich vulnerability results should you expect Defender for Cloud to show for VM1?",
+  "choices": [
+   "Agent-based results only, for better data freshness",
+   "Agentless results only, because agentless scanning has priority",
+   "A merged list of agent-based and agentless findings",
+   "The results of the most recent scan of either method"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "Machines that use only one method show results from that method. Machines that use both show agent-based results only, because they are fresher. Agentless scanning runs once every 24 hours.",
+  "rationale": [
+   "Correct: for machines that are scanned by both methods, Defender for Cloud shows the agent-based results to give better freshness.",
+   "Incorrect: agentless scanning runs on a 24-hour schedule, so its data is less fresh. It supplies the results only for machines without the sensor.",
+   "Incorrect: results are not merged. A machine with both methods shows one source, the agent-based one, to avoid duplicate or stale findings.",
+   "Incorrect: Defender for Cloud does not pick the newest scan per machine. The rule is fixed: agent-based results take precedence when both exist."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/auto-deploy-vulnerability-assessment#hybrid-scanning-behavior"
+ },
+ {
+  "id": "4.1.5-05",
+  "obj": "4.1.5",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Adatum Corporation must enable agentless vulnerability scanning for the Azure VMs in a subscription and then review the findings. The plan is currently off, and the Plan 2 commands use the Azure CLI.\n\nWhich three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "`az security pricing create --name VirtualMachines --tier Standard --subplan P2`",
+   "In the Defender for Servers plan settings, confirm that Agentless scanning for machines is turned on",
+   "In Recommendations, open the Vulnerabilities recommendations and review the findings by resource",
+   "`az security pricing create --name VirtualMachines --tier Standard --subplan P1`",
+   "`az security pricing create --name CloudPosture --tier Free`"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "The plan must be on at Plan 2 before its agentless setting can be managed. Scanning then runs and produces findings that you review under Recommendations.",
+  "rationale": [
+   "Step 1: Plan 2 enables Defender for Servers on the subscription and includes agentless scanning, so it must come first.",
+   "Step 2: agentless scanning is a setting of the enabled plan, so you confirm it after the plan exists.",
+   "Step 3: findings appear as vulnerability recommendations after scanning completes, so you review them last.",
+   "Incorrect: this command sets Plan 1, which does not include agentless scanning. Use it when sensor-based scanning is enough.",
+   "Incorrect: this command turns off the Defender CSPM plan, which is another source of agentless scanning, and does not enable the VM plan."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/enable-agentless-scanning-vms"
+ },
+ {
+  "id": "4.1.5-06",
+  "obj": "4.1.5",
+  "difficulty": "hard",
+  "type": "yesno",
+  "stem": "Tailspin Toys uses Defender for Servers Plan 1 on one subscription and Plan 2 on another subscription. The security team plans how to use Microsoft Defender Vulnerability Management for Azure VMs.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+  "choices": [
+   "The integrated scanner finds vulnerabilities on the network devices that connect the VMs.",
+   "Agentless scanning runs once every 24 hours on a schedule that you cannot configure.",
+   "Premium Defender Vulnerability Management capabilities such as certificate assessment are included in Plan 1."
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "The integrated scanner finds vulnerabilities on the machine itself, not on the network. Agentless scanning uses a fixed 24-hour cycle. Premium Defender Vulnerability Management features belong to Plan 2.",
+  "rationale": [
+   "No: the integrated Defender Vulnerability Management scanner assesses only vulnerabilities on the machine itself. Use a network scanner for network devices.",
+   "Yes: agentless scanning runs once every 24 hours on a nonconfigurable schedule, so findings for agentless-only machines can be up to a day old.",
+   "No: premium capabilities such as certificate assessment and baseline assessment are part of Defender for Servers Plan 2, not Plan 1."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/auto-deploy-vulnerability-assessment"
+ },
+ {
+  "id": "4.1.6-01",
+  "obj": "4.1.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Contoso, Ltd. starts using Microsoft Defender External Attack Surface Management (Defender EASM). The security team provides known assets such as the domain contoso.com so that Defender EASM can find related internet-facing infrastructure.\n\nWhat should you provide as the starting point for discovery?",
+  "choices": [
+   "Inventory candidates",
+   "Discovery seeds",
+   "Attack surface insights",
+   "Data connections"
+  ],
+  "answer": [
+   1
+  ],
+  "explanation": "Discovery seeds are known assets that belong to the organization. Defender EASM scans them recursively through observed connections to discover other infrastructure and compile the attack surface inventory.",
+  "rationale": [
+   "Incorrect: candidates are discovered assets that need manual approval before they join the inventory. They are results of discovery, not its input.",
+   "Correct: seeds are the known legitimate assets from which discovery starts, such as domains, IP blocks, hosts, email contacts and ASNs.",
+   "Incorrect: attack surface insights are dashboards that highlight risks by using vulnerability and infrastructure data. They are an output.",
+   "Incorrect: data connections export Defender EASM data to Log Analytics or Azure Data Explorer. They do not start discovery."
+  ],
+  "ref": "https://learn.microsoft.com/azure/external-attack-surface-management/what-is-discovery"
+ },
+ {
+  "id": "4.1.6-02",
+  "obj": "4.1.6",
+  "difficulty": "easy",
+  "type": "single",
+  "stem": "Northwind Traders uses Defender CSPM in Defender for Cloud. The security team wants Defender for Cloud to validate internet exposure of resources by contacting them from outside, without buying a separate Defender EASM license or configuring anything.\n\nWhich plan should you rely on?",
+  "choices": [
+   "Defender CSPM",
+   "Defender for Servers Plan 2",
+   "Foundational CSPM",
+   "Defender for APIs"
+  ],
+  "answer": [
+   0
+  ],
+  "explanation": "The Defender EASM integration is included in the Defender CSPM plan by default and needs no separate license or configuration. Defender for Cloud uses outside-in data for internet exposure validation.",
+  "rationale": [
+   "Correct: Defender CSPM includes the integration with Defender EASM by default, which supplies outside-in exposure validation.",
+   "Incorrect: Defender for Servers Plan 2 protects machines and does not include the EASM integration. Use it for server vulnerability and endpoint protection.",
+   "Incorrect: Foundational CSPM is the free tier and lacks the Defender EASM integration. Upgrade to Defender CSPM to get it.",
+   "Incorrect: Defender for APIs protects API endpoints in API Management. It does not provide outside-in exposure discovery."
+  ],
+  "ref": "https://learn.microsoft.com/azure/defender-for-cloud/concept-easm"
+ },
+ {
+  "id": "4.1.6-03",
+  "obj": "4.1.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Fabrikam, Inc. acquired a subsidiary, Fabrikam Labs, whose domains are linked to the central infrastructure but that is managed by another company. The security team runs a Defender EASM discovery group and does not want the subsidiary assets to be added to the inventory.\n\nWhat should you do?",
+  "choices": [
+   "Remove the shared domain from the seeds",
+   "Set the recurrence of the discovery group to Never",
+   "Add the subsidiary entities as exclusions in the discovery group",
+   "Turn on the Recent only toggle on the asset details page"
+  ],
+  "answer": [
+   2
+  ],
+  "explanation": "Discovery groups accept exclusions: entities that must not be added to the inventory even when they are detected, for example subsidiaries that connect to central infrastructure but belong to another organization.",
+  "rationale": [
+   "Incorrect: removing the shared seed would stop discovery of assets that the organization really owns. Use exclusions to filter specific entities instead.",
+   "Incorrect: a recurrence of Never runs discovery once. The subsidiary assets would still be discovered in that run.",
+   "Correct: exclusions prevent matching entities from being added to the inventory when discovery detects them.",
+   "Incorrect: the Recent only toggle limits the data displayed on an asset page to recent observations. It does not control which assets are added."
+  ],
+  "ref": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery"
+ },
+ {
+  "id": "4.1.6-04",
+  "obj": "4.1.6",
+  "difficulty": "medium",
+  "type": "single",
+  "stem": "Litware, Inc. reviews the results of a Defender EASM discovery run. Several assets show the status Candidate in the discovery information. The security team wants to include the assets that belong to the company in the inventory.\n\nWhat should you do?",
+  "choices": [
+   "Create a data connection that exports the inventory to Log Analytics",
+   "Change the discovery group recurrence to Weekly and rerun discovery",
+   "Add the candidate assets to the Quick Start list of attack surfaces",
+   "Review the candidates and approve the assets that the company owns"
+  ],
+  "answer": [
+   3
+  ],
+  "explanation": "Candidate means that the connection between the seed and the asset was not strong enough for automatic approval. Candidates require manual review and approval before they join the approved inventory.",
+  "rationale": [
+   "Incorrect: a data connection exports inventory data to another tool. It does not approve candidates.",
+   "Incorrect: weekly recurrence only reruns discovery. The relationship stays weak and the assets stay candidates until someone approves them.",
+   "Incorrect: Quick Start searches prepopulated attack surfaces by organization name while you create a discovery group. It is not a list of approved assets.",
+   "Correct: candidates need manual approval, so reviewing and approving the owned assets adds them to the approved inventory."
+  ],
+  "ref": "https://learn.microsoft.com/azure/external-attack-surface-management/understanding-asset-details"
+ },
+ {
+  "id": "4.1.6-05",
+  "obj": "4.1.6",
+  "difficulty": "hard",
+  "type": "order",
+  "stem": "Relecloud has no Defender EASM resource. The security team must create the resource in the Azure portal, discover the company attack surface from a known domain, and then review the inventory.\n\nWhich five actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+  "choices": [
+   "Create a resource group in a supported region",
+   "Create a Defender EASM resource in the resource group",
+   "Add a discovery group and enter the known domain as a seed",
+   "Review the discovery group and select Create & Run",
+   "Review the new assets in the approved inventory",
+   "Deploy the Defender for Servers plan to the resource group",
+   "Create a data connection to Azure Data Explorer before the first discovery run"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "explanation": "The EASM resource is created inside a resource group, discovery groups exist inside the resource, and inventory appears only after a discovery run completes.",
+  "rationale": [
+   "Step 1: the Defender EASM resource lives in a resource group, so the group must exist first, in a supported region.",
+   "Step 2: the workspace is created in the resource group and provides the portal where discovery is configured.",
+   "Step 3: a discovery group needs at least one seed such as the known domain, so you add it after the resource exists.",
+   "Step 4: reviewing and selecting Create & Run starts discovery from the seeds.",
+   "Step 5: after the run completes, discovered assets appear in the approved inventory for review.",
+   "Incorrect: Defender for Servers protects machines and is unrelated to creating an EASM resource or running discovery.",
+   "Incorrect: a data connection exports data after assets exist and is optional. It is not required before discovery and it needs permissions for the EASM API first."
+  ],
+  "ref": "https://learn.microsoft.com/azure/external-attack-surface-management/deploying-the-defender-easm-azure-resource"
+ },
+ {
+  "id": "4.1.6-06",
+  "obj": "4.1.6",
+  "difficulty": "hard",
+  "type": "multi",
+  "stem": "Tailspin Toys creates a Defender EASM discovery group. The security team wants to seed the discovery with assets that the company knows it owns. Defender EASM monitors the attack surface from an external perspective.\n\nWhich three items should you add as seeds? Each correct answer presents part of the solution.",
+  "choices": [
+   "The primary domain tailspintoys.com",
+   "A public IP address block that is registered to the company",
+   "The autonomous system number (ASN) of the company",
+   "The internal address range 10.0.0.0/8",
+   "The Microsoft Entra tenant ID of the company"
+  ],
+  "answer": [
+   0,
+   1,
+   2
+  ],
+  "explanation": "Defender EASM accepts domains, IP blocks, hosts, email contacts, ASNs and Whois organizations as seeds. Because it monitors from outside, private IP addresses cannot be used as seeds.",
+  "rationale": [
+   "Correct: a domain is a supported seed type and a typical starting point for discovery.",
+   "Correct: public IP blocks are supported seeds, because they are externally visible infrastructure.",
+   "Correct: ASNs are supported seed types that let discovery find IP blocks that belong to the same network.",
+   "Incorrect: private IP ranges cannot be seeds, because Defender EASM sees the attack surface from the internet and cannot reach internal ranges.",
+   "Incorrect: a tenant ID is not a supported seed type. Seeds must be internet-visible assets such as domains, hosts, IP blocks, email contacts, ASNs or Whois organizations."
+  ],
+  "ref": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery"
+ }
+]

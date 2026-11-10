@@ -1,0 +1,11 @@
+[
+  {
+    "id": "X-C1",
+    "title": "Contoso Pharmaceuticals",
+    "sections": [
+      ["Overview", "Contoso Pharmaceuticals is a drug manufacturer with offices in Amsterdam and Seattle. The company plans a multi-agent assistant for its quality assurance (QA) team."],
+      ["Existing environment", "Contoso uses Microsoft Entra ID for identity. Batch records are stored in Azure Cosmos DB. Standard operating procedures (SOPs) are PDF files in Azure Blob Storage.\n\nA Microsoft Foundry project named Project1 exists in West Europe."],
+      ["Requirements", "**Business requirements**\n\n- QA reviewers must approve every change that an agent proposes to a batch record.\n- Answers about SOPs must cite the source document.\n\n**Technical requirements**\n\n- Each agent must use its own identity.\n- Minimize custom code."]
+    ]
+  }
+]
